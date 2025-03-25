@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import { AuthInstance } from "@/Interseptors/AuthInterseptors";
 import Cookies from "js-cookie";
+import bcrypt from "bcryptjs";
 
 const StepperOtpForm = () => {
   const [step, setStep] = useState(1);
@@ -10,6 +11,8 @@ const StepperOtpForm = () => {
     name: "",
     email: "",
     phone: "",
+    password: "",
+    confirmPassword: "",
     street: "",
     city: "",
     country: "",
@@ -85,32 +88,38 @@ const StepperOtpForm = () => {
 
   // Validate current step before proceeding
   const validateStep = () => {
-    if (
-      step === 1 &&
-      (!formData.name.trim() ||
+    if (step === 1) {
+      if (
+        !formData.name.trim() ||
         !/\S+@\S+\.\S+/.test(formData.email) ||
         !formData.street.trim() ||
         !formData.city.trim() ||
         !formData.country.trim() ||
-        !formData.postalCode.trim())
-    ) {
-      alert("Please enter valid details!");
-      return false;
-    }
-    if (step === 2 && !formData.phone.trim()) {
-      alert("Please enter your Phone Number!");
-      return false;
-    }
-    if (step === 3 && formData.otp.includes("")) {
-      alert("Please enter a valid 6-digit OTP!");
-      return false;
+        !formData.postalCode.trim() ||
+        !formData.password.trim()
+      ) {
+        alert("Please enter all details, including a password!");
+        return false;
+      }
+      if (formData.password.length < 6) {
+        alert("Password must be at least 6 characters long!");
+        return false;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        alert("Passwords do not match!");
+        return false;
+      }
     }
     return true;
   };
 
+  const hashPassword = async (password) => {
+    const salt = await bcrypt.genSalt(10);
+    return bcrypt.hash(password, salt);
+  };
+
   const submitOtp = async (otp) => {
     setIsLoading(true);
-
     try {
       const hashedOTP = Cookies.get("OTP");
       const response = await AuthInstance.post("/VerifyOtp", {
@@ -118,19 +127,20 @@ const StepperOtpForm = () => {
         otp,
       });
 
-      if (response.data.success == true) {
-        const res = await AuthInstance.post('/Signup' , {formData})
-        if(res.data.success == true)
-        {
-            setTimeout(() => {
-                setStep(step + 1);
-                setIsLoading(false);
-            }, 2000);
-        }
-        else
-        {
-            alert("error while creating user")
-            return;
+      if (response.data.success === true) {
+        const hashedPassword = await hashPassword(formData.password);
+        const newUserData = { ...formData, password: hashedPassword };
+        console.log(newUserData);
+        
+        const res = await AuthInstance.post("/Signup", {newUserData}); 
+        if (res.data.success === true) {
+          setTimeout(() => {
+            setStep(step + 1);
+            setIsLoading(false);
+          }, 2000);
+        } else {
+          alert("Error while creating user");
+          return;
         }
       } else {
         alert("❌ Invalid OTP. Please try again.");
@@ -140,7 +150,7 @@ const StepperOtpForm = () => {
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      alert(error);
+      alert("⚠️ OTP verification failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -164,7 +174,7 @@ const StepperOtpForm = () => {
           Number: formData.phone,
         });
         if (res.data.success == true) {
-          Cookies.set("OTP", res.data.OTP , { expires: 1 / 1440 });
+          Cookies.set("OTP", res.data.OTP, { expires: 1 / 1440 });
           setStep(step + 1);
         }
       } else {
@@ -215,6 +225,23 @@ const StepperOtpForm = () => {
             placeholder="Full Name"
             className="w-full p-3 border rounded-md mb-3"
           />
+          <input
+            type="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="Password"
+            className="w-full p-3 border rounded-md mb-3"
+          />
+          <input
+            type="password"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="Confirm Password"
+            className="w-full p-3 border rounded-md mb-3"
+          />
+
           <input
             type="email"
             name="email"
