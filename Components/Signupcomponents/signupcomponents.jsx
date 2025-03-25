@@ -164,8 +164,7 @@ const StepperOtpForm = () => {
           Number: formData.phone,
         });
         if (res.data.success == true) {
-          Cookies.set("OTP", res.data.OTP);
-          // , { expires: 1 / 1440 }
+          Cookies.set("OTP", res.data.OTP , { expires: 1 / 1440 });
           setStep(step + 1);
         }
       } else {
