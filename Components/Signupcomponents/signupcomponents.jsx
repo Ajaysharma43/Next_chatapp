@@ -108,7 +108,6 @@ const StepperOtpForm = () => {
     return true;
   };
 
-  // Submit OTP to backend
   const submitOtp = async (otp) => {
     setIsLoading(true);
 
@@ -120,14 +119,23 @@ const StepperOtpForm = () => {
       });
 
       if (response.data.success == true) {
-        alert("✅ OTP Verified Successfully!");
-        setStep(step + 1);
-        setIsLoading(false)
+        const res = await AuthInstance.post('/Signup' , {formData})
+        if(res.data.success == true)
+        {
+            setTimeout(() => {
+                setStep(step + 1);
+                setIsLoading(false);
+            }, 2000);
+        }
+        else
+        {
+            alert("error while creating user")
+        }
       } else {
         alert("❌ Invalid OTP. Please try again.");
         setFormData({ ...formData, otp: ["", "", "", "", "", ""] });
         inputRefs.current[0].focus();
-        setIsLoading(false)
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
@@ -297,6 +305,23 @@ const StepperOtpForm = () => {
                 className="w-10 h-10 text-xl text-center border rounded-md"
               />
             ))}
+          </div>
+        </div>
+      )}
+
+      {step === 4 && (
+        <div className="flex items-center justify-center">
+          <div className="rounded-lg p-6 max-w-md text-center">
+            <h2 className="text-2xl font-semibold text-green-600 mb-2">
+              🎉 Signup Successful!
+            </h2>
+            <p className="text-gray-700 mb-4">
+              Thank you for signing up. Your account has been created
+              successfully.
+            </p>
+            <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+              Go to Login
+            </button>
           </div>
         </div>
       )}
