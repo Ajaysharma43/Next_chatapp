@@ -130,6 +130,7 @@ const StepperOtpForm = () => {
         else
         {
             alert("error while creating user")
+            return;
         }
       } else {
         alert("❌ Invalid OTP. Please try again.");
@@ -139,7 +140,7 @@ const StepperOtpForm = () => {
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
-      alert("⚠️ OTP verification failed. Please try again.");
+      alert(error);
     } finally {
       setIsLoading(false);
     }
@@ -182,7 +183,7 @@ const StepperOtpForm = () => {
     <div className="relative max-w-lg mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
       {/* Backdrop Loader */}
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-[#11111142] bg-opacity-50 z-10">
           <div className="w-12 h-12 border-4 border-t-transparent border-white rounded-full animate-spin"></div>
         </div>
       )}
@@ -340,7 +341,7 @@ const StepperOtpForm = () => {
           onClick={nextStep}
           disabled={isLoading || !ValidEmail}
           className={`px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-300 ${
-            step == 2 ? "hidden" : "block"
+            step == 2 || step == 3 ? "hidden" : "block"
           }`}
         >
           Next
