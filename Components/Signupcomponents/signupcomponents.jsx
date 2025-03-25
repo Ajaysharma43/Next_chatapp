@@ -33,8 +33,6 @@ const StepperOtpForm = () => {
         validateEmailFromBackend(e.target.value);
       }, 500);
     }
-
-    
   };
 
   // Validate email from backend
@@ -50,7 +48,7 @@ const StepperOtpForm = () => {
 
       if (response.data.success === true) {
         setValidEmail(true);
-        setEmailValidationMessage("✅ Email is valid");
+        setEmailValidationMessage("✅ Email is available");
       } else {
         setValidEmail(false);
         setEmailValidationMessage("❌ Email already in use");
@@ -115,15 +113,21 @@ const StepperOtpForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await AuthInstance.post("/verifyOtp", { otp });
+      const hashedOTP = Cookies.get("OTP");
+      const response = await AuthInstance.post("/VerifyOtp", {
+        OTP: hashedOTP,
+        otp,
+      });
 
-      if (response.data.success) {
+      if (response.data.success == true) {
         alert("✅ OTP Verified Successfully!");
         setStep(step + 1);
+        setIsLoading(false)
       } else {
         alert("❌ Invalid OTP. Please try again.");
         setFormData({ ...formData, otp: ["", "", "", "", "", ""] });
         inputRefs.current[0].focus();
+        setIsLoading(false)
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
@@ -144,27 +148,24 @@ const StepperOtpForm = () => {
     }
   };
 
-  const GenerateOtp = async() => {
+  const GenerateOtp = async () => {
     try {
-        if(formData.phone.length == 10)
-        {
-            const res = await AuthInstance.post('/OTPgenerate' , {Number : formData.phone})
-            if(res.data.success == true)
-            {
-
-            }
+      if (formData.phone.length == 10) {
+        const res = await AuthInstance.post("/OTPgenerate", {
+          Number: formData.phone,
+        });
+        if (res.data.success == true) {
+          Cookies.set("OTP", res.data.OTP);
+          // , { expires: 1 / 1440 }
+          setStep(step + 1);
         }
-        else
-        {
-            alert("enter a valid 10 digit phone Number")
-        }
-        {
-            Cookies.set('OTP', res.data.OTP, { expires: 1 / 1440 });
-        }
+      } else {
+        alert("enter a valid 10 digit phone Number");
+      }
     } catch (error) {
-        
+      console.error(error);
     }
-  }
+  };
 
   // Go to previous step
   const prevStep = () => setStep(step - 1);
@@ -182,7 +183,11 @@ const StepperOtpForm = () => {
       <div className="flex justify-center mb-6 space-x-4">
         {["1", "2", "3", "4"].map((num, index) => (
           <div key={index} className="flex items-center">
-            <div className={`w-8 h-8 flex items-center justify-center rounded-full text-white font-bold ${step >= index + 1 ? "bg-blue-500" : "bg-gray-300"}`}>
+            <div
+              className={`w-8 h-8 flex items-center justify-center rounded-full text-white font-bold ${
+                step >= index + 1 ? "bg-blue-500" : "bg-gray-300"
+              }`}
+            >
               {num}
             </div>
             {index < 3 && <div className="w-12 h-1 bg-gray-300 mx-2"></div>}
@@ -193,69 +198,82 @@ const StepperOtpForm = () => {
       {/* Step 1: Personal Info */}
       {step === 1 && (
         <div>
-        <h2 className="text-xl font-semibold mb-4">Step 1: Personal Info</h2>
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Full Name"
-          className="w-full p-3 border rounded-md mb-3"
-        />
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Email"
-          className="w-full p-3 border rounded-md mb-1"
-        />
-        {emailValidationMessage && (
-          <p className="text-sm mt-1 text-red-500">{emailValidationMessage}</p>
-        )}
-        <input
-          type="text"
-          name="street"
-          value={formData.street}
-          onChange={handleChange}
-          placeholder="Street"
-          className="w-full p-3 border rounded-md mb-3"
-        />
-        <input
-          type="text"
-          name="city"
-          value={formData.city}
-          onChange={handleChange}
-          placeholder="City"
-          className="w-full p-3 border rounded-md mb-3"
-        />
-        <input
-          type="text"
-          name="country"
-          value={formData.country}
-          onChange={handleChange}
-          placeholder="Country"
-          className="w-full p-3 border rounded-md mb-3"
-        />
-        <input
-          type="text"
-          name="postalCode"
-          value={formData.postalCode}
-          onChange={handleChange}
-          placeholder="Postal Code"
-          className="w-full p-3 border rounded-md mb-3"
-        />
-      </div>
-      
+          <h2 className="text-xl font-semibold mb-4">Step 1: Personal Info</h2>
+          <input
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Full Name"
+            className="w-full p-3 border rounded-md mb-3"
+          />
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Email"
+            className="w-full p-3 border rounded-md mb-1"
+          />
+          {emailValidationMessage && (
+            <p className="text-sm mt-1 text-red-500">
+              {emailValidationMessage}
+            </p>
+          )}
+          <input
+            type="text"
+            name="street"
+            value={formData.street}
+            onChange={handleChange}
+            placeholder="Street"
+            className="w-full p-3 border rounded-md mb-3"
+          />
+          <input
+            type="text"
+            name="city"
+            value={formData.city}
+            onChange={handleChange}
+            placeholder="City"
+            className="w-full p-3 border rounded-md mb-3"
+          />
+          <input
+            type="text"
+            name="country"
+            value={formData.country}
+            onChange={handleChange}
+            placeholder="Country"
+            className="w-full p-3 border rounded-md mb-3"
+          />
+          <input
+            type="text"
+            name="postalCode"
+            value={formData.postalCode}
+            onChange={handleChange}
+            placeholder="Postal Code"
+            className="w-full p-3 border rounded-md mb-3"
+          />
+        </div>
       )}
 
       {/* Step 2: Phone Number */}
       {step === 2 && (
         <div>
           <h2 className="text-xl font-semibold mb-4">Step 2: Phone Number</h2>
-          <input type="tel" name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone Number" className="w-full p-3 border rounded-md" />
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="Phone Number"
+            className="w-full p-3 border rounded-md"
+          />
           <div className="flex justify-end relative top-[65px]">
-          <button onClick={GenerateOtp} className="px-4 py-2 bg-blue-500 text-white rounded-lg">Generate OTP</button>
+            <button
+              onClick={GenerateOtp}
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+            >
+              Generate OTP
+            </button>
           </div>
         </div>
       )}
@@ -263,10 +281,21 @@ const StepperOtpForm = () => {
       {/* Step 3: OTP Verification */}
       {step === 3 && (
         <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4">Step 3: OTP Verification</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Step 3: OTP Verification
+          </h2>
           <div className="flex justify-center space-x-2 mb-6">
             {formData.otp.map((_, index) => (
-              <input key={index} type="text" maxLength="1" value={formData.otp[index]} onChange={(e) => handleOtpChange(index, e)} onKeyDown={(e) => handleKeyDown(index, e)} ref={(el) => (inputRefs.current[index] = el)} className="w-10 h-10 text-xl text-center border rounded-md" />
+              <input
+                key={index}
+                type="text"
+                maxLength="1"
+                value={formData.otp[index]}
+                onChange={(e) => handleOtpChange(index, e)}
+                onKeyDown={(e) => handleKeyDown(index, e)}
+                ref={(el) => (inputRefs.current[index] = el)}
+                className="w-10 h-10 text-xl text-center border rounded-md"
+              />
             ))}
           </div>
         </div>
@@ -274,8 +303,23 @@ const StepperOtpForm = () => {
 
       {/* Navigation Buttons */}
       <div className="mt-6 flex justify-between">
-        {step > 1 && <button onClick={prevStep} className="px-4 py-2 bg-gray-400 text-white rounded-lg">Previous</button>}
-        <button onClick={nextStep} disabled={isLoading || !ValidEmail} className={`px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-300 ${step == 2 ? "hidden" : "block"}`}>Next</button>
+        {step > 1 && (
+          <button
+            onClick={prevStep}
+            className="px-4 py-2 bg-gray-400 text-white rounded-lg"
+          >
+            Previous
+          </button>
+        )}
+        <button
+          onClick={nextStep}
+          disabled={isLoading || !ValidEmail}
+          className={`px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-300 ${
+            step == 2 ? "hidden" : "block"
+          }`}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
