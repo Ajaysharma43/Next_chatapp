@@ -48,7 +48,7 @@ export async function middleware(request) {
         }
     }
 
-    
+
     try {
         await jwtVerify(AccessToken.value, JWT_SECRET);
         console.log("AccessToken is valid");
@@ -103,5 +103,5 @@ export async function middleware(request) {
 }
 
 export const config = {
-    matcher: ["/"], 
+    matcher: ["/"],
 };
