@@ -61,7 +61,7 @@ export async function middleware(request) {
     }
 }
 
-// Apply middleware to protected routes
+
 export const config = {
-    matcher: ["/"], // Adjust based on protected routes
+    matcher: ["/"],
 };
