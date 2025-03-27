@@ -170,6 +170,7 @@ const StepperOtpForm = () => {
   const GenerateOtp = async () => {
     try {
       if (formData.phone.length == 10) {
+        console.log(formData.phone)
         const res = await AuthInstance.post("/OTPgenerate", {
           Number: formData.phone,
         });

@@ -1,107 +1,67 @@
 import { NextResponse } from "next/server";
 import { jwtVerify, SignJWT } from "jose";
 
+// Ensure JWT_SECRET is set in environment variables
+if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined in environment variables.");
+}
+
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
-export async function middleware(request) {
-    const RefreshToken = request.cookies.get("RefreshToken");
-    const AccessToken = request.cookies.get("AccessToken");
+async function generateAccessToken(id) {
+    return await new SignJWT({ id })
+        .setProtectedHeader({ alg: "HS256" , typ : "JWT" })
+        .setIssuedAt()
+        .setExpirationTime("2h") 
+        .sign(JWT_SECRET);
+}
 
-    if (!AccessToken) {
-        console.log("AccessToken is missing");
-
-        if (RefreshToken) {
-            const refreshTokenValue = RefreshToken?.value;
-            if (!refreshTokenValue) {
-                console.log("RefreshToken is missing or invalid");
-                return NextResponse.redirect(new URL("/login", request.url));
-            }
-
-            try {
-                const { payload } = await jwtVerify(refreshTokenValue, JWT_SECRET);
-                console.log("RefreshToken is valid");
-
-                const userId = payload.id;
-                console.log("Extracted userId from RefreshToken:", userId);
-
-                const newAccessToken = await new SignJWT({ userId })
-                    .setProtectedHeader({ alg: "HS256" })
-                    .setExpirationTime("2h")
-                    .sign(JWT_SECRET);
-
-                const response = NextResponse.next();
-                response.cookies.set("AccessToken", newAccessToken, {
-                    httpOnly: true,
-                    secure: true,
-                    path: "/",
-                    sameSite: "strict",
-                });
-
-                return response;
-            } catch (refreshErr) {
-                console.error("RefreshToken is invalid or expired:", refreshErr.message);
-                return NextResponse.redirect(new URL("/login", request.url));
-            }
-        } else {
-            console.log("RefreshToken is missing");
-            return NextResponse.redirect(new URL("/login", request.url));
-        }
-    }
-
-
+// Function to refresh the Access Token
+async function refreshAccessToken(request, refreshToken) {
     try {
-        await jwtVerify(AccessToken.value, JWT_SECRET);
-        console.log("AccessToken is valid");
-        if (RefreshToken.value) {
-            const refreshTokenValue = RefreshToken?.value;
-            if (!refreshTokenValue) {
-                console.log("RefreshToken is missing or invalid");
-                return NextResponse.redirect(new URL("/login", request.url));
-            }
-        }
-        return NextResponse.next();
+        const { payload } = await jwtVerify(refreshToken, JWT_SECRET);
+        if (!payload.id) throw new Error("Invalid RefreshToken: Missing user ID");
+
+        console.log("RefreshToken is valid, generating new AccessToken");
+
+        const newAccessToken = await generateAccessToken(payload.id);
+        const response = NextResponse.next();
+
+        response.cookies.set("AccessToken", newAccessToken, {
+        });
+
+        return response;
     } catch (err) {
-        console.error("AccessToken is invalid or expired:", err.message);
-
-        if (RefreshToken) {
-            const refreshTokenValue = RefreshToken?.value;
-            if (!refreshTokenValue) {
-                console.log("RefreshToken is missing or invalid");
-                return NextResponse.redirect(new URL("/login", request.url));
-            }
-
-            try {
-                const { payload } = await jwtVerify(refreshTokenValue, JWT_SECRET);
-                console.log("RefreshToken is valid");
-
-                const userId = payload.id;
-                console.log("Extracted userId from RefreshToken:", userId);
-
-                const newAccessToken = await new SignJWT({ userId })
-                    .setProtectedHeader({ alg: "HS256" })
-                    .setExpirationTime("2h")
-                    .sign(JWT_SECRET);
-
-                const response = NextResponse.next();
-                response.cookies.set("AccessToken", newAccessToken, {
-                    httpOnly: true,
-                    secure: true,
-                    path: "/",
-                    sameSite: "strict",
-                });
-
-                return response;
-            } catch (refreshErr) {
-                console.error("RefreshToken is invalid or expired:", refreshErr.message);
-                return NextResponse.redirect(new URL("/login", request.url));
-            }
-        } else {
-            console.log("RefreshToken is missing");
-            return NextResponse.redirect(new URL("/login", request.url));
-        }
+        console.error("RefreshToken is invalid or expired:", err.message);
+        return NextResponse.redirect(new URL("/login", request.url));
     }
 }
 
+export async function middleware(request) {
+    const accessToken = request.cookies.get("AccessToken")?.value;
+    const refreshToken = request.cookies.get("RefreshToken")?.value;
+
+    if (!refreshToken) {
+        console.log("RefreshToken is missing");
+        return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    if (!accessToken) {
+        console.log("AccessToken is missing, trying to refresh...");
+        return refreshAccessToken(request, refreshToken);
+    }
+
+    try {
+        await jwtVerify(accessToken, JWT_SECRET);
+        console.log("AccessToken is valid");
+        return NextResponse.next();
+    } catch (err) {
+        console.error("AccessToken is invalid or expired:", err.message);
+        return await refreshAccessToken(request, refreshToken);
+    }
+}
+
+// Apply middleware to protected routes
 export const config = {
-    matcher: ["/"],
+    matcher: ["/"], // Adjust based on protected routes
 };

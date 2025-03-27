@@ -1,4 +1,6 @@
 "use client";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 
@@ -9,25 +11,31 @@ export default function Home() {
   const socketRef = useRef();
 
   useEffect(() => {
-    
+    const token = Cookies.get('AccessToken')
+    console.log(token)
+    const decode = jwtDecode(token)
+    console.log(decode.id)
+    setUser(decode.id)
+
     socketRef.current = io("http://localhost:4000");
 
     socketRef.current.on("connect", () => {
-      setUser(`${Date.now()}-user`);
     });
 
-
+    socketRef.current.on('GetPrevChats', (data) => {
+      setMessages(data.chats)
+    })
     socketRef.current.on("response", (message) => {
       console.log(message);
       setMessages((prevMessages) => [...prevMessages, message.message]);
     });
 
-  
+
     socketRef.current.on("connect_error", (err) => {
       console.error("Connection error:", err);
     });
 
-    
+
     return () => {
       socketRef.current.disconnect();
     };
@@ -49,8 +57,8 @@ export default function Home() {
       <h1 className="text-2xl font-bold mb-4">ChatApp</h1>
       <div className="border rounded-lg p-4 h-64 overflow-y-scroll bg-gray-100">
         {messages.map((msg, index) => (
-          <div key={index} className={`mb-2 ${msg.user == user? "text-end" : "text-start"}`}>
-            <strong>{msg.user == user ? "You" : msg.user}:</strong> {msg.text}
+          <div key={index} className={`mb-2 ${msg.sender_id == user ? "text-end" : "text-start"}`}>
+            <strong>{msg.sender_id == user ? "You" : msg.sender_id}:</strong> {msg.message}
           </div>
         ))}
       </div>

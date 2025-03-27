@@ -22,6 +22,7 @@ const LoginForm = () => {
             console.log("res is : " , res.data)
             if(res.data.success == true)
             {
+                console.log(res.data.AccessToken)
                 Cookies.set('RefreshToken' , res.data.RefreshToken , {expires : 7})
                 Cookies.set("AccessToken", res.data.AccessToken, { expires: 2 / 24 });
                 alert("login successfully")
