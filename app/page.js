@@ -13,8 +13,9 @@ export default function Home() {
   const socketRef = useRef();
   const [visibleDelete, setVisibleDelete] = useState({});
   const [typing, setTyping] = useState(false);
-  const [TypingUser , setTypingUser] = useState(false)
+  const [TypingUser, setTypingUser] = useState(false)
   const typingTimeoutRef = useRef(null);
+  const UserTypingTimeoutRef = useRef(null)
 
   useEffect(() => {
     const token = Cookies.get("AccessToken");
@@ -34,8 +35,17 @@ export default function Home() {
       setMessages(data.UpdatedData)
     })
 
-    socketRef.current.on('userTyping' , (user) => {
+    socketRef.current.on('userTyping', (user) => {
+      console.log(`${user}  is typing`)
       setTypingUser(user)
+
+      if (UserTypingTimeoutRef.current) {
+        clearTimeout(UserTypingTimeoutRef.current);
+      }
+
+      UserTypingTimeoutRef.current = setTimeout(() => {
+        setTypingUser(null);
+      }, 2000);
     })
 
     socketRef.current.on("response", (message) => {
@@ -67,14 +77,14 @@ export default function Home() {
 
   const HandleTyping = () => {
     setTyping(true);
-    socketRef.current.emit('typing' , (user))
 
-
+    socketRef.current.emit('typing', (user))
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
     typingTimeoutRef.current = setTimeout(() => {
+
       setTyping(false);
     }, 2000);
   };
@@ -107,8 +117,8 @@ export default function Home() {
 
             <div
               className={`max-w-xs p-3 rounded-lg text-sm shadow-md ${msg.sender_id === user
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-700 text-white"
+                ? "bg-blue-600 text-white"
+                : "bg-gray-700 text-white"
                 }`}
               onClick={() => toggleDelete(index)}
             >
@@ -119,6 +129,9 @@ export default function Home() {
             </div>
           </motion.div>
         ))}
+        {
+          typing && TypingUser != user ? (<h1>{TypingUser} is typing</h1>) : ""
+        }
       </motion.div>
 
       <div className="p-4 bg-gray-800 flex items-center gap-3 shadow-md">
@@ -126,7 +139,7 @@ export default function Home() {
           type="text"
           placeholder="Type a message..."
           value={newMessage}
-          onChange={(e) => {setNewMessage(e.target.value) ; HandleTyping()}}
+          onChange={(e) => { setNewMessage(e.target.value); HandleTyping() }}
           className="flex-1 p-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:ring-2 focus:ring-blue-500"
         />
         <button
