@@ -36,16 +36,17 @@ export default function Home() {
     })
 
     socketRef.current.on('userTyping', (user) => {
+      setTyping(true)
       console.log(`${user}  is typing`)
       setTypingUser(user)
+    })
 
-      if (UserTypingTimeoutRef.current) {
-        clearTimeout(UserTypingTimeoutRef.current);
-      }
+    socketRef.current.on('userStoppedTyping', (user) => {
 
-      UserTypingTimeoutRef.current = setTimeout(() => {
-        setTypingUser(null);
-      }, 2000);
+
+      console.log(`${user} stopped typing`)
+      setTyping(false);
+      setTypingUser(null);
     })
 
     socketRef.current.on("response", (message) => {
@@ -54,6 +55,10 @@ export default function Home() {
     });
 
     return () => {
+      socketRef.current.off('GetPrevChats')
+      socketRef.current.off('GetUpdatedChats')
+      socketRef.current.off('userTyping')
+      socketRef.current.off('response')
       socketRef.current.disconnect();
     };
   }, []);
@@ -76,17 +81,14 @@ export default function Home() {
   };
 
   const HandleTyping = () => {
-    setTyping(true);
-
     socketRef.current.emit('typing', (user))
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
     typingTimeoutRef.current = setTimeout(() => {
-
-      setTyping(false);
-    }, 2000);
+      socketRef.current.emit('stoppedtyping', (user))
+    }, 1000);
   };
 
   return (
