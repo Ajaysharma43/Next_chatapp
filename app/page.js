@@ -105,42 +105,50 @@ export default function Home() {
           animate={{ opacity: 1 }}
         >
           <AnimatePresence>
-            {messages.map((msg, index) => (
-              <motion.div
-                key={index}
-                className={`flex w-full mb-2 ${msg.sender_id === user ? "justify-end" : "justify-start"
-                  }`}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                {msg.sender_id === user && visibleDelete[index] && (
+            {messages.map((msg, index) => {
+              // Convert timestamp to Date object
+              const createdAt = new Date(msg.created_at);
+              const formattedDate = createdAt.toLocaleDateString(); // e.g., "3/27/2025"
+              const formattedTime = createdAt.toLocaleTimeString(); // e.g., "10:45 AM"
 
-                  <motion.button className="mr-2 text-red-400 hover:text-red-600 bg-white h-fit rounded-full" onClick={() => DeleteMessage(msg.id)}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}>
-                    <MdDelete size={20} />
-                  </motion.button>
-                )}
-
-
-                <div
-                  className={`max-w-xs p-3 rounded-lg text-sm shadow-md ${msg.sender_id === user
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-700 text-white"
-                    }`}
-                  onClick={() => toggleDelete(index)}
+              return (
+                <motion.div
+                  key={index}
+                  className={`flex w-full mb-2 ${msg.sender_id === user ? "justify-end" : "justify-start"}`}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <span className="block font-semibold">
-                    {msg.sender_id === user ? "You" : msg.sender_id}:
-                  </span>
-                  {msg.message}
-                </div>
-              </motion.div>
-            ))}
+                  {msg.sender_id === user && visibleDelete[index] && (
+                    <motion.button
+                      className="mr-2 text-red-400 hover:text-red-600 bg-white h-fit rounded-full"
+                      onClick={() => DeleteMessage(msg.id)}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <MdDelete size={20} />
+                    </motion.button>
+                  )}
+
+                  <div
+                    className={`max-w-xs p-3 rounded-lg text-sm shadow-md ${msg.sender_id === user ? "bg-blue-600 text-white" : "bg-gray-700 text-white"
+                      }`}
+                    onClick={() => toggleDelete(index)}
+                  >
+                    <span className="block font-semibold">
+                      {msg.sender_id === user ? "You" : msg.sender_id}:
+                    </span>
+                    {msg.message}
+                    <div className="mt-1 text-xs text-gray-300">
+                      <span>{formattedDate} • {formattedTime}</span>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
           <AnimatePresence>
             <AnimatePresence>

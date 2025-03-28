@@ -8,8 +8,8 @@ if (!process.env.JWT_SECRET) {
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
-async function generateAccessToken(id) {
-    return await new SignJWT({ id })
+async function generateAccessToken(id , role) {
+    return await new SignJWT({ id , role })
         .setProtectedHeader({ alg: "HS256" , typ : "JWT" })
         .setIssuedAt()
         .setExpirationTime("2h") 
@@ -24,7 +24,7 @@ async function refreshAccessToken(request, refreshToken) {
 
         console.log("RefreshToken is valid, generating new AccessToken");
 
-        const newAccessToken = await generateAccessToken(payload.id);
+        const newAccessToken = await generateAccessToken(payload.id , payload.role);
         const response = NextResponse.next();
 
         response.cookies.set("AccessToken", newAccessToken, {

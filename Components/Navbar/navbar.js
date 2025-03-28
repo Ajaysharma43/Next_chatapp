@@ -1,4 +1,42 @@
+"use client";
+
+import axios from "axios";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
 const Navbar = () => {
+    const [navdata, setnavdata] = useState([]);
+    const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    useEffect(() => {
+        const GetData = async () => {
+            const token = Cookies.get("AccessToken");
+
+            if (!token) {
+                console.error("No token found!");
+                return;
+            }
+
+            try {
+                const decode = jwtDecode(token);
+                const response = await axios.get(
+                    `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
+                );
+                console.log(response.data);
+                setnavdata(response.data.message);
+            } catch (error) {
+                console.error("Error decoding token or fetching data:", error);
+            }
+        };
+        GetData();
+    }, []);
+
+    const toggleMobileMenu = () => {
+        setMobileMenuOpen(!isMobileMenuOpen);
+    };
+
     return (
         <>
             <nav className="bg-blue-600 text-white shadow-lg">
@@ -10,15 +48,16 @@ const Navbar = () => {
 
                     {/* Navigation Links */}
                     <div className="hidden md:flex space-x-6">
-                        <a href="#home" className="hover:text-gray-300">Home</a>
-                        <a href="#about" className="hover:text-gray-300">About</a>
-                        <a href="#contact" className="hover:text-gray-300">Contact</a>
-                        <a href="#chat" className="hover:text-gray-300">Chat</a>
+                        {navdata.map((item, index) => (
+                            <Link key={index} href={item.route} className="hover:text-gray-300">
+                                {item.modules}
+                            </Link>
+                        ))}
                     </div>
 
                     {/* Mobile Menu Button */}
                     <div className="md:hidden">
-                        <button className="text-white focus:outline-none">
+                        <button className="text-white focus:outline-none" onClick={toggleMobileMenu}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-6 w-6"
@@ -35,6 +74,19 @@ const Navbar = () => {
                             </svg>
                         </button>
                     </div>
+                </div>
+
+                {/* Mobile Menu */}
+                <div className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}>
+                    <ul className="bg-blue-600 space-y-2 p-4">
+                        {navdata.map((item, index) => (
+                            <li key={index}>
+                                <Link href={item.route} className="block hover:text-gray-300">
+                                    {item.modules}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
                 </div>
             </nav>
         </>
