@@ -4,11 +4,13 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Navbar = () => {
     const [navdata, setnavdata] = useState([]);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const Pathname = usePathname()
 
     useEffect(() => {
         const GetData = async () => {
@@ -24,7 +26,6 @@ const Navbar = () => {
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
                 );
-                console.log(response.data);
                 setnavdata(response.data.message);
             } catch (error) {
                 console.error("Error decoding token or fetching data:", error);
@@ -39,7 +40,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="bg-blue-600 text-white shadow-lg">
+            <nav className={`bg-blue-600 text-white shadow-lg ${Pathname.startsWith('/dashboard')? "hidden" : "block"}`}>
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                     {/* Logo Section */}
                     <div className="text-2xl font-bold">
