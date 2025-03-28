@@ -12,6 +12,8 @@ const Navbar = () => {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const Pathname = usePathname()
 
+    const Routes = ['/login' , '/signup' , '/dashboard']
+
     useEffect(() => {
         const GetData = async () => {
             const token = Cookies.get("AccessToken");
@@ -40,7 +42,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className={`bg-blue-600 text-white shadow-lg ${Pathname.startsWith('/dashboard')? "hidden" : "block"}`}>
+            <nav className={`bg-blue-600 text-white shadow-lg ${Routes.some((route) => Pathname.startsWith(route)) ? "hidden" : "block"}`}>
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                     {/* Logo Section */}
                     <div className="text-2xl font-bold">
