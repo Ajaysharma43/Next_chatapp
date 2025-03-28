@@ -26,8 +26,8 @@ const DashboardNavbar = () => {
           <Link href="/dashboard/profile" className="hover:text-gray-300">
             Profile
           </Link>
-          <Link href="/dashboard/settings" className="hover:text-gray-300">
-            Settings
+          <Link href="/dashboard/users" className="hover:text-gray-300">
+            Users
           </Link>
           <button className="hover:text-gray-300" onClick={() => alert("Logging out...")}>
             Logout
@@ -64,8 +64,8 @@ const DashboardNavbar = () => {
           <Link href="/dashboard/profile" className="block px-4 py-2 hover:bg-blue-500">
             Profile
           </Link>
-          <Link href="/dashboard/settings" className="block px-4 py-2 hover:bg-blue-500">
-            Settings
+          <Link href="/dashboard/Users" className="block px-4 py-2 hover:bg-blue-500">
+            User
           </Link>
           <button
             className="block px-4 py-2 hover:bg-blue-500 w-full text-left"

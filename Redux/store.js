@@ -1,10 +1,12 @@
 "use client"
-const { configureStore } = require("@reduxjs/toolkit");
+import { configureStore } from "@reduxjs/toolkit"
 import chatreducer from "@/Redux/features/Chatslice"
+import DashboardReducer from '@/Redux/features/DashboardSlice'
 
 const store = configureStore({
     reducer : {
-        chatreducer : chatreducer
+        chatreducer : chatreducer,
+        DashboardReducer : DashboardReducer
     }
 })
 
