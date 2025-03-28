@@ -9,10 +9,12 @@ import { useEffect, useState } from "react";
 
 const Navbar = () => {
     const [navdata, setnavdata] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const Pathname = usePathname()
+    const Pathname = usePathname();
+    const accessToken = Cookies.get("AccessToken");
 
-    const Routes = ['/login' , '/signup' , '/dashboard']
+    const Routes = ["/login", "/signup", "/dashboard", "/not-found"];
 
     useEffect(() => {
         const GetData = async () => {
@@ -20,6 +22,7 @@ const Navbar = () => {
 
             if (!token) {
                 console.error("No token found!");
+                setLoading(false);
                 return;
             }
 
@@ -30,11 +33,14 @@ const Navbar = () => {
                 );
                 setnavdata(response.data.message);
             } catch (error) {
-                console.error("Error decoding token or fetching data:", error);
+                console.error("Error fetching data:", error);
+            } finally {
+                setLoading(false); // Stop loading when API call finishes
             }
         };
+
         GetData();
-    }, []);
+    }, [accessToken]);
 
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!isMobileMenuOpen);
@@ -42,7 +48,12 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className={`bg-blue-600 text-white shadow-lg ${Routes.some((route) => Pathname.startsWith(route)) ? "hidden" : "block"}`}>
+            {/* Hide Navbar on specific routes */}
+            <nav
+                className={`bg-blue-600 text-white shadow-lg ${
+                    Routes.some((route) => Pathname.startsWith(route)) ? "hidden" : "block"
+                }`}
+            >
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                     {/* Logo Section */}
                     <div className="text-2xl font-bold">
@@ -51,11 +62,21 @@ const Navbar = () => {
 
                     {/* Navigation Links */}
                     <div className="hidden md:flex space-x-6">
-                        {navdata.map((item, index) => (
-                            <Link key={index} href={item.route} className="hover:text-gray-300">
-                                {item.modules}
-                            </Link>
-                        ))}
+                        {loading ? (
+                            // Loader Skeleton while fetching
+                            <>
+                                <div className="h-6 w-24 bg-gray-400 animate-pulse rounded"></div>
+                                <div className="h-6 w-24 bg-gray-400 animate-pulse rounded"></div>
+                                <div className="h-6 w-24 bg-gray-400 animate-pulse rounded"></div>
+                            </>
+                        ) : (
+                            // Render navigation items
+                            navdata.map((item, index) => (
+                                <Link key={index} href={item.route} className="hover:text-gray-300">
+                                    {item.modules}
+                                </Link>
+                            ))
+                        )}
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -82,13 +103,22 @@ const Navbar = () => {
                 {/* Mobile Menu */}
                 <div className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}>
                     <ul className="bg-blue-600 space-y-2 p-4">
-                        {navdata.map((item, index) => (
-                            <li key={index}>
-                                <Link href={item.route} className="block hover:text-gray-300">
-                                    {item.modules}
-                                </Link>
-                            </li>
-                        ))}
+                        {loading ? (
+                            // Loader for mobile menu
+                            <>
+                                <div className="h-6 w-32 bg-gray-400 animate-pulse rounded"></div>
+                                <div className="h-6 w-32 bg-gray-400 animate-pulse rounded"></div>
+                                <div className="h-6 w-32 bg-gray-400 animate-pulse rounded"></div>
+                            </>
+                        ) : (
+                            navdata.map((item, index) => (
+                                <li key={index}>
+                                    <Link href={item.route} className="block hover:text-gray-300">
+                                        {item.modules}
+                                    </Link>
+                                </li>
+                            ))
+                        )}
                     </ul>
                 </div>
             </nav>

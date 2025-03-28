@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation"
 import { NextResponse } from "next/server"
 
 export const DashboardAccess = (role , request) => {
@@ -9,6 +10,6 @@ export const DashboardAccess = (role , request) => {
     else
     {
         console.log('you are Unauthorized')
-        return NextResponse.redirect(new URL("/login", request.url));
+        return NextResponse.rewrite(new URL("/not-found", request.url));
     }
 }
