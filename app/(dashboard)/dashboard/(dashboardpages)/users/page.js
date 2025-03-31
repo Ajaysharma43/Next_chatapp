@@ -7,6 +7,7 @@ import { UpdateDialog } from "./(UserDialogs)/UpdateDialoag";
 import { DashboardInstance } from "@/Interseptors/DashboardInterseptors";
 import { DeleteUser } from "./(UserDialogs)/DeleteDilog";
 import { AddUser } from "./(UserDialogs)/AddUser";
+import { Sorting } from "./(UserDialogs)/SortingDialog";
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ const Users = () => {
   const [UpdateDialogState, setUpdateDialogState] = useState(false);
   const [DeleteDilog, setdeletedilog] = useState(false)
   const [AddUserDialog, setAddUserDialog] = useState(false)
+  const [sortdialog , setsortdialog] = useState(false)
   const [id, setid] = useState(null)
   const [formData, setFormData] = useState({
     name: "",
@@ -133,6 +135,17 @@ const Users = () => {
     }
   }
 
+  const HandleSortingdialog = () => {
+    if(sortdialog == false)
+    {
+      setsortdialog(true)
+    }
+    else
+    {
+      setsortdialog(false)
+    }
+  }
+
   return (
     <>
       <UpdateDialog
@@ -146,6 +159,12 @@ const Users = () => {
       <DeleteUser open={DeleteDilog} onClose={HandleDeleteDialog} id={id} handleDelete={HandleDelete} />
 
       <AddUser open={AddUserDialog}  onClose={HandleCreate} HandleCreate={CreateUser}/>
+
+      <Sorting open={sortdialog} onClose={HandleSortingdialog}/>
+
+      <div className="flex justify-end m-4">
+        <button className="uppercase bg-purple-400 p-4 text-white shadow rounded-lg transition-all duration-300 hover:bg-purple-600" onClick={HandleSortingdialog}>sortdata</button>
+      </div>
 
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4 text-center">Users Page</h1>
