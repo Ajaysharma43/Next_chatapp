@@ -5,12 +5,15 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { UpdateDialog } from "./(UserDialogs)/UpdateDialoag";
 import { DashboardInstance } from "@/Interseptors/DashboardInterseptors";
+import { DeleteUser } from "./(UserDialogs)/DeleteDilog";
 
 const Users = () => {
   const dispatch = useDispatch();
   const UserData = useSelector((state) => state.DashboardReducer.UserData);
   const [localUserData, setLocalUserData] = useState(UserData);
   const [UpdateDialogState, setUpdateDialogState] = useState(false);
+  const [DeleteDilog, setdeletedilog] = useState(false)
+  const [id, setid] = useState(null)
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -77,6 +80,31 @@ const Users = () => {
     }
   };
 
+  const HandleDeleteDialog = (id) => {
+    if (DeleteDilog == false) {
+      setid(id)
+      setdeletedilog(true)
+    }
+    else {
+      setid(null)
+      setdeletedilog(false)
+    }
+  }
+
+  const HandleDelete = async (id) => {
+    console.log("user deleted with id : ", id)
+    const res = await DashboardInstance.delete(`/Delete?id=${id}`)
+    if (res.data.Success == true) {
+      const updatedata = localUserData.filter((item) => item.id !== id)
+      setLocalUserData(updatedata)
+      setdeletedilog(false)
+    }
+    else {
+      alert('user delete failed')
+    }
+
+  }
+
   return (
     <>
       <UpdateDialog
@@ -86,6 +114,8 @@ const Users = () => {
         handleChange={handleChange}
         handleSubmit={handleSubmit}
       />
+
+      <DeleteUser open={DeleteDilog} onClose={HandleDeleteDialog} id={id} handleDelete={HandleDelete} />
 
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4 text-center">Users Page</h1>
@@ -138,7 +168,8 @@ const Users = () => {
                         >
                           <Edit size={14} /> Edit
                         </button>
-                        <button className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white text-xs md:text-sm font-semibold py-1 px-2 md:py-2 md:px-3 rounded-lg transition duration-300">
+                        <button className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white text-xs md:text-sm font-semibold py-1 px-2 md:py-2 md:px-3 rounded-lg transition duration-300"
+                          onClick={() => HandleDeleteDialog(item.id)}>
                           <Trash size={14} /> Delete
                         </button>
                       </div>
