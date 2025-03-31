@@ -1,5 +1,5 @@
 "use client";
-import { Dialog, DialogContent, DialogTitle, TextField, Button } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, TextField, Button, InputLabel, Select, MenuItem } from "@mui/material";
 
 export const UpdateDialog = ({ open, onClose, formData, handleChange, handleSubmit }) => {
   return (
@@ -11,13 +11,6 @@ export const UpdateDialog = ({ open, onClose, formData, handleChange, handleSubm
             label="Name"
             name="name"
             value={formData.name}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Email"
-            name="email"
-            value={formData.email}
             onChange={handleChange}
             fullWidth
           />
@@ -56,13 +49,15 @@ export const UpdateDialog = ({ open, onClose, formData, handleChange, handleSubm
             onChange={handleChange}
             fullWidth
           />
-          <TextField
-            label="Role"
+          <InputLabel>Role</InputLabel>
+          <Select
             name="roles"
             value={formData.roles}
             onChange={handleChange}
-            fullWidth
-          />
+          >
+            <MenuItem value="admin">Admin</MenuItem>
+            <MenuItem value="user">User</MenuItem>
+          </Select>
           <div className="flex justify-end gap-2 mt-4">
             <Button variant="outlined" onClick={onClose}>
               Cancel

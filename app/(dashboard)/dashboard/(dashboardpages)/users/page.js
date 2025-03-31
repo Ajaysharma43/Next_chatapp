@@ -4,13 +4,15 @@ import { Edit, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { UpdateDialog } from "./(UserDialogs)/UpdateDialoag";
+import { DashboardInstance } from "@/Interseptors/DashboardInterseptors";
 
 const Users = () => {
+  const dispatch = useDispatch();
   const UserData = useSelector((state) => state.DashboardReducer.UserData);
+  const [localUserData, setLocalUserData] = useState(UserData);
   const [UpdateDialogState, setUpdateDialogState] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     phone: "",
     street: "",
     city: "",
@@ -19,30 +21,31 @@ const Users = () => {
     roles: "",
   });
   const [limit, setLimit] = useState(5);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(GetUserData({ limit }));
-    console.log(UserData);
   }, [dispatch, limit]);
 
+  useEffect(() => {
+    setLocalUserData(UserData);
+  }, [UserData]);
+
   const handleEdit = (user) => {
-    setFormData(user); // Set the selected user's data in the form
-    setUpdateDialogState(true); // Open the dialog
+    setFormData(user);
+    setUpdateDialogState(true);
   };
 
   const handleCloseDialog = () => {
-    setUpdateDialogState(false); // Close the dialog
+    setUpdateDialogState(false);
     setFormData({
       name: "",
-      email: "",
       phone: "",
       street: "",
       city: "",
       postal_code: "",
       country: "",
       roles: "",
-    }); // Clear the form data
+    });
   };
 
   const handleChange = (e) => {
@@ -53,16 +56,29 @@ const Users = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Updated Data:", formData);
-    // Add logic to update the user data (e.g., dispatch an action or call an API)
-    handleCloseDialog(); // Close the dialog after submission
+    try {
+      const res = await DashboardInstance.post("/Update", { formData });
+      if (res.data.Success) {
+        // Update local state immediately
+        setLocalUserData((prevData) =>
+          prevData.map((user) =>
+            user.id === formData.id ? { ...user, ...formData } : user
+          )
+        );
+
+        handleCloseDialog();
+      } else {
+        alert("Data updating failed");
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
   };
 
   return (
     <>
-      {/* Update Dialog */}
       <UpdateDialog
         open={UpdateDialogState}
         onClose={handleCloseDialog}
@@ -74,20 +90,18 @@ const Users = () => {
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4 text-center">Users Page</h1>
 
-        {/* Responsive Wrapper */}
         <div className="overflow-x-auto">
           <table className="w-full border-collapse border border-gray-300 text-sm md:text-base">
-            {/* Table Head */}
             <thead>
-            <tr className="bg-gray-200 text-gray-700 text-xs md:text-sm">
+              <tr className="bg-gray-200 text-gray-700 text-xs md:text-sm">
                 <th className="border border-gray-300 px-2 md:px-4 py-2">ID</th>
                 <th className="border border-gray-300 px-2 md:px-4 py-2">Name</th>
                 <th className="border border-gray-300 px-2 md:px-4 py-2">Email</th>
-                <th className="border border-gray-300 px-2 md:px-4 py-2 ">Phone</th>
-                <th className="border border-gray-300 px-2 md:px-4 py-2 ">Street</th>
+                <th className="border border-gray-300 px-2 md:px-4 py-2">Phone</th>
+                <th className="border border-gray-300 px-2 md:px-4 py-2">Street</th>
                 <th className="border border-gray-300 px-2 md:px-4 py-2">City</th>
-                <th className="border border-gray-300 px-2 md:px-4 py-2 ">Postal Code</th>
-                <th className="border border-gray-300 px-2 md:px-4 py-2 ">Country</th>
+                <th className="border border-gray-300 px-2 md:px-4 py-2">Postal Code</th>
+                <th className="border border-gray-300 px-2 md:px-4 py-2">Country</th>
                 <th className="border border-gray-300 px-2 md:px-4 py-2">Role</th>
                 <th className="border border-gray-300 px-2 md:px-4 py-2">Created At</th>
                 <th className="border border-gray-300 px-2 md:px-4 py-2">Password</th>
@@ -95,9 +109,8 @@ const Users = () => {
               </tr>
             </thead>
 
-            {/* Table Body */}
             <tbody>
-            {UserData.map((item) => {
+              {localUserData.map((item) => {
                 const createdAt = new Date(item.created_at);
                 const formattedDate = createdAt.toLocaleDateString();
                 const formattedTime = createdAt.toLocaleTimeString();
@@ -107,11 +120,11 @@ const Users = () => {
                     <td className="border border-gray-300 px-2 md:px-4 py-2">{item.id}</td>
                     <td className="border border-gray-300 px-2 md:px-4 py-2">{item.name}</td>
                     <td className="border border-gray-300 px-2 md:px-4 py-2">{item.email}</td>
-                    <td className="border border-gray-300 px-2 md:px-4 py-2 ">{item.phone}</td>
-                    <td className="border border-gray-300 px-2 md:px-4 py-2 ">{item.street}</td>
+                    <td className="border border-gray-300 px-2 md:px-4 py-2">{item.phone}</td>
+                    <td className="border border-gray-300 px-2 md:px-4 py-2">{item.street}</td>
                     <td className="border border-gray-300 px-2 md:px-4 py-2">{item.city}</td>
-                    <td className="border border-gray-300 px-2 md:px-4 py-2 ">{item.postal_code}</td>
-                    <td className="border border-gray-300 px-2 md:px-4 py-2 ">{item.country}</td>
+                    <td className="border border-gray-300 px-2 md:px-4 py-2">{item.postal_code}</td>
+                    <td className="border border-gray-300 px-2 md:px-4 py-2">{item.country}</td>
                     <td className="border border-gray-300 px-2 md:px-4 py-2">{item.roles}</td>
                     <td className="border border-gray-300 px-2 md:px-4 py-2">
                       {formattedDate} <span className="hidden md:inline">{formattedTime}</span>
@@ -121,7 +134,7 @@ const Users = () => {
                       <div className="flex gap-2 justify-center">
                         <button
                           className="flex items-center gap-1 bg-blue-500 hover:bg-blue-600 text-white text-xs md:text-sm font-semibold py-1 px-2 md:py-2 md:px-3 rounded-lg transition duration-300"
-                          onClick={() => handleEdit(item)} // Handle edit button click
+                          onClick={() => handleEdit(item)}
                         >
                           <Edit size={14} /> Edit
                         </button>
