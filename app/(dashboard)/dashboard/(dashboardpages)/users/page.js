@@ -146,6 +146,10 @@ const Users = () => {
     }
   }
 
+  const handleSort = (data) => {
+    console.log(data)
+  }
+
   return (
     <>
       <UpdateDialog
@@ -160,7 +164,7 @@ const Users = () => {
 
       <AddUser open={AddUserDialog}  onClose={HandleCreate} HandleCreate={CreateUser}/>
 
-      <Sorting open={sortdialog} onClose={HandleSortingdialog}/>
+      <Sorting open={sortdialog} onClose={HandleSortingdialog} handleSort={handleSort}/>
 
       <div className="flex justify-end m-4">
         <button className="uppercase bg-purple-400 p-4 text-white shadow rounded-lg transition-all duration-300 hover:bg-purple-600" onClick={HandleSortingdialog}>sortdata</button>
