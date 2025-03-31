@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { UpdateDialog } from "./(UserDialogs)/UpdateDialoag";
 import { DashboardInstance } from "@/Interseptors/DashboardInterseptors";
 import { DeleteUser } from "./(UserDialogs)/DeleteDilog";
+import { AddUser } from "./(UserDialogs)/AddUser";
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -13,6 +14,7 @@ const Users = () => {
   const [localUserData, setLocalUserData] = useState(UserData);
   const [UpdateDialogState, setUpdateDialogState] = useState(false);
   const [DeleteDilog, setdeletedilog] = useState(false)
+  const [AddUserDialog, setAddUserDialog] = useState(false)
   const [id, setid] = useState(null)
   const [formData, setFormData] = useState({
     name: "",
@@ -105,6 +107,32 @@ const Users = () => {
 
   }
 
+  const HandleCreate = () => {
+    if(AddUserDialog == false)
+    {
+      setAddUserDialog(true)
+    }
+    else
+    {
+      setAddUserDialog(false)
+    }
+  }
+
+  const CreateUser = async(UserData) => {
+    console.log('user data is : ' , UserData)
+    const res = await DashboardInstance.post('/CreateUser' , {UserData})
+    if(res.data.Success == true)
+    {
+      console.log(res.data.user)
+      setLocalUserData([...localUserData, ...res.data.user]);
+
+    }
+    else
+    {
+      alert('user creation failed')
+    }
+  }
+
   return (
     <>
       <UpdateDialog
@@ -116,6 +144,8 @@ const Users = () => {
       />
 
       <DeleteUser open={DeleteDilog} onClose={HandleDeleteDialog} id={id} handleDelete={HandleDelete} />
+
+      <AddUser open={AddUserDialog}  onClose={HandleCreate} HandleCreate={CreateUser}/>
 
       <div className="container mx-auto p-4">
         <h1 className="text-2xl font-bold mb-4 text-center">Users Page</h1>
@@ -181,6 +211,11 @@ const Users = () => {
           </table>
         </div>
       </div>
+      
+      <div className="flex justify-end m-4">
+      <button className="uppercase bg-purple-400 p-4 text-white shadow rounded-lg transition-all duration-300 hover:bg-purple-600" onClick={HandleCreate}>Adduser</button>
+      </div>
+      
     </>
   );
 };
