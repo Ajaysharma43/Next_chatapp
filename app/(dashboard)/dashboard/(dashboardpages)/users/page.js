@@ -267,8 +267,8 @@ const Users = () => {
         </div>
       </div>
       <div className="flex justify-center gap-4">
-        <button onClick={PrevPage}>
-          <ArrowBigLeft />
+        <button onClick={PrevPage} className={`w-fit h-fit p-1 transition-all duration-200  ${page == 1 ? "text-gray-500" : "text-black hover:bg-gray-300 hover:rounded-full"}`}>
+          <ArrowBigLeft className={``}/>
         </button>
 
         {
@@ -282,13 +282,12 @@ const Users = () => {
             </button>
           ))
         }
-        <button onClick={NextPage}><ArrowBigRight /></button>
+        <button onClick={NextPage} className={`w-fit h-fit p-1 transition-all duration-200  ${page == Totalpages ? "text-gray-500" : "text-black hover:bg-gray-300 hover:rounded-full"}`}><ArrowBigRight /></button>
       </div>
 
       <div className="flex justify-end m-4">
         <button className="uppercase bg-purple-400 p-4 text-white shadow rounded-lg transition-all duration-300 hover:bg-purple-600" onClick={HandleCreate}>Adduser</button>
       </div>
-
     </>
   );
 };
