@@ -19,7 +19,7 @@ const Users = () => {
   const [AddUserDialog, setAddUserDialog] = useState(false)
   const [sortdialog, setsortdialog] = useState(false)
   const [id, setid] = useState(null)
-  const [sortingData , setSortingData] = useState({})
+  const [sortingData, setSortingData] = useState({})
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -31,19 +31,17 @@ const Users = () => {
   });
   const [limit, setLimit] = useState(2);
   const [page, setpage] = useState(1)
-  const [IsSorting , setIsSorting] = useState(false)
+  const [IsSorting, setIsSorting] = useState(false)
 
   useEffect(() => {
-    if(IsSorting == true)
-    {
+    if (IsSorting == true) {
       let data = sortingData
       dispatch(SortUserData({ data, limit, page }))
     }
-    else
-    {
+    else {
       dispatch(GetUserData({ limit, page }));
     }
-    
+
   }, [dispatch, limit, page, SortUserData]);
 
   useEffect(() => {
@@ -81,13 +79,12 @@ const Users = () => {
     try {
       const res = await DashboardInstance.post("/Update", { formData });
       if (res.data.Success) {
-        // Update local state immediately
         setLocalUserData((prevData) =>
           prevData.map((user) =>
             user.id === formData.id ? { ...user, ...formData } : user
           )
         );
-
+        
         handleCloseDialog();
       } else {
         alert("Data updating failed");
@@ -113,7 +110,9 @@ const Users = () => {
     const res = await DashboardInstance.delete(`/Delete?id=${id}`)
     if (res.data.Success == true) {
       const updatedata = localUserData.filter((item) => item.id !== id)
-      setLocalUserData(updatedata)
+      let data = sortingData
+        dispatch(SortUserData({ data, limit, page }))
+      
       setdeletedilog(false)
     }
     else {
@@ -135,9 +134,8 @@ const Users = () => {
     console.log('user data is : ', UserData)
     const res = await DashboardInstance.post('/CreateUser', { UserData })
     if (res.data.Success == true) {
-      console.log(res.data.user)
-      setLocalUserData([...localUserData, ...res.data.user]);
-
+      let data = sortingData
+      dispatch(SortUserData({ data, limit, page }))
     }
     else {
       alert('user creation failed')
@@ -268,7 +266,7 @@ const Users = () => {
       </div>
       <div className="flex justify-center gap-4">
         <button onClick={PrevPage} className={`w-fit h-fit p-1 transition-all duration-200  ${page == 1 ? "text-gray-500" : "text-black hover:bg-gray-300 hover:rounded-full"}`}>
-          <ArrowBigLeft className={``}/>
+          <ArrowBigLeft className={``} />
         </button>
 
         {
