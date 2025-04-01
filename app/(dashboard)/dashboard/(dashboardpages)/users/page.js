@@ -1,5 +1,5 @@
 "use client";
-import { GetUserData } from "@/Redux/features/DashboardSlice";
+import { GetUserData, SortUserData } from "@/Redux/features/DashboardSlice";
 import { ArrowBigLeft, ArrowBigRight, Edit, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +19,7 @@ const Users = () => {
   const [AddUserDialog, setAddUserDialog] = useState(false)
   const [sortdialog, setsortdialog] = useState(false)
   const [id, setid] = useState(null)
+  const [sortingData , setSortingData] = useState({})
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -30,9 +31,20 @@ const Users = () => {
   });
   const [limit, setLimit] = useState(2);
   const [page, setpage] = useState(1)
+  const [IsSorting , setIsSorting] = useState(false)
+
   useEffect(() => {
-    dispatch(GetUserData({ limit, page }));
-  }, [dispatch, limit, page]);
+    if(IsSorting == true)
+    {
+      let data = sortingData
+      dispatch(SortUserData({ data, limit, page }))
+    }
+    else
+    {
+      dispatch(GetUserData({ limit, page }));
+    }
+    
+  }, [dispatch, limit, page, SortUserData]);
 
   useEffect(() => {
     setLocalUserData(UserData);
@@ -142,7 +154,10 @@ const Users = () => {
   }
 
   const handleSort = (data) => {
+    setIsSorting(true)
     console.log(data)
+    setSortingData(data)
+    dispatch(SortUserData({ data, limit, page }))
   }
 
   const Togglepage = (page) => {
@@ -260,7 +275,7 @@ const Users = () => {
           Array.from({ length: Totalpages }, (_, i) => (
             <button
               key={i + 1}
-              className={`px-3 py-1 border rounded ${page == i + 1 ? "bg-blue-300" : "bg-amber-300"}`}
+              className={`px-3 py-1 border rounded transition-all duration-500 ${page == i + 1 ? "bg-blue-300 hover:bg-blue-400" : "bg-amber-300 hover:bg-amber-400"}`}
               onClick={() => Togglepage(i + 1)}
             >
               {i + 1}

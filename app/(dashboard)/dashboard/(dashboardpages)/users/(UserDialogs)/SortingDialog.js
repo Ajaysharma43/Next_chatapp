@@ -36,24 +36,10 @@ export const Sorting = ({ open, onClose, handleSort }) => {
               className="w-full p-2 border rounded"
             >
               <option value="name">Name</option>
-              <option value="time">Time</option>
+              <option value="created_at">Time</option>
               <option value="id">ID</option>
             </select>
           </div>
-
-          {/* Show Time Input if 'Time' is Selected */}
-          {formData.sortBy === "time" && (
-            <div>
-              <label className="block text-sm font-medium">Select Time</label>
-              <input
-                type="datetime-local"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-              />
-            </div>
-          )}
 
           {/* Order Selection */}
           <div>
@@ -64,8 +50,8 @@ export const Sorting = ({ open, onClose, handleSort }) => {
               onChange={handleChange}
               className="w-full p-2 border rounded"
             >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
+              <option value="ASC">Ascending</option>
+              <option value="DESC">Descending</option>
             </select>
           </div>
 

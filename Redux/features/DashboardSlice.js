@@ -9,6 +9,16 @@ export const GetUserData = createAsyncThunk('GetUserData', async ({ limit, page 
         console.error(error)
     }
 })
+
+export const SortUserData = createAsyncThunk('GetSortData', async ({ data , limit , page }) => {
+    try {
+        const res = await DashboardInstance.post(`/SortData`, { data , limit , page })
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+
+})
 const initialState = {
     UserData: [],
     Totalpages: null
@@ -21,6 +31,11 @@ const DashboardReducer = createSlice({
         builder.addCase(GetUserData.fulfilled, (state, action) => {
             state.UserData = action.payload.Data,
                 state.Totalpages = action.payload.TotalPages
+        }),
+
+        builder.addCase(SortUserData.fulfilled, (state, action) => {
+            state.UserData = action.payload.Data
+            state.Totalpages = action.payload.TotalPages
         })
     }
 })
