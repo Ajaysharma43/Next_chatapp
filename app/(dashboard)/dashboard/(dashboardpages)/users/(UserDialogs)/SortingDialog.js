@@ -5,14 +5,34 @@ export const Sorting = ({ open, onClose, handleSort }) => {
   const [formData, setFormData] = useState({
     sortBy: "name", // Default sorting criteria
     order: "asc", // Default order
-    time: "", // Time input (only if "Time" is selected)
+    time: {
+      From: "",
+      To: ""
+    }, // Time input (only if "Time" is selected)
   });
 
   // Handle changes in sorting selection
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((prev) => {
+      if (name.startsWith("time.")) {
+        const key = name.split(".")[1]; // Extract 'From' or 'To'
+        let updatedTime = { ...prev.time, [key]: value };
+
+        // Ensure "To" date is not before "From" date
+        if (key === "From" && prev.time.To && value > prev.time.To) {
+          updatedTime.To = value; // Adjust "To" to match "From"
+        }
+
+        return { ...prev, time: updatedTime };
+      }
+
+      return { ...prev, [name]: value };
+    });
   };
+
+
 
   // Handle form submission
   const handleSubmit = (e) => {
@@ -41,6 +61,41 @@ export const Sorting = ({ open, onClose, handleSort }) => {
             </select>
           </div>
 
+          {
+            formData.sortBy == 'created_at' ?
+              (
+                <div>
+                  <div>
+                    <label>From</label>
+                    <input
+                      type="date"
+                      name="time.From"
+                      value={formData.time.From}
+                      onChange={handleChange}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+
+                  <div>
+                    <label>To</label>
+                    <input
+                      type="date"
+                      name="time.To"
+                      value={formData.time.To}
+                      onChange={handleChange}
+                      min={formData.time.From} // Prevents selecting a date before "From"
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+
+                </div>
+              )
+              :
+              (
+                ""
+              )
+          }
+
           {/* Order Selection */}
           <div>
             <label className="block text-sm font-medium">Order</label>
@@ -54,6 +109,8 @@ export const Sorting = ({ open, onClose, handleSort }) => {
               <option value="DESC">Descending</option>
             </select>
           </div>
+
+
 
           {/* Buttons */}
           <div className="flex justify-end space-x-2">
