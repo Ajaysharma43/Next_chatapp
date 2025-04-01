@@ -196,6 +196,12 @@ const Users = () => {
 
       <Sorting open={sortdialog} onClose={HandleSortingdialog} handleSort={handleSort} />
 
+<div className="flex justify-center m-4 gap-2">
+<input type="search" name="" id="" className="border p-2 rounded-md transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-0 focus:ring-blue-300"/>
+<button className="p-2 bg-blue-400 text-white uppercase rounded-md transition-all duration-300 cursor-pointer hover:bg-blue-600">Search</button>
+</div>
+
+
       <div className="flex justify-end m-4">
         <button className="uppercase bg-purple-400 p-4 text-white shadow rounded-lg transition-all duration-300 hover:bg-purple-600" onClick={HandleSortingdialog}>sortdata</button>
       </div>
