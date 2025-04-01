@@ -84,7 +84,7 @@ const Users = () => {
             user.id === formData.id ? { ...user, ...formData } : user
           )
         );
-        
+
         handleCloseDialog();
       } else {
         alert("Data updating failed");
@@ -111,8 +111,8 @@ const Users = () => {
     if (res.data.Success == true) {
       const updatedata = localUserData.filter((item) => item.id !== id)
       let data = sortingData
-        dispatch(SortUserData({ data, limit, page }))
-      
+      dispatch(SortUserData({ data, limit, page }))
+
       setdeletedilog(false)
     }
     else {
