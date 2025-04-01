@@ -132,9 +132,9 @@ export const AddUser = ({ open, onClose, HandleCreate }) => {
             />
             {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
             {emailStatus && <motion.p className={`text-xs mt-1 ${emailStatus.includes("Error") ? "text-red-500" : "text-green-500"}`}
-            initial={{opacity : 0 }}
-            animate={{opacity : 1 }}
-            transition={{duration : 1}}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1 }}
             >{emailStatus}</motion.p>}
           </div>
 
