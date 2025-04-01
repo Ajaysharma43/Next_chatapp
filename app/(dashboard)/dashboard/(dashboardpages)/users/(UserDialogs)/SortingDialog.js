@@ -42,7 +42,7 @@ export const Sorting = ({ open, onClose, handleSort }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+    <Dialog open={open} maxWidth="xs" fullWidth>
       <DialogTitle className="text-center text-lg font-bold">Sort Data</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit} className="space-y-4 p-4">

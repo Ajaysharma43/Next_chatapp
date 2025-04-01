@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogTitle, TextField, Button, InputLabel, Sele
 
 export const UpdateDialog = ({ open, onClose, formData, handleChange, handleSubmit }) => {
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} >
       <DialogTitle>Update User</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
