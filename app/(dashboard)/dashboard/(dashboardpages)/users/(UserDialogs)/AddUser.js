@@ -1,6 +1,7 @@
 import { AuthInstance } from "@/Interseptors/AuthInterseptors";
 import { Dialog, DialogContent, DialogTitle } from "@mui/material";
 import { useEffect, useState } from "react";
+import { motion } from 'framer-motion'
 
 export const AddUser = ({ open, onClose, HandleCreate }) => {
   const [formData, setFormData] = useState({
@@ -9,7 +10,7 @@ export const AddUser = ({ open, onClose, HandleCreate }) => {
     phone: "",
     street: "",
     city: "",
-    country : "",
+    country: "",
     postal_code: "",
     password: "",
     confirmPassword: "",
@@ -17,41 +18,46 @@ export const AddUser = ({ open, onClose, HandleCreate }) => {
 
   const [errors, setErrors] = useState({});
   const [emailStatus, setEmailStatus] = useState(null);
-  const [Create , setCreateUser] = useState(false)
+  const [Create, setCreateUser] = useState(false)
   const [typingTimeout, setTypingTimeout] = useState(null);
 
   // Handle input change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-
-    if (name === "email") {
-      if (typingTimeout) clearTimeout(typingTimeout);
-      setTypingTimeout(setTimeout(() => EmailVerify(value), 500)); // Debounce Email Verify
-    }
   };
 
   // Email Verification with Debounce
   const EmailVerify = async (email) => {
-    if (!email) return;
-  
+    if (!formData.email) return;
+
     try {
-      const res = await AuthInstance.post("/Checkuser", { email });
-  
-      if (res.data.success) {
-        setEmailStatus("Email available");
-        setCreateUser(true);
-      } else {
-        setEmailStatus("Email already in use");
-        setCreateUser(false);
+      if (formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        const res = await AuthInstance.post("/Checkuser", { email: formData.email });
+        setEmailStatus("wait checking if email is available ...")
+        if (res.data.success) {
+          setTimeout(() => {
+            setEmailStatus("Email available");
+            setCreateUser(true);
+          }, 2000);
+        } else {
+          setTimeout(() => {
+            setEmailStatus("Email already in use");
+            setCreateUser(false);
+          }, 2000);
+        }
       }
+      else {
+        setEmailStatus("Invalid email format")
+      }
+
     } catch (error) {
       console.error("Email verification failed:", error);
       setEmailStatus("Error checking email");
       setCreateUser(false);
     }
   };
-  
+
 
   // Validate form data
   const validate = () => {
@@ -80,7 +86,7 @@ export const AddUser = ({ open, onClose, HandleCreate }) => {
         phone: "",
         street: "",
         city: "",
-        country : "",
+        country: "",
         postal_code: "",
         password: "",
         confirmPassword: "",
@@ -96,7 +102,7 @@ export const AddUser = ({ open, onClose, HandleCreate }) => {
   }, [typingTimeout]);
 
   return (
-    <Dialog open={open}  maxWidth="sm" fullWidth>
+    <Dialog open={open} maxWidth="sm" fullWidth>
       <DialogTitle className="text-center text-lg font-bold">Add New User</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -121,10 +127,15 @@ export const AddUser = ({ open, onClose, HandleCreate }) => {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              onBlur={EmailVerify}
               className="w-full p-2 border rounded focus:border-blue-500"
             />
             {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
-            {emailStatus && <p className={`text-xs mt-1 ${emailStatus.includes("Error") ? "text-red-500" : "text-green-500"}`}>{emailStatus}</p>}
+            {emailStatus && <motion.p className={`text-xs mt-1 ${emailStatus.includes("Error") ? "text-red-500" : "text-green-500"}`}
+            initial={{opacity : 0 }}
+            animate={{opacity : 1 }}
+            transition={{duration : 1}}
+            >{emailStatus}</motion.p>}
           </div>
 
           {/* Phone */}
