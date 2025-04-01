@@ -1,6 +1,6 @@
 "use client";
 import { GetUserData } from "@/Redux/features/DashboardSlice";
-import { Edit, Trash } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, Edit, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { UpdateDialog } from "./(UserDialogs)/UpdateDialoag";
@@ -12,11 +12,12 @@ import { Sorting } from "./(UserDialogs)/SortingDialog";
 const Users = () => {
   const dispatch = useDispatch();
   const UserData = useSelector((state) => state.DashboardReducer.UserData);
+  const Totalpages = useSelector((state) => state.DashboardReducer.Totalpages);
   const [localUserData, setLocalUserData] = useState(UserData);
   const [UpdateDialogState, setUpdateDialogState] = useState(false);
   const [DeleteDilog, setdeletedilog] = useState(false)
   const [AddUserDialog, setAddUserDialog] = useState(false)
-  const [sortdialog , setsortdialog] = useState(false)
+  const [sortdialog, setsortdialog] = useState(false)
   const [id, setid] = useState(null)
   const [formData, setFormData] = useState({
     name: "",
@@ -27,11 +28,11 @@ const Users = () => {
     country: "",
     roles: "",
   });
-  const [limit, setLimit] = useState(5);
-
+  const [limit, setLimit] = useState(2);
+  const [page, setpage] = useState(1)
   useEffect(() => {
-    dispatch(GetUserData({ limit }));
-  }, [dispatch, limit]);
+    dispatch(GetUserData({ limit, page }));
+  }, [dispatch, limit, page]);
 
   useEffect(() => {
     setLocalUserData(UserData);
@@ -110,44 +111,60 @@ const Users = () => {
   }
 
   const HandleCreate = () => {
-    if(AddUserDialog == false)
-    {
+    if (AddUserDialog == false) {
       setAddUserDialog(true)
     }
-    else
-    {
+    else {
       setAddUserDialog(false)
     }
   }
 
-  const CreateUser = async(UserData) => {
-    console.log('user data is : ' , UserData)
-    const res = await DashboardInstance.post('/CreateUser' , {UserData})
-    if(res.data.Success == true)
-    {
+  const CreateUser = async (UserData) => {
+    console.log('user data is : ', UserData)
+    const res = await DashboardInstance.post('/CreateUser', { UserData })
+    if (res.data.Success == true) {
       console.log(res.data.user)
       setLocalUserData([...localUserData, ...res.data.user]);
 
     }
-    else
-    {
+    else {
       alert('user creation failed')
     }
   }
 
   const HandleSortingdialog = () => {
-    if(sortdialog == false)
-    {
+    if (sortdialog == false) {
       setsortdialog(true)
     }
-    else
-    {
+    else {
       setsortdialog(false)
     }
   }
 
   const handleSort = (data) => {
     console.log(data)
+  }
+
+  const Togglepage = (page) => {
+    setpage(page)
+  }
+
+  const NextPage = () => {
+    if (page >= Totalpages) {
+      setpage(Totalpages)
+    }
+    else {
+      setpage(page + 1)
+    }
+  }
+
+  const PrevPage = () => {
+    if (page <= 1) {
+      setpage(1)
+    }
+    else {
+      setpage(page - 1)
+    }
   }
 
   return (
@@ -162,9 +179,9 @@ const Users = () => {
 
       <DeleteUser open={DeleteDilog} onClose={HandleDeleteDialog} id={id} handleDelete={HandleDelete} />
 
-      <AddUser open={AddUserDialog}  onClose={HandleCreate} HandleCreate={CreateUser}/>
+      <AddUser open={AddUserDialog} onClose={HandleCreate} HandleCreate={CreateUser} />
 
-      <Sorting open={sortdialog} onClose={HandleSortingdialog} handleSort={handleSort}/>
+      <Sorting open={sortdialog} onClose={HandleSortingdialog} handleSort={handleSort} />
 
       <div className="flex justify-end m-4">
         <button className="uppercase bg-purple-400 p-4 text-white shadow rounded-lg transition-all duration-300 hover:bg-purple-600" onClick={HandleSortingdialog}>sortdata</button>
@@ -234,11 +251,29 @@ const Users = () => {
           </table>
         </div>
       </div>
-      
-      <div className="flex justify-end m-4">
-      <button className="uppercase bg-purple-400 p-4 text-white shadow rounded-lg transition-all duration-300 hover:bg-purple-600" onClick={HandleCreate}>Adduser</button>
+      <div className="flex justify-center gap-4">
+        <button onClick={PrevPage}>
+          <ArrowBigLeft />
+        </button>
+
+        {
+          Array.from({ length: Totalpages }, (_, i) => (
+            <button
+              key={i + 1}
+              className={`px-3 py-1 border rounded ${page == i + 1 ? "bg-blue-300" : "bg-amber-300"}`}
+              onClick={() => Togglepage(i + 1)}
+            >
+              {i + 1}
+            </button>
+          ))
+        }
+        <button onClick={NextPage}><ArrowBigRight /></button>
       </div>
-      
+
+      <div className="flex justify-end m-4">
+        <button className="uppercase bg-purple-400 p-4 text-white shadow rounded-lg transition-all duration-300 hover:bg-purple-600" onClick={HandleCreate}>Adduser</button>
+      </div>
+
     </>
   );
 };
