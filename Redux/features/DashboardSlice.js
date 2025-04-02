@@ -32,9 +32,7 @@ export const GetSearchData = createAsyncThunk('GetSearchData', async ({ SearchUs
 
 export const SearchSortedData = createAsyncThunk('SearchSortedData', async ({ SearchUserData, data, limit, page }) => {
     try {
-        console.log(SearchUserData, data, limit, page)
         const res = await DashboardInstance.post('/SearchSortData', { SearchUserData, data, limit, page })
-        console.log(res.data)
         return res.data;
     } catch (error) {
         console.error(error)

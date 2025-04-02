@@ -38,11 +38,10 @@ const Users = () => {
 
 
   useEffect(() => {
-    if(isSearched == true && IsSorting == true)
-      {
-        let data = sortingData
-        dispatch(SearchSortedData({ SearchUserData, data, limit, page }))
-      }
+    if (isSearched == true && IsSorting == true) {
+      let data = sortingData
+      dispatch(SearchSortedData({ SearchUserData, data, limit, page }))
+    }
     else if (isSearched == true) {
       dispatch(GetSearchData({ SearchUserData, limit, page }))
     }
@@ -50,7 +49,7 @@ const Users = () => {
       let data = sortingData
       dispatch(SortUserData({ data, limit, page }))
     }
-    
+
     else {
       dispatch(GetUserData({ limit, page }));
     }
@@ -168,16 +167,25 @@ const Users = () => {
     if (isSearched == true) {
       dispatch(SearchSortedData({ SearchUserData, data, limit, page }))
     }
-    else
-    {
+    else {
       dispatch(SortUserData({ data, limit, page }))
     }
-    
+
   }
 
   const SearchData = async () => {
     dispatch(GetSearchData({ SearchUserData, limit, page }))
   }
+
+  const Handlechange = (e) => {
+    const value = e.target.value;
+    setsearchuserdata(value);
+    
+    if (!value.trim()) {  // Use 'value' instead of 'SearchUserData'
+        dispatch(GetUserData({ limit, page }));
+    }
+};
+
 
   return (
     <>
@@ -198,7 +206,7 @@ const Users = () => {
       <BackdropLoader />
 
       <div className="flex justify-center m-4 gap-2">
-        <input type="search" name="" id="" value={SearchUserData} onChange={(e) => setsearchuserdata(e.target.value)} className="border p-2 rounded-md transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-0 focus:ring-blue-300" />
+        <input type="search" name="" id="" value={SearchUserData} onChange={(e) => Handlechange(e)} className="border p-2 rounded-md transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-0 focus:ring-blue-300" />
         <button className="p-2 bg-blue-400 text-white uppercase rounded-md transition-all duration-300 cursor-pointer hover:bg-blue-600" onClick={SearchData}>Search</button>
 
       </div>
