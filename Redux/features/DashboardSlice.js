@@ -13,6 +13,7 @@ export const GetUserData = createAsyncThunk('GetUserData', async ({ limit, page 
 export const SortUserData = createAsyncThunk('GetSortData', async ({ data, limit, page }) => {
     try {
         const res = await DashboardInstance.post(`/SortData`, { data, limit, page })
+        console.log(res.data)
         return res.data
     } catch (error) {
         console.error(error)
@@ -23,6 +24,7 @@ export const SortUserData = createAsyncThunk('GetSortData', async ({ data, limit
 export const GetSearchData = createAsyncThunk('GetSearchData', async ({ SearchUserData, limit, page }) => {
     try {
         const res = await DashboardInstance.post('/Search', { SearchUserData, limit, page })
+        
         return res.data
 
     } catch (error) {
@@ -50,8 +52,8 @@ const initialState = {
 }
 
 const UpdateCurrentPage = (state, action) => {
-    if (state.CurrentPage >= action.payload.TotalPages) {
-        return state.CurrentPage = action.payload.TotalPages
+    if (state.CurrentPage > action.payload.TotalPages) {
+        return action.payload.TotalPages
     }
     else {
         return state.CurrentPage
@@ -88,17 +90,17 @@ const DashboardReducer = createSlice({
     extraReducers: (builder) => {
         // GetUserData reducers
         builder.addCase(GetUserData.fulfilled, (state, action) => {
-            state.CurrentPage = UpdateCurrentPage(state, action)
             state.UserData = action.payload.Data,
                 state.Totalpages = action.payload.TotalPages
+                state.CurrentPage = UpdateCurrentPage(state, action)
             state.IsSearched = false
         })
 
         // SortUserData reducers
         builder.addCase(SortUserData.fulfilled, (state, action) => {
-            state.CurrentPage = UpdateCurrentPage(state, action)
             state.UserData = action.payload.Data
             state.Totalpages = action.payload.TotalPages
+            state.CurrentPage = UpdateCurrentPage(state, action)
         })
 
         // GetSearchData reducers
@@ -106,10 +108,10 @@ const DashboardReducer = createSlice({
             state.SearchLoading = true
         })
         builder.addCase(GetSearchData.fulfilled, (state, action) => {
-            state.CurrentPage = UpdateCurrentPage(state, action)
             state.UserData = action.payload.Data
             state.Totalpages = action.payload.TotalPages
             state.IsSearched = action.payload.Success
+            state.CurrentPage = UpdateCurrentPage(state, action)
             state.SearchLoading = false
         })
         builder.addCase(GetSearchData.rejected, (state, action) => {
@@ -122,10 +124,10 @@ const DashboardReducer = createSlice({
         })
 
         builder.addCase(SearchSortedData.fulfilled, (state, action) => {
-            state.CurrentPage = UpdateCurrentPage(state, action)
             state.UserData = action.payload.UserData
             state.Totalpages = action.payload.TotalPages
             state.IsSearched = action.payload.Success
+            state.CurrentPage = UpdateCurrentPage(state, action)
             state.SearchLoading = false
         })
     }
