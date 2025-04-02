@@ -38,6 +38,8 @@ export const SearchSortedData = createAsyncThunk('SearchSortedData', async ({ Se
         console.error(error)
     }
 })
+
+
 const initialState = {
     UserData: [],
     Totalpages: null,
@@ -45,6 +47,17 @@ const initialState = {
     Limit: 2,
     CurrentPage: 1,
     SearchLoading: false
+}
+
+const UpdateCurrentPage = (state , action) => {
+    if(state.CurrentPage >= action.payload.TotalPages)
+    {
+        return state.CurrentPage = action.payload.TotalPages
+    }
+    else
+    {
+        return state.CurrentPage
+    }
 }
 
 const DashboardReducer = createSlice({
@@ -68,8 +81,10 @@ const DashboardReducer = createSlice({
             }
         },
         Toggle: (state, action) => {
-            console.log(action.payload)
             state.CurrentPage = action.payload
+        },
+        UpdatePage : (state , action) => {
+            state.CurrentPage = 1
         }
     },
     extraReducers: (builder) => {
@@ -77,15 +92,18 @@ const DashboardReducer = createSlice({
         builder.addCase(GetUserData.fulfilled, (state, action) => {
             state.UserData = action.payload.Data,
                 state.Totalpages = action.payload.TotalPages
+                state.CurrentPage = UpdateCurrentPage(state , action)
+                state.IsSearched = false
         }),
 
             // SortUserData reducers
             builder.addCase(SortUserData.fulfilled, (state, action) => {
                 state.UserData = action.payload.Data
                 state.Totalpages = action.payload.TotalPages
+                state.CurrentPage = UpdateCurrentPage(state , action)
             })
 
-        // GetUserData reducers
+        // GetSearchData reducers
         builder.addCase(GetSearchData.pending, (state, action) => {
             state.SearchLoading = true
         })
@@ -93,13 +111,14 @@ const DashboardReducer = createSlice({
             state.UserData = action.payload.Data
             state.Totalpages = action.payload.TotalPages
             state.IsSearched = action.payload.Success
+            state.CurrentPage = UpdateCurrentPage(state , action)
             state.SearchLoading = false
         })
         builder.addCase(GetSearchData.rejected, (state, action) => {
             state.SearchLoading = false
         })
 
-        // SearchUserData reducers
+        // GetSearchSortedData reducers
         builder.addCase(SearchSortedData.pending, (state, action) => {
             state.SearchLoading = true
         })
@@ -108,11 +127,12 @@ const DashboardReducer = createSlice({
             state.UserData = action.payload.UserData
             state.Totalpages = action.payload.TotalPages
             state.IsSearched = action.payload.Success
+            state.CurrentPage = UpdateCurrentPage(state , action)
             state.SearchLoading = false
         })
     }
 })
 
 
-export const { Next, Prev, Toggle } = DashboardReducer.actions;
+export const { Next, Prev, Toggle ,UpdatePage } = DashboardReducer.actions;
 export default DashboardReducer.reducer

@@ -1,5 +1,5 @@
 "use client";
-import { GetSearchData, GetUserData, Next, Prev, SearchSortedData, SortUserData, Toggle } from "@/Redux/features/DashboardSlice";
+import { GetSearchData, GetUserData, Next, Prev, SearchSortedData, SortUserData, Toggle, UpdatePage } from "@/Redux/features/DashboardSlice";
 import { ArrowBigLeft, ArrowBigRight, Edit, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -181,7 +181,7 @@ const Users = () => {
     const value = e.target.value;
     setsearchuserdata(value);
     
-    if (!value.trim()) {  // Use 'value' instead of 'SearchUserData'
+    if (!value.trim()) {
         dispatch(GetUserData({ limit, page }));
     }
 };
