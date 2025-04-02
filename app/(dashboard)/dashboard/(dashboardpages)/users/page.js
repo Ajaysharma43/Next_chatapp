@@ -1,5 +1,5 @@
 "use client";
-import { GetSearchData, GetUserData, Next, Prev, SortUserData, Toggle } from "@/Redux/features/DashboardSlice";
+import { GetSearchData, GetUserData, Next, Prev, SearchSortedData, SortUserData, Toggle } from "@/Redux/features/DashboardSlice";
 import { ArrowBigLeft, ArrowBigRight, Edit, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,13 +38,20 @@ const Users = () => {
 
 
   useEffect(() => {
-    if (isSearched == true) {
+    console.log(isSearched , IsSorting)
+    if(isSearched == true && IsSorting == true)
+      {
+        let data = sortingData
+        dispatch(SearchSortedData({ SearchUserData, data, limit, page }))
+      }
+    else if (isSearched == true) {
       dispatch(GetSearchData({ SearchUserData, limit, page }))
     }
     else if (IsSorting == true) {
       let data = sortingData
       dispatch(SortUserData({ data, limit, page }))
     }
+    
     else {
       dispatch(GetUserData({ limit, page }));
     }
@@ -162,7 +169,14 @@ const Users = () => {
     setIsSorting(true)
     console.log(data)
     setSortingData(data)
-    dispatch(SortUserData({ data, limit, page }))
+    if (isSearched == true) {
+      dispatch(SearchSortedData({ SearchUserData, data, limit, page }))
+    }
+    else
+    {
+      dispatch(SortUserData({ data, limit, page }))
+    }
+    
   }
 
   const SearchData = async () => {
@@ -186,7 +200,7 @@ const Users = () => {
 
       <Sorting open={sortdialog} onClose={HandleSortingdialog} handleSort={handleSort} />
 
-      <BackdropLoader/>
+      <BackdropLoader />
 
       <div className="flex justify-center m-4 gap-2">
         <input type="search" name="" id="" value={SearchUserData} onChange={(e) => setsearchuserdata(e.target.value)} className="border p-2 rounded-md transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-0 focus:ring-blue-300" />
