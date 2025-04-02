@@ -174,7 +174,16 @@ const Users = () => {
   }
 
   const SearchData = async () => {
-    dispatch(GetSearchData({ SearchUserData, limit, page }))
+    if(IsSorting == true)
+    {
+      let data = sortingData
+      dispatch(SearchSortedData({ SearchUserData, data, limit, page }))
+    }
+    else
+    {
+      dispatch(GetSearchData({ SearchUserData, limit, page }))
+    }
+    
   }
 
   const Handlechange = (e) => {
