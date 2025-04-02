@@ -1,5 +1,5 @@
 "use client";
-import { GetUserData, SortUserData } from "@/Redux/features/DashboardSlice";
+import { GetSearchData, GetUserData, SortUserData } from "@/Redux/features/DashboardSlice";
 import { ArrowBigLeft, ArrowBigRight, Edit, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,9 +32,15 @@ const Users = () => {
   const [limit, setLimit] = useState(2);
   const [page, setpage] = useState(1)
   const [IsSorting, setIsSorting] = useState(false)
+  const [SearchUserData, setsearchuserdata] = useState("")
+  const isSearched = useSelector((state) => state.DashboardReducer.IsSearched)
 
   useEffect(() => {
-    if (IsSorting == true) {
+    if(isSearched == true)
+    {
+      dispatch(GetSearchData({SearchUserData , limit , page}))
+    }
+    else if (IsSorting == true) {
       let data = sortingData
       dispatch(SortUserData({ data, limit, page }))
     }
@@ -180,6 +186,11 @@ const Users = () => {
     }
   }
 
+  const SearchData = async () => {
+    console.log(SearchUserData)
+    dispatch(GetSearchData({SearchUserData , limit , page}))
+  }
+
   return (
     <>
       <UpdateDialog
@@ -196,10 +207,11 @@ const Users = () => {
 
       <Sorting open={sortdialog} onClose={HandleSortingdialog} handleSort={handleSort} />
 
-<div className="flex justify-center m-4 gap-2">
-<input type="search" name="" id="" className="border p-2 rounded-md transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-0 focus:ring-blue-300"/>
-<button className="p-2 bg-blue-400 text-white uppercase rounded-md transition-all duration-300 cursor-pointer hover:bg-blue-600">Search</button>
-</div>
+      <div className="flex justify-center m-4 gap-2">
+        <input type="search" name="" id="" value={SearchUserData} onChange={(e) => setsearchuserdata(e.target.value)} className="border p-2 rounded-md transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-0 focus:ring-blue-300" />
+        <button className="p-2 bg-blue-400 text-white uppercase rounded-md transition-all duration-300 cursor-pointer hover:bg-blue-600" onClick={SearchData}>Search</button>
+
+      </div>
 
 
       <div className="flex justify-end m-4">

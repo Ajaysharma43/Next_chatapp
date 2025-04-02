@@ -10,9 +10,19 @@ export const GetUserData = createAsyncThunk('GetUserData', async ({ limit, page 
     }
 })
 
-export const SortUserData = createAsyncThunk('GetSortData', async ({ data , limit , page }) => {
+export const SortUserData = createAsyncThunk('GetSortData', async ({ data, limit, page }) => {
     try {
-        const res = await DashboardInstance.post(`/SortData`, { data , limit , page })
+        const res = await DashboardInstance.post(`/SortData`, { data, limit, page })
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+
+})
+
+export const GetSearchData = createAsyncThunk('GetSearchData', async ({ SearchUserData, limit, page }) => {
+    try {
+        const res = await DashboardInstance.post('/Search', { SearchUserData, limit, page })
         return res.data
     } catch (error) {
         console.error(error)
@@ -21,7 +31,8 @@ export const SortUserData = createAsyncThunk('GetSortData', async ({ data , limi
 })
 const initialState = {
     UserData: [],
-    Totalpages: null
+    Totalpages: null,
+    IsSearched: false
 }
 
 const DashboardReducer = createSlice({
@@ -33,9 +44,15 @@ const DashboardReducer = createSlice({
                 state.Totalpages = action.payload.TotalPages
         }),
 
-        builder.addCase(SortUserData.fulfilled, (state, action) => {
+            builder.addCase(SortUserData.fulfilled, (state, action) => {
+                state.UserData = action.payload.Data
+                state.Totalpages = action.payload.TotalPages
+            })
+
+        builder.addCase(GetSearchData.fulfilled, (state, action) => {
             state.UserData = action.payload.Data
             state.Totalpages = action.payload.TotalPages
+            state.IsSearched = action.payload.Success
         })
     }
 })
