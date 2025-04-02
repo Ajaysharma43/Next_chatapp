@@ -49,13 +49,11 @@ const initialState = {
     SearchLoading: false
 }
 
-const UpdateCurrentPage = (state , action) => {
-    if(state.CurrentPage >= action.payload.TotalPages)
-    {
+const UpdateCurrentPage = (state, action) => {
+    if (state.CurrentPage >= action.payload.TotalPages) {
         return state.CurrentPage = action.payload.TotalPages
     }
-    else
-    {
+    else {
         return state.CurrentPage
     }
 }
@@ -83,35 +81,35 @@ const DashboardReducer = createSlice({
         Toggle: (state, action) => {
             state.CurrentPage = action.payload
         },
-        UpdatePage : (state , action) => {
+        UpdatePage: (state, action) => {
             state.CurrentPage = 1
         }
     },
     extraReducers: (builder) => {
         // GetUserData reducers
         builder.addCase(GetUserData.fulfilled, (state, action) => {
+            state.CurrentPage = UpdateCurrentPage(state, action)
             state.UserData = action.payload.Data,
                 state.Totalpages = action.payload.TotalPages
-                state.CurrentPage = UpdateCurrentPage(state , action)
-                state.IsSearched = false
-        }),
+            state.IsSearched = false
+        })
 
-            // SortUserData reducers
-            builder.addCase(SortUserData.fulfilled, (state, action) => {
-                state.UserData = action.payload.Data
-                state.Totalpages = action.payload.TotalPages
-                state.CurrentPage = UpdateCurrentPage(state , action)
-            })
+        // SortUserData reducers
+        builder.addCase(SortUserData.fulfilled, (state, action) => {
+            state.CurrentPage = UpdateCurrentPage(state, action)
+            state.UserData = action.payload.Data
+            state.Totalpages = action.payload.TotalPages
+        })
 
         // GetSearchData reducers
         builder.addCase(GetSearchData.pending, (state, action) => {
             state.SearchLoading = true
         })
         builder.addCase(GetSearchData.fulfilled, (state, action) => {
+            state.CurrentPage = UpdateCurrentPage(state, action)
             state.UserData = action.payload.Data
             state.Totalpages = action.payload.TotalPages
             state.IsSearched = action.payload.Success
-            state.CurrentPage = UpdateCurrentPage(state , action)
             state.SearchLoading = false
         })
         builder.addCase(GetSearchData.rejected, (state, action) => {
@@ -124,15 +122,15 @@ const DashboardReducer = createSlice({
         })
 
         builder.addCase(SearchSortedData.fulfilled, (state, action) => {
+            state.CurrentPage = UpdateCurrentPage(state, action)
             state.UserData = action.payload.UserData
             state.Totalpages = action.payload.TotalPages
             state.IsSearched = action.payload.Success
-            state.CurrentPage = UpdateCurrentPage(state , action)
             state.SearchLoading = false
         })
     }
 })
 
 
-export const { Next, Prev, Toggle ,UpdatePage } = DashboardReducer.actions;
+export const { Next, Prev, Toggle, UpdatePage } = DashboardReducer.actions;
 export default DashboardReducer.reducer
