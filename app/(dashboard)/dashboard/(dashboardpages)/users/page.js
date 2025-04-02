@@ -38,7 +38,6 @@ const Users = () => {
 
 
   useEffect(() => {
-    console.log(isSearched , IsSorting)
     if(isSearched == true && IsSorting == true)
       {
         let data = sortingData
@@ -120,7 +119,6 @@ const Users = () => {
   }
 
   const HandleDelete = async (id) => {
-    console.log("user deleted with id : ", id)
     const res = await DashboardInstance.delete(`/Delete?id=${id}`)
     if (res.data.Success == true) {
       const updatedata = localUserData.filter((item) => item.id !== id)
@@ -145,7 +143,6 @@ const Users = () => {
   }
 
   const CreateUser = async (UserData) => {
-    console.log('user data is : ', UserData)
     const res = await DashboardInstance.post('/CreateUser', { UserData })
     if (res.data.Success == true) {
       let data = sortingData
@@ -167,7 +164,6 @@ const Users = () => {
 
   const handleSort = (data) => {
     setIsSorting(true)
-    console.log(data)
     setSortingData(data)
     if (isSearched == true) {
       dispatch(SearchSortedData({ SearchUserData, data, limit, page }))
@@ -180,7 +176,6 @@ const Users = () => {
   }
 
   const SearchData = async () => {
-    console.log(SearchUserData)
     dispatch(GetSearchData({ SearchUserData, limit, page }))
   }
 

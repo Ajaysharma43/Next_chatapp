@@ -32,7 +32,7 @@ export const GetSearchData = createAsyncThunk('GetSearchData', async ({ SearchUs
 
 export const SearchSortedData = createAsyncThunk('SearchSortedData', async ({ SearchUserData, data, limit, page }) => {
     try {
-        console.log(SearchUserData , data, limit , page)
+        console.log(SearchUserData, data, limit, page)
         const res = await DashboardInstance.post('/SearchSortData', { SearchUserData, data, limit, page })
         console.log(res.data)
         return res.data;
@@ -75,16 +75,19 @@ const DashboardReducer = createSlice({
         }
     },
     extraReducers: (builder) => {
+        // GetUserData reducers
         builder.addCase(GetUserData.fulfilled, (state, action) => {
             state.UserData = action.payload.Data,
                 state.Totalpages = action.payload.TotalPages
         }),
 
+            // SortUserData reducers
             builder.addCase(SortUserData.fulfilled, (state, action) => {
                 state.UserData = action.payload.Data
                 state.Totalpages = action.payload.TotalPages
             })
 
+        // GetUserData reducers
         builder.addCase(GetSearchData.pending, (state, action) => {
             state.SearchLoading = true
         })
@@ -98,11 +101,12 @@ const DashboardReducer = createSlice({
             state.SearchLoading = false
         })
 
-        builder.addCase(SearchSortedData.pending , (state , action) => {
+        // SearchUserData reducers
+        builder.addCase(SearchSortedData.pending, (state, action) => {
             state.SearchLoading = true
         })
 
-        builder.addCase(SearchSortedData.fulfilled , (state , action) => {
+        builder.addCase(SearchSortedData.fulfilled, (state, action) => {
             state.UserData = action.payload.UserData
             state.Totalpages = action.payload.TotalPages
             state.IsSearched = action.payload.Success
