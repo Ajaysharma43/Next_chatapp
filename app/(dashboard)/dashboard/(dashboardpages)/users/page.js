@@ -1,5 +1,5 @@
 "use client";
-import { GetSearchData, GetUserData, SortUserData } from "@/Redux/features/DashboardSlice";
+import { GetSearchData, GetUserData, Next, Prev, SortUserData, Toggle } from "@/Redux/features/DashboardSlice";
 import { ArrowBigLeft, ArrowBigRight, Edit, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,11 +8,15 @@ import { DashboardInstance } from "@/Interseptors/DashboardInterseptors";
 import { DeleteUser } from "./(UserDialogs)/DeleteDilog";
 import { AddUser } from "./(UserDialogs)/AddUser";
 import { Sorting } from "./(UserDialogs)/SortingDialog";
+import BackdropLoader from "./(Loader)/loader";
 
 const Users = () => {
   const dispatch = useDispatch();
   const UserData = useSelector((state) => state.DashboardReducer.UserData);
   const Totalpages = useSelector((state) => state.DashboardReducer.Totalpages);
+  const limit = useSelector((state) => state.DashboardReducer.Limit);
+  const page = useSelector((state) => state.DashboardReducer.CurrentPage)
+  const isSearched = useSelector((state) => state.DashboardReducer.IsSearched)
   const [localUserData, setLocalUserData] = useState(UserData);
   const [UpdateDialogState, setUpdateDialogState] = useState(false);
   const [DeleteDilog, setdeletedilog] = useState(false)
@@ -29,16 +33,13 @@ const Users = () => {
     country: "",
     roles: "",
   });
-  const [limit, setLimit] = useState(2);
-  const [page, setpage] = useState(1)
   const [IsSorting, setIsSorting] = useState(false)
   const [SearchUserData, setsearchuserdata] = useState("")
-  const isSearched = useSelector((state) => state.DashboardReducer.IsSearched)
+
 
   useEffect(() => {
-    if(isSearched == true)
-    {
-      dispatch(GetSearchData({SearchUserData , limit , page}))
+    if (isSearched == true) {
+      dispatch(GetSearchData({ SearchUserData, limit, page }))
     }
     else if (IsSorting == true) {
       let data = sortingData
@@ -164,31 +165,9 @@ const Users = () => {
     dispatch(SortUserData({ data, limit, page }))
   }
 
-  const Togglepage = (page) => {
-    setpage(page)
-  }
-
-  const NextPage = () => {
-    if (page >= Totalpages) {
-      setpage(Totalpages)
-    }
-    else {
-      setpage(page + 1)
-    }
-  }
-
-  const PrevPage = () => {
-    if (page <= 1) {
-      setpage(1)
-    }
-    else {
-      setpage(page - 1)
-    }
-  }
-
   const SearchData = async () => {
     console.log(SearchUserData)
-    dispatch(GetSearchData({SearchUserData , limit , page}))
+    dispatch(GetSearchData({ SearchUserData, limit, page }))
   }
 
   return (
@@ -206,6 +185,8 @@ const Users = () => {
       <AddUser open={AddUserDialog} onClose={HandleCreate} HandleCreate={CreateUser} />
 
       <Sorting open={sortdialog} onClose={HandleSortingdialog} handleSort={handleSort} />
+
+      <BackdropLoader/>
 
       <div className="flex justify-center m-4 gap-2">
         <input type="search" name="" id="" value={SearchUserData} onChange={(e) => setsearchuserdata(e.target.value)} className="border p-2 rounded-md transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-offset-0 focus:ring-blue-300" />
@@ -283,7 +264,7 @@ const Users = () => {
         </div>
       </div>
       <div className="flex justify-center gap-4">
-        <button onClick={PrevPage} className={`w-fit h-fit p-1 transition-all duration-200  ${page == 1 ? "text-gray-500" : "text-black hover:bg-gray-300 hover:rounded-full"}`}>
+        <button onClick={() => dispatch(Prev())} className={`w-fit h-fit p-1 transition-all duration-200  ${page == 1 ? "text-gray-500" : "text-black hover:bg-gray-300 hover:rounded-full"}`}>
           <ArrowBigLeft className={``} />
         </button>
 
@@ -292,13 +273,13 @@ const Users = () => {
             <button
               key={i + 1}
               className={`px-3 py-1 border rounded transition-all duration-500 ${page == i + 1 ? "bg-blue-300 hover:bg-blue-400" : "bg-amber-300 hover:bg-amber-400"}`}
-              onClick={() => Togglepage(i + 1)}
+              onClick={() => dispatch(Toggle(i + 1))}
             >
               {i + 1}
             </button>
           ))
         }
-        <button onClick={NextPage} className={`w-fit h-fit p-1 transition-all duration-200  ${page == Totalpages ? "text-gray-500" : "text-black hover:bg-gray-300 hover:rounded-full"}`}><ArrowBigRight /></button>
+        <button onClick={() => dispatch(Next())} className={`w-fit h-fit p-1 transition-all duration-200  ${page == Totalpages ? "text-gray-500" : "text-black hover:bg-gray-300 hover:rounded-full"}`}><ArrowBigRight /></button>
       </div>
 
       <div className="flex justify-end m-4">
