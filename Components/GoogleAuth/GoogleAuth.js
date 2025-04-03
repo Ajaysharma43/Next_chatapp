@@ -27,6 +27,7 @@ const GetData = async (credentialResponse ,userid , router) => {
           secure: true,
           sameSite: "Strict",
         });
+
         router.push("/");
     }
     else
@@ -47,16 +48,8 @@ export default function LoginWithGoogle() {
       <GoogleLogin
         onSuccess={async (credentialResponse) => {
           try {
-            console.log(credentialResponse)
             const userid = credentialResponse.clientId
             const decode = jwtDecode(credentialResponse.credential);
-            console.log("Decoded Google Token:", decode);
-            console.log("Token Expiration:", new Date(decode.exp * 1000));
-
-            Cookies.set("AccessToken", credentialResponse.credential, {
-              secure: true,
-              sameSite: "Strict",
-            });
 
             if (decode.email_verified) {
               await GetData(credentialResponse , userid , router);
