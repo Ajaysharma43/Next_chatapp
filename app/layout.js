@@ -4,6 +4,7 @@ import Navbar from "@/Components/Navbar/navbar";
 import { Provider } from "react-redux";
 import store from "@/Redux/store";
 import ReduxProvider from "@/Redux/reduxprovider";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,10 +27,12 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID}>
         <ReduxProvider>
         <Navbar/>
         {children}
         </ReduxProvider>
+        </GoogleOAuthProvider>
       </body>
     </html>
   );

@@ -4,6 +4,7 @@ import { AuthInstance } from "@/Interseptors/AuthInterseptors";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import GoogleLogin from "../GoogleAuth/GoogleAuth";
 const LoginForm = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +84,10 @@ const LoginForm = () => {
           Login
         </button>
       </form>
+
+      <div>
+        <GoogleLogin/>
+      </div>
 
       <p className="text-sm text-center mt-3">
         Do not have an account?{" "}
