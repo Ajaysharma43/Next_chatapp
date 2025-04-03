@@ -13,6 +13,7 @@ const Navbar = () => {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const Pathname = usePathname();
     const accessToken = Cookies.get("AccessToken");
+    const [socialauth , setsocialauth] = useState(false)
 
     const Routes = ["/login", "/signup", "/dashboard", "/not-found"];
 
@@ -28,6 +29,7 @@ const Navbar = () => {
 
             try {
                 const decode = jwtDecode(token);
+                setsocialauth(decode?.socialauthenticated)
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
                 );
@@ -77,6 +79,9 @@ const Navbar = () => {
                                 </Link>
                             ))
                         )}
+                        {
+                            socialauth == true? (<><button>logout</button></>) : (<></>)
+                        }
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -119,6 +124,9 @@ const Navbar = () => {
                                 </li>
                             ))
                         )}
+                        {
+                            socialauth == true? (<><button>logout</button></>) : (<></>)
+                        }
                     </ul>
                 </div>
             </nav>
