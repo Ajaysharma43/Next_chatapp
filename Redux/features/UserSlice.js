@@ -22,6 +22,7 @@ export const GetSingleUser = createAsyncThunk('GetSingleUser', async ({ id, curr
 
 export const AddFriends = createAsyncThunk('AddFriends', async ({ data }) => {
     try {
+        console.log(data)
         const res = await UsersInstance.post('/SendRequest', { data })
         return res.data
     } catch (error) {
@@ -29,9 +30,18 @@ export const AddFriends = createAsyncThunk('AddFriends', async ({ data }) => {
     }
 })
 
-export const AcceptRequest = createAsyncThunk('AcceptRequest' , async({data}) => {
+export const AcceptRequest = createAsyncThunk('AcceptRequest', async ({ data }) => {
     try {
-        const res = await UsersInstance.post('/AcceptRequest' , {data})
+        const res = await UsersInstance.post('/AcceptRequest', { data })
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+export const DeclineRequest = createAsyncThunk('DeclineRequest', async ({ data }) => {
+    try {
+        const res = await UsersInstance.post('/DeclineRequest', { data })
         return res.data
     } catch (error) {
         console.error(error)
@@ -80,8 +90,13 @@ const UserReducer = createSlice({
             state.UsersRelation = action.payload.relationshipStatus
         })
 
-        builder.addCase(AcceptRequest.fulfilled , (state , action) => {
+        builder.addCase(AcceptRequest.fulfilled, (state, action) => {
             state.IsUserFriends = action.payload.success
+            state.UsersRelation = action.payload.relationshipStatus
+        })
+
+        builder.addCase(DeclineRequest.fulfilled , (state , action) => {
+            state.IsUserFriends = false
             state.UsersRelation = action.payload.relationshipStatus
         })
     }

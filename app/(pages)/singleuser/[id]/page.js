@@ -1,5 +1,5 @@
 "use client";
-import { AddFriends, AcceptFriendRequest, GetSingleUser, AcceptRequest } from "@/Redux/features/UserSlice";
+import { AddFriends, AcceptFriendRequest, GetSingleUser, AcceptRequest , DeclineRequest } from "@/Redux/features/UserSlice";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useParams } from "next/navigation";
@@ -32,6 +32,7 @@ const SingleUser = () => {
                 setCurrentUserId(decode.id);
                 setData({ sender: decode.id, receiver: parseInt(id) });
                 dispatch(GetSingleUser({ id, currentUserId: decode.id }));
+                console.log(senderid , currentUserId)
             } catch (error) {
                 console.error("Error decoding token:", error);
             }
@@ -41,7 +42,8 @@ const SingleUser = () => {
     }, [id, dispatch]);
 
     const handleSendFriendRequest = () => {
-        dispatch(AddFriends(data));
+        console.log(senderid , currentUserId)
+        dispatch(AddFriends({data}));
     };
 
     const handleAcceptFriendRequest = () => {
@@ -97,7 +99,8 @@ const SingleUser = () => {
                                                         onClick={() => dispatch(AcceptRequest({data}))}>
                                                             Accept
                                                         </button>
-                                                        <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg shadow-md transition duration-200 ease-in-out transform hover:scale-105">
+                                                        <button className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg shadow-md transition duration-200 ease-in-out transform hover:scale-105"
+                                                        onClick={() => dispatch(DeclineRequest({data}))}>
                                                             Reject
                                                         </button>
                                                     </div>
