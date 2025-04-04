@@ -19,14 +19,14 @@ const ShowUserData = () => {
             {SearchData.length > 0 ? (
                 <div className="space-y-3">
                     {SearchData.map((item) => (
-                        <>
+                        <div key={item.id}>
                         <Link href={`/singleuser/${item.id}`}>
                         <div key={item.id} className="bg-white p-3 rounded-lg shadow hover:bg-gray-50 transition">
                             <h1 className="text-lg font-semibold text-gray-800">{item.name}</h1>
                             
                         </div>
                         </Link>
-                        </>
+                        </div>
                     ))}
                 </div>
             ) : (

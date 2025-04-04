@@ -29,6 +29,15 @@ export const AddFriends = createAsyncThunk('AddFriends', async ({ data }) => {
     }
 })
 
+export const AcceptRequest = createAsyncThunk('AcceptRequest' , async({data}) => {
+    try {
+        const res = await UsersInstance.post('/AcceptRequest' , {data})
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 const initialState = {
     SearchData: [],
     SingleUser: {},
@@ -67,6 +76,11 @@ const UserReducer = createSlice({
             state.AddFriendsLoading = true
         })
         builder.addCase(AddFriends.fulfilled, (state, action) => {
+            state.IsUserFriends = action.payload.success
+            state.UsersRelation = action.payload.relationshipStatus
+        })
+
+        builder.addCase(AcceptRequest.fulfilled , (state , action) => {
             state.IsUserFriends = action.payload.success
             state.UsersRelation = action.payload.relationshipStatus
         })
