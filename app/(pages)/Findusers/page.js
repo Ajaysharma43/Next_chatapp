@@ -1,5 +1,6 @@
 "use client"
 import SearchUsers from "@/Components/FindUsersComponent/SearchUsers.jsx"
+import ShowUserData from "@/Components/FindUsersComponent/ShowUserdata"
 
 const About = () => {
     return(
@@ -8,6 +9,9 @@ const About = () => {
         <article>
             <section>
                 <SearchUsers/>
+            </section>
+            <section>
+                <ShowUserData/>
             </section>
         </article>
         </>
