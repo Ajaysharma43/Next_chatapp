@@ -24,6 +24,7 @@ export const AddFriends = createAsyncThunk('AddFriends', async ({ data }) => {
     try {
         console.log(data)
         const res = await UsersInstance.post('/SendRequest', { data })
+        console.log(res.data)
         return res.data
     } catch (error) {
         console.error(error)
@@ -88,6 +89,7 @@ const UserReducer = createSlice({
         builder.addCase(AddFriends.fulfilled, (state, action) => {
             state.IsUserFriends = action.payload.success
             state.UsersRelation = action.payload.relationshipStatus
+            state.senderid = action.payload.data.sender
         })
 
         builder.addCase(AcceptRequest.fulfilled, (state, action) => {

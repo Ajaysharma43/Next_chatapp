@@ -1,5 +1,5 @@
 "use client";
-import { AddFriends, AcceptFriendRequest, GetSingleUser, AcceptRequest , DeclineRequest } from "@/Redux/features/UserSlice";
+import { AddFriends, GetSingleUser, AcceptRequest , DeclineRequest } from "@/Redux/features/UserSlice";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useParams } from "next/navigation";
@@ -23,10 +23,6 @@ const SingleUser = () => {
         const fetchUser = () => {
             const token = Cookies.get("AccessToken");
 
-            if (!token) {
-                console.error("No token found");
-                return;
-            }
             try {
                 const decode = jwtDecode(token);
                 setCurrentUserId(decode.id);
@@ -46,9 +42,6 @@ const SingleUser = () => {
         dispatch(AddFriends({data}));
     };
 
-    const handleAcceptFriendRequest = () => {
-        dispatch(AcceptFriendRequest(data));
-    };
 
     if (IsUserSearchLoading) {
         return (
@@ -117,7 +110,6 @@ const SingleUser = () => {
                                         {UsersRelation === "request_received" ? (
                                             <button
                                                 className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg shadow-md transition"
-                                                onClick={handleAcceptFriendRequest}
                                             >
                                                 Accept Request ✅
                                             </button>
