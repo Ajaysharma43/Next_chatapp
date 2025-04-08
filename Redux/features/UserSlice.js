@@ -49,9 +49,20 @@ export const DeclineRequest = createAsyncThunk('DeclineRequest', async ({ data }
     }
 })
 
+export const GetRequests = createAsyncThunk('GetRequests', async ({ senderid }) => {
+    try {
+        const res = await UsersInstance.get(`/GetRequests?senderid=${senderid}`)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 const initialState = {
     SearchData: [],
     SingleUser: {},
+    Requests: [],
+    RecieveRequests : [],
     IsSearchLoading: false,
     IsUserSearchLoading: false,
     AddFriendsLoading: false,
@@ -97,9 +108,14 @@ const UserReducer = createSlice({
             state.UsersRelation = action.payload.relationshipStatus
         })
 
-        builder.addCase(DeclineRequest.fulfilled , (state , action) => {
+        builder.addCase(DeclineRequest.fulfilled, (state, action) => {
             state.IsUserFriends = false
             state.UsersRelation = action.payload.relationshipStatus
+        })
+
+        builder.addCase(GetRequests.fulfilled, (state, action) => {
+            state.Requests = action.payload.SendRequests
+            state.RecieveRequests = action.payload.ReciveRequests
         })
     }
 })
