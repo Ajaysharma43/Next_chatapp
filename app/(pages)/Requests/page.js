@@ -10,6 +10,7 @@ import ReceivedRequests from "./(UserRequests)/RecieveRequests";
 const Contact = () => {
     const Requests = useSelector((state) => state.UserReducer.Requests);
     const RecieveRequests = useSelector((state) => state.UserReducer.RecieveRequests);
+    const IsUserFriends = useSelector((state) => state.UserReducer.IsUserFriends);
     const dispatch = useDispatch();
     const [userId, setUserId] = useState(null);
 
@@ -21,7 +22,7 @@ const Contact = () => {
             dispatch(GetRequests({ senderid: Decode.id }));
         };
         GetUserRequests();
-    }, [dispatch]);
+    }, [dispatch , IsUserFriends]);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-100 py-10 px-6">

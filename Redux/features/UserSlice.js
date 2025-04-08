@@ -33,6 +33,7 @@ export const AddFriends = createAsyncThunk('AddFriends', async ({ data }) => {
 
 export const AcceptRequest = createAsyncThunk('AcceptRequest', async ({ data }) => {
     try {
+        console.log(data)
         const res = await UsersInstance.post('/AcceptRequest', { data })
         return res.data
     } catch (error) {

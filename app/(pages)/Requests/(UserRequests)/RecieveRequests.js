@@ -1,7 +1,10 @@
 "use client";
+import { AcceptRequest } from "@/Redux/features/UserSlice";
 import { UserPlus } from "lucide-react";
+import { useDispatch } from "react-redux";
 
 const ReceivedRequests = ({ requests, userId }) => {
+    const dispatch = useDispatch()
     return (
         <section>
             <div className="flex items-center justify-center gap-3 mb-8">
@@ -28,7 +31,8 @@ const ReceivedRequests = ({ requests, userId }) => {
                                         <strong>Received:</strong> {new Date(request.created_at).toLocaleString()}
                                     </p>
                                     <div className="mt-4 flex gap-3">
-                                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow transition">
+                                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow transition"
+                                        onClick={() => dispatch(AcceptRequest({data : {sender : request.sender_id , receiver : request.receiver_id} }))}>
                                             Accept
                                         </button>
                                         <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow transition">
