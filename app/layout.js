@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import store from "@/Redux/store";
 import ReduxProvider from "@/Redux/reduxprovider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import Friends from "@/Components/friends/page";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
         <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID}>
         <ReduxProvider>
         <Navbar/>
+        <Friends/>
         {children}
         </ReduxProvider>
         </GoogleOAuthProvider>

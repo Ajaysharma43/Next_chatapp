@@ -59,10 +59,21 @@ export const GetRequests = createAsyncThunk('GetRequests', async ({ senderid }) 
     }
 })
 
+export const CheckFriends = createAsyncThunk('CheckFriends' , async({id , data}) => {
+    try {
+        const res = await UsersInstance.post('/CheckFriends' , {id : id , data : data})
+        console.log(res.data)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 const initialState = {
     SearchData: [],
     SingleUser: {},
     Requests: [],
+    Friends : [],
     RecieveRequests : [],
     IsSearchLoading: false,
     IsUserSearchLoading: false,
@@ -118,6 +129,10 @@ const UserReducer = createSlice({
             state.Requests = action.payload.SendRequests
             state.RecieveRequests = action.payload.ReciveRequests
         })
+
+        builder.addCase(CheckFriends.fulfilled , (state , action) => {
+            state.Friends = action.payload.FriendsData
+        } )
     }
 })
 
