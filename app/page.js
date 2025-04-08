@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import { AnimatePresence, motion } from "framer-motion";
 import { MdDelete } from "react-icons/md";
+import socket from "./SocketConnection/SocketConnection";
 
 export default function Home() {
   const [messages, setMessages] = useState([]);
@@ -24,24 +25,24 @@ export default function Home() {
       setUser(decode.id);
     }
 
-    socketRef.current = io(`${process.env.NEXT_PUBLIC_SERVER_URL}`);
+    socket = io(`${process.env.NEXT_PUBLIC_SERVER_URL}`);
 
-    socketRef.current.on("GetPrevChats", (data) => {
+    socket.on("GetPrevChats", (data) => {
       setMessages(data.chats);
     });
 
-    socketRef.current.on('GetUpdatedChats', (data) => {
+    socket.on('GetUpdatedChats', (data) => {
       setVisibleDelete(false)
       setMessages(data.UpdatedData)
     })
 
-    socketRef.current.on('userTyping', (user) => {
+    socket.on('userTyping', (user) => {
       setTyping(true)
       console.log(`${user}  is typing`)
       setTypingUser(user)
     })
 
-    socketRef.current.on('userStoppedTyping', (user) => {
+    socket.on('userStoppedTyping', (user) => {
 
 
       console.log(`${user} stopped typing`)
@@ -49,28 +50,28 @@ export default function Home() {
       setTypingUser(null);
     })
 
-    socketRef.current.on("response", (message) => {
+    socket.on("response", (message) => {
       console.log(message.message)
       setMessages(message.message);
     });
 
     return () => {
-      socketRef.current.off('GetPrevChats')
-      socketRef.current.off('GetUpdatedChats')
-      socketRef.current.off('userTyping')
-      socketRef.current.off('response')
-      socketRef.current.disconnect();
+      socket.off('GetPrevChats')
+      socket.off('GetUpdatedChats')
+      socket.off('userTyping')
+      socket.off('response')
+      socket.disconnect();
     };
   }, []);
 
   const sendMessage = () => {
     if (!user || !newMessage.trim()) return;
-    socketRef.current.emit("message", { user, text: newMessage });
+    socket.emit("message", { user, text: newMessage });
     setNewMessage("");
   };
 
   const DeleteMessage = (id) => {
-    socketRef.current.emit('deleteMessage', (id))
+    socket.emit('deleteMessage', (id))
   }
 
   const toggleDelete = (index) => {
@@ -81,13 +82,13 @@ export default function Home() {
   };
 
   const HandleTyping = () => {
-    socketRef.current.emit('typing', (user))
+    socket.emit('typing', (user))
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
     typingTimeoutRef.current = setTimeout(() => {
-      socketRef.current.emit('stoppedtyping', (user))
+      socket.emit('stoppedtyping', (user))
     }, 1000);
   };
 
