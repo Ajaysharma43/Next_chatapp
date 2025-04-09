@@ -27,9 +27,9 @@ const PersonalChat = () => {
 
       socket.emit("PreviosChats", id, userid);
 
-      socket.on("Messages", (Chats) => {
+      socket.on("Messages", (Chats , onlineUsers) => {
         if (Chats && Chats.length > 0) {
-          console.log("Previous Chats:", Chats);
+          console.log("Previous Chats:", Chats , onlineUsers);
           setMessages(Chats);
         } else {
           console.log("No chats available");
