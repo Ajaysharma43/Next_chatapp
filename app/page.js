@@ -25,8 +25,6 @@ export default function Home() {
       setUser(decode.id);
     }
 
-    socket = io(`${process.env.NEXT_PUBLIC_SERVER_URL}`);
-
     socket.on("GetPrevChats", (data) => {
       setMessages(data.chats);
     });
