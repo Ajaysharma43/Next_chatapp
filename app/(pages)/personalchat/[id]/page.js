@@ -4,12 +4,16 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { FaCheckDouble } from "react-icons/fa6";
+
 
 const PersonalChat = () => {
   const { id } = useParams(); // `id` is the receiver's ID
   const [userid, setuserid] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setmessage] = useState("");
+  const onlineUsers = useSelector((state) => state.chatreducer.OnlineUsers);
   const bottomRef = useRef(null);
 
   // Decode user ID from JWT
@@ -17,32 +21,51 @@ const PersonalChat = () => {
     const token = Cookies.get("AccessToken");
     const decode = jwtDecode(token);
     setuserid(decode.id);
-  }, []);
+  }, [onlineUsers.length]);
 
   // Join room and fetch previous chats
   useEffect(() => {
     if (userid) {
       // Join your own room
-      socket.emit("join-room", userid);
+      socket.emit("join-room",id , userid);
 
       socket.emit("PreviosChats", id, userid);
 
-      socket.on("Messages", (Chats , onlineUsers) => {
+      socket.on("Messages", (Chats, onlineUsers) => {
         if (Chats && Chats.length > 0) {
-          console.log("Previous Chats:", Chats , onlineUsers);
+          console.log("Previous Chats:", Chats, onlineUsers);
           setMessages(Chats);
         } else {
           console.log("No chats available");
         }
       });
 
-      socket.on("RecieveMessages", (Messages) => {
-        console.log("Received Updated Messages:", Messages);
+      socket.on("RecieveMessages", (Messages, isRecieveronline) => {
+        console.log("Received Updated Messages:", Messages, isRecieveronline);
         setMessages((prev) => [...prev, ...Messages]);
         setmessage("");
-
+        if (isRecieveronline == true) {
+          socket.emit('MarkAsRead', parseInt(id) , userid)
+        }
       });
+
+      socket.on("UpdateMessagesStatus" , (MarkasRead) => {
+        console.log(MarkasRead)
+        setMessages(MarkasRead)
+      })
+
+      socket.on('UpdateMessages' , (updateddata) => {
+        console.log(updateddata)
+        setMessages(updateddata)
+      })
     }
+
+    return () => {
+      // leave the room when component unmounts
+      if (userid) {
+        socket.emit("leave-room", userid);
+      }
+    };
   }, [userid]);
 
   // Scroll to bottom on message update
@@ -68,6 +91,7 @@ const PersonalChat = () => {
   return (
     <>
       <div className="h-screen flex flex-col justify-between bg-white border rounded-lg shadow-lg">
+        <div>{onlineUsers.includes(parseInt(id)) ? (<><h1 className="text-green-400">online</h1></>) : (<><h1 className="text-red-400">offline</h1></>)}</div>
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50">
           {messages.map((item, index) => (
@@ -84,7 +108,7 @@ const PersonalChat = () => {
                     : "bg-gray-200 text-gray-900 rounded-bl-none"}
         `}
               >
-                <p className="break-words">{item.message}</p>
+                <p className="break-words flex gap-2">{item.message}<FaCheckDouble className={`${item.messagestatus == true? "text-green-500" : "text-white"}`}/></p>
               </div>
             </div>
           ))}
