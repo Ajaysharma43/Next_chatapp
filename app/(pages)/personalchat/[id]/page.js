@@ -10,11 +10,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MdDelete } from "react-icons/md";
 
 const PersonalChat = () => {
-  const { id } = useParams(); // receiver's ID
+  const { id } = useParams();
   const [userid, setuserid] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setmessage] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [typing, settyping] = useState(false);
   const onlineUsers = useSelector((state) => state.chatreducer.OnlineUsers);
   const bottomRef = useRef(null);
 
@@ -52,6 +53,13 @@ const PersonalChat = () => {
       socket.on("UpdatedDeletedMessages", (UpdatedMessages) => {
         setMessages(UpdatedMessages);
       });
+
+      socket.on("isTyping", (id) => {
+        if (parseInt(id) === userid) {
+          settyping(true);
+          setTimeout(() => settyping(false), 2000);
+        }
+      });
     }
 
     return () => {
@@ -63,7 +71,7 @@ const PersonalChat = () => {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, typing]);
 
   const SendMessage = () => {
     if (!message.trim() || !userid) return;
@@ -80,6 +88,11 @@ const PersonalChat = () => {
     setSelectedIndex(null);
   };
 
+  const handleTyping = (e) => {
+    setmessage(e.target.value);
+    socket.emit("typing", id);
+  };
+
   return (
     <div className="h-screen flex flex-col justify-between bg-white border rounded-lg shadow-lg">
       {/* Online Status */}
@@ -91,24 +104,29 @@ const PersonalChat = () => {
         )}
       </div>
 
-      {/* Messages Area */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50">
         <AnimatePresence initial={false}>
           {messages.map((item, index) => (
             <motion.div
               key={item.id}
-              className={`flex ${userid === item.sender ? "justify-end" : "justify-start"
-                }`}
+              layout
+              className={`flex ${userid === item.sender ? "justify-end" : "justify-start"}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8, x: userid === item.sender ? 50 : -50 }}
+              exit={{
+                opacity: 0,
+                scale: 0.8,
+                x: userid === item.sender ? 50 : -50,
+              }}
               transition={{ duration: 0.3 }}
             >
               <div
-                className={`relative max-w-xs md:max-w-sm lg:max-w-md px-4 py-2 rounded-2xl shadow flex gap-3 ${userid === item.sender
+                className={`max-w-xs md:max-w-sm lg:max-w-md px-4 py-2 rounded-2xl shadow flex gap-3 items-center ${
+                  userid === item.sender
                     ? "bg-blue-500 text-white rounded-br-none"
                     : "bg-gray-200 text-gray-900 rounded-bl-none"
-                  }`}
+                }`}
                 onClick={() => handleToggleDelete(index)}
               >
                 <motion.p
@@ -121,40 +139,72 @@ const PersonalChat = () => {
                 </motion.p>
 
                 {userid === item.sender && (
-                  <motion.span
-                    key={item.messagestatus}
-                    initial={{ opacity: 0, rotateY: 0 }}
-                    animate={{ opacity: 1, rotateY: 360 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    style={{ transformPerspective: 1000 }}
-                  >
-                    <FaCheckDouble
-                      className={`${item.messagestatus ? "text-green-500" : "text-white"
-                        }`}
-                    />
-                  </motion.span>
-                )}
-
-                <AnimatePresence>
-                  {userid === item.sender && selectedIndex === index && (
-                    <motion.button
-                      className="absolute top-2 right-[130px] text-red-500"
-                      initial={{ opacity: 0, scale: 0.6 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.6 }}
-                      transition={{ duration: 0.3 }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        DeleteMessage(item.id);
-                      }}
+                  <>
+                    <motion.span
+                      key={item.messagestatus}
+                      initial={{ opacity: 0, rotateY: 0 }}
+                      animate={{ opacity: 1, rotateY: 360 }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                      style={{ transformPerspective: 1000 }}
                     >
-                      <MdDelete size={20} />
-                    </motion.button>
-                  )}
-                </AnimatePresence>
+                      <FaCheckDouble
+                        className={`${
+                          item.messagestatus ? "text-green-500" : "text-white"
+                        }`}
+                      />
+                    </motion.span>
+
+                    <AnimatePresence>
+                      {selectedIndex === index && (
+                        <motion.button
+                          className="text-red-200 hover:text-red-400"
+                          initial={{ opacity: 0, scale: 0.6 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          exit={{ opacity: 0, scale: 0.6 }}
+                          transition={{ duration: 0.3 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            DeleteMessage(item.id);
+                          }}
+                        >
+                          <MdDelete size={18} />
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
+                  </>
+                )}
               </div>
             </motion.div>
           ))}
+
+          {/* Typing Animation */}
+          {typing && (
+            <motion.div
+              className="flex justify-start"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="bg-gray-300 text-gray-800 px-4 py-2 rounded-2xl rounded-bl-none shadow text-sm flex items-center gap-2">
+                <motion.span
+                  className="inline-block w-1 h-1 bg-gray-800 rounded-full"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 0.6, repeat: Infinity, delay: 0 }}
+                />
+                <motion.span
+                  className="inline-block w-1 h-1 bg-gray-800 rounded-full"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 0.6, repeat: Infinity, delay: 0.2 }}
+                />
+                <motion.span
+                  className="inline-block w-1 h-1 bg-gray-800 rounded-full"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 0.6, repeat: Infinity, delay: 0.4 }}
+                />
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
         <div ref={bottomRef}></div>
       </div>
@@ -166,7 +216,7 @@ const PersonalChat = () => {
           placeholder="Type your message..."
           className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={message}
-          onChange={(e) => setmessage(e.target.value)}
+          onChange={handleTyping}
           onKeyDown={(e) => e.key === "Enter" && SendMessage()}
         />
         <button

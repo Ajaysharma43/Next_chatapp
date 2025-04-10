@@ -1,24 +1,22 @@
 "use client";
 
 import socket from "@/app/SocketConnection/SocketConnection";
-import { UsersInstance } from "@/Interseptors/UsersInterseptors";
 import { CheckFriends } from "@/Redux/features/UserSlice";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Friends = () => {
   const [userId, setUserId] = useState(null);
   const [unreadMap, setUnreadMap] = useState({});
   const dispatch = useDispatch();
 
-  // Redux data
   const onlineUsers = useSelector((state) => state.chatreducer.OnlineUsers);
   const friends = useSelector((state) => state.UserReducer.Friends);
 
-  // Get user ID from JWT and initialize socket
   useEffect(() => {
     const token = Cookies.get("AccessToken");
     if (!token) return;
@@ -40,44 +38,34 @@ const Friends = () => {
     };
   }, [dispatch, onlineUsers.length]);
 
-  // Fetch unread message counts once friends and userId are available
   useEffect(() => {
     if (!userId || friends.length === 0) return;
-  
-    const counts = {};
-  
+
     const handleUnreadMessages = (UnreadMessages) => {
       const unreadData = UnreadMessages[0];
-  
       if (!unreadData) return;
-  
+
       const otherFriendId =
         userId === unreadData.sender ? unreadData.receiver : unreadData.sender;
-  
+
       setUnreadMap((prev) => ({
         ...prev,
         [otherFriendId]: unreadData,
       }));
     };
-  
-    // Add listener once
+
     socket.on("UpdateUnreadMessages", handleUnreadMessages);
-  
-    // Emit request for each friend
+
     friends.forEach((friend) => {
       const sender = friend.sender_id;
       const receiver = friend.receiver_id;
-  
       socket.emit("GetUnreadMessages", sender, receiver);
     });
-  
-    // Cleanup
+
     return () => {
       socket.off("UpdateUnreadMessages", handleUnreadMessages);
     };
   }, [userId, friends]);
-  
-  
 
   return (
     <div className="p-4">
@@ -121,8 +109,19 @@ const Friends = () => {
                 </div>
 
                 {unreadCount?.count > 0 && (
-                  <div className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
-                    {unreadCount.count} new
+                  <div className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full flex items-center justify-center min-w-[40px] text-center">
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={unreadCount.count}
+                        initial={{ opacity: 0, y: -4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 4 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {unreadCount.count}
+                      </motion.span>
+                    </AnimatePresence>{" "}
+                    new
                   </div>
                 )}
               </Link>
