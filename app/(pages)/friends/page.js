@@ -92,7 +92,7 @@ const Friends = () => {
               className="flex justify-between items-center bg-gray-100 p-3 rounded-md mb-2 shadow-sm"
             >
               <Link
-                href={`/personalchat/${otherFriendId}`}
+                href={`/personalchat/${otherFriendId}/${otherFriendName}`}
                 className="flex justify-between w-full items-center"
               >
                 <div className="flex flex-col">

@@ -5,12 +5,14 @@ import { jwtDecode } from "jwt-decode";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { FaCheckDouble } from "react-icons/fa6";
+import { FaCheckDouble, FaCheck } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdDelete } from "react-icons/md";
 
 const PersonalChat = () => {
-  const { id } = useParams();
+  const { id, username } = useParams();
+  const decodedUsername = decodeURIComponent(username);
+
   const [userid, setuserid] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setmessage] = useState("");
@@ -95,14 +97,19 @@ const PersonalChat = () => {
 
   return (
     <div className="h-screen flex flex-col justify-between bg-white border rounded-lg shadow-lg">
-      {/* Online Status */}
-      <div className="p-2 text-sm">
-        {onlineUsers.includes(parseInt(id)) ? (
-          <span className="text-green-400">Online</span>
-        ) : (
-          <span className="text-red-400">Offline</span>
-        )}
+      {/* Online Status + Username */}
+      <div className="p-3 flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-t-lg shadow-inner">
+        <span
+          className={`w-2 h-2 rounded-full ${onlineUsers.includes(parseInt(id)) ? "bg-green-500" : "bg-red-500"
+            }`}
+        ></span>
+        <span>
+          {onlineUsers.includes(parseInt(id)) ? "Online" : "Offline"}
+        </span>
+        <span className="mx-2 text-gray-400">•</span>
+        <span className="text-base font-semibold text-gray-800">{decodedUsername}</span>
       </div>
+
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50">
@@ -122,11 +129,10 @@ const PersonalChat = () => {
               transition={{ duration: 0.3 }}
             >
               <div
-                className={`max-w-xs md:max-w-sm lg:max-w-md px-4 py-2 rounded-2xl shadow flex gap-3 items-center ${
-                  userid === item.sender
-                    ? "bg-blue-500 text-white rounded-br-none"
-                    : "bg-gray-200 text-gray-900 rounded-bl-none"
-                }`}
+                className={`max-w-xs md:max-w-sm lg:max-w-md px-4 py-2 rounded-2xl shadow flex gap-3 items-center ${userid === item.sender
+                  ? "bg-blue-500 text-white rounded-br-none"
+                  : "bg-gray-200 text-gray-900 rounded-bl-none"
+                  }`}
                 onClick={() => handleToggleDelete(index)}
               >
                 <motion.p
@@ -147,11 +153,7 @@ const PersonalChat = () => {
                       transition={{ duration: 0.5, ease: "easeInOut" }}
                       style={{ transformPerspective: 1000 }}
                     >
-                      <FaCheckDouble
-                        className={`${
-                          item.messagestatus ? "text-green-500" : "text-white"
-                        }`}
-                      />
+                      {item?.messagestatus == true ? (<><FaCheckDouble className="text-black" /></>) : (<><FaCheck className="text-white" /></>)}
                     </motion.span>
 
                     <AnimatePresence>
