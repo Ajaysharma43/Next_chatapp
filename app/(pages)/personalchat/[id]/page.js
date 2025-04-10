@@ -27,7 +27,7 @@ const PersonalChat = () => {
   useEffect(() => {
     if (userid) {
       // Join your own room
-      socket.emit("join-room",id , userid);
+      socket.emit("join-room", id, userid);
 
       socket.emit("PreviosChats", id, userid);
 
@@ -45,16 +45,16 @@ const PersonalChat = () => {
         setMessages((prev) => [...prev, ...Messages]);
         setmessage("");
         if (isRecieveronline == true) {
-          socket.emit('MarkAsRead', parseInt(id) , userid)
+          socket.emit('MarkAsRead', parseInt(id), userid)
         }
       });
 
-      socket.on("UpdateMessagesStatus" , (MarkasRead) => {
+      socket.on("UpdateMessagesStatus", (MarkasRead) => {
         console.log(MarkasRead)
         setMessages(MarkasRead)
       })
 
-      socket.on('UpdateMessages' , (updateddata) => {
+      socket.on('UpdateMessages', (updateddata) => {
         console.log(updateddata)
         setMessages(updateddata)
       })
@@ -102,13 +102,14 @@ const PersonalChat = () => {
               <div
                 className={`
           max-w-xs md:max-w-sm lg:max-w-md
-          px-4 py-2 rounded-2xl shadow
+          px-4 py-2 rounded-2xl shadow flex gap-3
           ${userid === item.sender
                     ? "bg-blue-500 text-white rounded-br-none"
                     : "bg-gray-200 text-gray-900 rounded-bl-none"}
         `}
               >
-                <p className="break-words flex gap-2">{item.message}<FaCheckDouble className={`${item.messagestatus == true? "text-green-500" : "text-white"}`}/></p>
+                <p className="break-words">{item.message}</p>
+                <h1 className={`${userid == item.sender? "block" : "hidden"}`}><FaCheckDouble className={`${item.messagestatus == true ? "text-green-500" : "text-white"}`} /></h1>
               </div>
             </div>
           ))}

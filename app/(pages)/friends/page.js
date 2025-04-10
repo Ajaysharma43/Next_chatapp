@@ -51,14 +51,17 @@ const Friends = () => {
 
         try {
           const res = await UsersInstance.post("/UnreadMessages", {
-            sender : userId,
+            sender,
             receiver,
           });
 
-          console.log(res.data.UnreadMessages)
+          const unreadData = res.data.UnreadMessages[0];
           const otherFriendId = userId === sender ? receiver : sender;
-          counts[otherFriendId] = res.data.UnreadMessages[0]
-          console.log(counts)
+
+          // Only store if the friend is the sender of unread messages
+          if (unreadData && unreadData.sender === otherFriendId) {
+            counts[otherFriendId] = unreadData;
+          }
         } catch (error) {
           console.error("Error fetching unread count:", error);
         }
@@ -89,8 +92,8 @@ const Friends = () => {
             : friend.sender_name;
 
           const isOnline = onlineUsers.includes(otherFriendId);
-          const unreadCount = unreadMap[otherFriendId] || 0;
-          console.log(unreadCount)
+          const unreadCount = unreadMap[otherFriendId];
+
           return (
             <div
               key={friend.id}
@@ -101,7 +104,9 @@ const Friends = () => {
                 className="flex justify-between w-full items-center"
               >
                 <div className="flex flex-col">
-                  <h2 className="font-medium text-gray-800">{otherFriendName}</h2>
+                  <h2 className="font-medium text-gray-800">
+                    {otherFriendName}
+                  </h2>
                   <span
                     className={`text-sm font-semibold ${
                       isOnline ? "text-green-600" : "text-red-500"
@@ -111,7 +116,7 @@ const Friends = () => {
                   </span>
                 </div>
 
-                {unreadCount.count > 0 && (
+                {unreadCount?.count > 0 && (
                   <div className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full">
                     {unreadCount.count} new
                   </div>
