@@ -42,38 +42,42 @@ const Friends = () => {
 
   // Fetch unread message counts once friends and userId are available
   useEffect(() => {
-    const fetchUnreadCounts = async () => {
-      const counts = {};
-
-      for (const friend of friends) {
-        const sender = friend.sender_id;
-        const receiver = friend.receiver_id;
-
-        try {
-          const res = await UsersInstance.post("/UnreadMessages", {
-            sender,
-            receiver,
-          });
-
-          const unreadData = res.data.UnreadMessages[0];
-          const otherFriendId = userId === sender ? receiver : sender;
-
-          // Only store if the friend is the sender of unread messages
-          if (unreadData && unreadData.sender === otherFriendId) {
-            counts[otherFriendId] = unreadData;
-          }
-        } catch (error) {
-          console.error("Error fetching unread count:", error);
-        }
-      }
-
-      setUnreadMap(counts);
+    if (!userId || friends.length === 0) return;
+  
+    const counts = {};
+  
+    const handleUnreadMessages = (UnreadMessages) => {
+      const unreadData = UnreadMessages[0];
+  
+      if (!unreadData) return;
+  
+      const otherFriendId =
+        userId === unreadData.sender ? unreadData.receiver : unreadData.sender;
+  
+      setUnreadMap((prev) => ({
+        ...prev,
+        [otherFriendId]: unreadData,
+      }));
     };
-
-    if (userId && friends.length > 0) {
-      fetchUnreadCounts();
-    }
-  }, [friends, userId]);
+  
+    // Add listener once
+    socket.on("UpdateUnreadMessages", handleUnreadMessages);
+  
+    // Emit request for each friend
+    friends.forEach((friend) => {
+      const sender = friend.sender_id;
+      const receiver = friend.receiver_id;
+  
+      socket.emit("GetUnreadMessages", sender, receiver);
+    });
+  
+    // Cleanup
+    return () => {
+      socket.off("UpdateUnreadMessages", handleUnreadMessages);
+    };
+  }, [userId, friends]);
+  
+  
 
   return (
     <div className="p-4">
