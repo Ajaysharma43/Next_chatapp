@@ -6,12 +6,15 @@ import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { FaCheckDouble } from "react-icons/fa6";
+import { motion, AnimatePresence } from "framer-motion";
+import { MdDelete } from "react-icons/md";
 
 const PersonalChat = () => {
-  const { id } = useParams(); // `id` is the receiver's ID
+  const { id } = useParams(); // receiver's ID
   const [userid, setuserid] = useState(null);
   const [messages, setMessages] = useState([]);
   const [message, setmessage] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(null);
   const onlineUsers = useSelector((state) => state.chatreducer.OnlineUsers);
   const bottomRef = useRef(null);
 
@@ -27,15 +30,13 @@ const PersonalChat = () => {
       socket.emit("PreviosChats", id, userid);
 
       socket.on("Messages", (Chats) => {
-        if (Chats && Chats.length > 0) {
-          setMessages(Chats);
-        }
+        if (Chats?.length > 0) setMessages(Chats);
       });
 
       socket.on("RecieveMessages", (Messages, isRecieveronline) => {
         setMessages((prev) => [...prev, ...Messages]);
         setmessage("");
-        if (isRecieveronline === true) {
+        if (isRecieveronline) {
           socket.emit("MarkAsRead", parseInt(id), userid);
         }
       });
@@ -46,6 +47,10 @@ const PersonalChat = () => {
 
       socket.on("UpdateMessages", (updateddata) => {
         setMessages(updateddata);
+      });
+
+      socket.on("UpdatedDeletedMessages", (UpdatedMessages) => {
+        setMessages(UpdatedMessages);
       });
     }
 
@@ -65,41 +70,92 @@ const PersonalChat = () => {
     socket.emit("SendMessage", message, id, userid);
   };
 
+  const handleToggleDelete = (index) => {
+    setSelectedIndex((prevIndex) => (prevIndex === index ? null : index));
+  };
+
+  const DeleteMessage = (messageId) => {
+    socket.emit("DeleteMessage", messageId, userid, parseInt(id));
+    setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
+    setSelectedIndex(null);
+  };
+
   return (
     <div className="h-screen flex flex-col justify-between bg-white border rounded-lg shadow-lg">
-      <div>
+      {/* Online Status */}
+      <div className="p-2 text-sm">
         {onlineUsers.includes(parseInt(id)) ? (
-          <h1 className="text-green-400">online</h1>
+          <span className="text-green-400">Online</span>
         ) : (
-          <h1 className="text-red-400">offline</h1>
+          <span className="text-red-400">Offline</span>
         )}
       </div>
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50">
-        {messages.map((item, index) => (
-          <div
-            key={index}
-            className={`flex ${userid === item.sender ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`
-                max-w-xs md:max-w-sm lg:max-w-md
-                px-4 py-2 rounded-2xl shadow flex gap-3
-                ${userid === item.sender
-                  ? "bg-blue-500 text-white rounded-br-none"
-                  : "bg-gray-200 text-gray-900 rounded-bl-none"}
-              `}
+        <AnimatePresence initial={false}>
+          {messages.map((item, index) => (
+            <motion.div
+              key={item.id}
+              className={`flex ${userid === item.sender ? "justify-end" : "justify-start"
+                }`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8, x: userid === item.sender ? 50 : -50 }}
+              transition={{ duration: 0.3 }}
             >
-              <p className="break-words">{item.message}</p>
-              <h1 className={`${userid === item.sender ? "block" : "hidden"}`}>
-                <FaCheckDouble
-                  className={`${item.messagestatus === true ? "text-green-500" : "text-white"}`}
-                />
-              </h1>
-            </div>
-          </div>
-        ))}
+              <div
+                className={`relative max-w-xs md:max-w-sm lg:max-w-md px-4 py-2 rounded-2xl shadow flex gap-3 ${userid === item.sender
+                    ? "bg-blue-500 text-white rounded-br-none"
+                    : "bg-gray-200 text-gray-900 rounded-bl-none"
+                  }`}
+                onClick={() => handleToggleDelete(index)}
+              >
+                <motion.p
+                  className="break-words"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  {item.message}
+                </motion.p>
+
+                {userid === item.sender && (
+                  <motion.span
+                    key={item.messagestatus}
+                    initial={{ opacity: 0, rotateY: 0 }}
+                    animate={{ opacity: 1, rotateY: 360 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    style={{ transformPerspective: 1000 }}
+                  >
+                    <FaCheckDouble
+                      className={`${item.messagestatus ? "text-green-500" : "text-white"
+                        }`}
+                    />
+                  </motion.span>
+                )}
+
+                <AnimatePresence>
+                  {userid === item.sender && selectedIndex === index && (
+                    <motion.button
+                      className="absolute top-2 right-[130px] text-red-500"
+                      initial={{ opacity: 0, scale: 0.6 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.6 }}
+                      transition={{ duration: 0.3 }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        DeleteMessage(item.id);
+                      }}
+                    >
+                      <MdDelete size={20} />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
         <div ref={bottomRef}></div>
       </div>
 
