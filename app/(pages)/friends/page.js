@@ -100,30 +100,55 @@ const Friends = () => {
                     {otherFriendName}
                   </h2>
                   <span
-                    className={`text-sm font-semibold ${
-                      isOnline ? "text-green-600" : "text-red-500"
-                    }`}
+                    className={`text-sm font-semibold ${isOnline ? "text-green-600" : "text-red-500"
+                      }`}
                   >
                     {isOnline ? "Online" : "Offline"}
                   </span>
                 </div>
 
-                {unreadCount?.count > 0 && (
-                  <div className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full flex items-center justify-center min-w-[40px] text-center">
-                    <AnimatePresence mode="wait">
-                      <motion.span
-                        key={unreadCount.count}
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 4 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        {unreadCount.count}
-                      </motion.span>
-                    </AnimatePresence>{" "}
-                    new
-                  </div>
-                )}
+                {
+                  unreadCount?.count > 9 ?
+                    (
+                      <div className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full flex items-center justify-center min-w-[40px] text-center">
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={unreadCount.count}
+                            initial={{ opacity: 0, y: -4 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 4 }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            9+ Messages
+                          </motion.span>
+                        </AnimatePresence>
+                      </div>
+                    )
+                    :
+                    (
+                      <>
+                        {unreadCount?.count > 0 && (
+                          <div className="text-xs bg-blue-600 text-white px-2 py-1 rounded-full flex items-center justify-center min-w-[40px] text-center">
+                            <AnimatePresence mode="wait">
+                              <motion.span
+                                key={unreadCount.count}
+                                initial={{ opacity: 0, y: -4 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: 4 }}
+                                transition={{ duration: 0.3 }}
+                              >
+                                {unreadCount.count}
+                              </motion.span>
+                            </AnimatePresence>
+                            &nbsp;{unreadCount.count == 1 ? "new message" : "new messages"}
+                          </div>
+                        )}
+                      </>
+                    )
+
+                }
+
+
               </Link>
             </div>
           );
