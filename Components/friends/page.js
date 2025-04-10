@@ -5,20 +5,22 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useDispatch } from "react-redux";
 import { UpdateOnlineUsers } from "@/Redux/features/Chatslice";
+import { usePathname } from "next/navigation";
 
 const Friends = () => {
   const dispatch = useDispatch();
+  const pathname = usePathname(); // 👈 Get current pathname
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const token = Cookies.get("AccessToken");
 
-    if (token) {
+    if (pathname !== "/login") {
       const decoded = jwtDecode(token);
       const id = decoded?.id;
       setUserId(id);
 
-      socket.connect()
+      socket.connect();
       socket.on("connect", () => {
         console.log("🟢 Connected:", socket.id);
         socket.emit("user-online", id);
@@ -27,7 +29,7 @@ const Friends = () => {
 
       socket.on("update-online-status", (users) => {
         console.log("📡 Updated online users:", users);
-        dispatch(UpdateOnlineUsers(users)); // Update Redux store
+        dispatch(UpdateOnlineUsers(users));
       });
 
       socket.on("UserOnlineStatus", ({ id, isOnline }) => {
@@ -38,12 +40,15 @@ const Friends = () => {
         console.log("🔴 Disconnected");
       });
 
+      // Clean-up function
       return () => {
-        socket.disconnect();
-        console.log(`⚠️ Disconnected socket for user ${id}`);
+        if (pathname === "/login") {
+          socket.disconnect();
+          console.log(`⚠️ Disconnected socket for user ${id} on login page`);
+        }
       };
     }
-  }, [dispatch]);
+  }, [dispatch, pathname]); // 👈 Add pathname as a dependency
 
   return <div></div>;
 };
