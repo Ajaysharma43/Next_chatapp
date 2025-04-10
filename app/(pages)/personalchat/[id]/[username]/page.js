@@ -6,8 +6,10 @@ import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { FaCheckDouble, FaCheck } from "react-icons/fa6";
+import { FaSmile } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { MdDelete } from "react-icons/md";
+import EmojiPicker from "emoji-picker-react";
 
 const PersonalChat = () => {
   const { id, username } = useParams();
@@ -18,6 +20,8 @@ const PersonalChat = () => {
   const [message, setmessage] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [typing, settyping] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const onlineUsers = useSelector((state) => state.chatreducer.OnlineUsers);
   const bottomRef = useRef(null);
 
@@ -80,6 +84,15 @@ const PersonalChat = () => {
     socket.emit("SendMessage", message, id, userid);
   };
 
+  const handleTyping = (e) => {
+    setmessage(e.target.value);
+    socket.emit("typing", id);
+  };
+
+  const handleEmojiClick = (emojiData) => {
+    setmessage((prev) => prev + emojiData.emoji);
+  };
+
   const handleToggleDelete = (index) => {
     setSelectedIndex((prevIndex) => (prevIndex === index ? null : index));
   };
@@ -90,26 +103,17 @@ const PersonalChat = () => {
     setSelectedIndex(null);
   };
 
-  const handleTyping = (e) => {
-    setmessage(e.target.value);
-    socket.emit("typing", id);
-  };
-
   return (
     <div className="h-screen flex flex-col justify-between bg-white border rounded-lg shadow-lg">
-      {/* Online Status + Username */}
+      {/* Header */}
       <div className="p-3 flex items-center gap-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-t-lg shadow-inner">
         <span
-          className={`w-2 h-2 rounded-full ${onlineUsers.includes(parseInt(id)) ? "bg-green-500" : "bg-red-500"
-            }`}
+          className={`w-2 h-2 rounded-full ${onlineUsers.includes(parseInt(id)) ? "bg-green-500" : "bg-red-500"}`}
         ></span>
-        <span>
-          {onlineUsers.includes(parseInt(id)) ? "Online" : "Offline"}
-        </span>
+        <span>{onlineUsers.includes(parseInt(id)) ? "Online" : "Offline"}</span>
         <span className="mx-2 text-gray-400">•</span>
         <span className="text-base font-semibold text-gray-800">{decodedUsername}</span>
       </div>
-
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-gray-50">
@@ -153,7 +157,11 @@ const PersonalChat = () => {
                       transition={{ duration: 0.5, ease: "easeInOut" }}
                       style={{ transformPerspective: 1000 }}
                     >
-                      {item?.messagestatus == true ? (<><FaCheckDouble className="text-black" /></>) : (<><FaCheck className="text-white" /></>)}
+                      {item?.messagestatus == true ? (
+                        <FaCheckDouble className="text-black" />
+                      ) : (
+                        <FaCheck className="text-white" />
+                      )}
                     </motion.span>
 
                     <AnimatePresence>
@@ -211,22 +219,38 @@ const PersonalChat = () => {
         <div ref={bottomRef}></div>
       </div>
 
-      {/* Message Input */}
-      <div className="p-4 flex gap-2 border-t">
-        <input
-          type="text"
-          placeholder="Type your message..."
-          className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={message}
-          onChange={handleTyping}
-          onKeyDown={(e) => e.key === "Enter" && SendMessage()}
-        />
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          onClick={SendMessage}
-        >
-          Send
-        </button>
+      {/* Input Area */}
+      <div className="p-4 flex flex-col gap-2 border-t relative">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+            className="text-xl text-yellow-500 hover:text-yellow-600"
+          >
+            <FaSmile />
+          </button>
+
+          <input
+            type="text"
+            placeholder="Type your message..."
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value={message}
+            onChange={handleTyping}
+            onKeyDown={(e) => e.key === "Enter" && SendMessage()}
+          />
+
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            onClick={SendMessage}
+          >
+            Send
+          </button>
+        </div>
+
+        {showEmojiPicker && (
+          <div className="absolute bottom-16 left-4 z-10">
+            <EmojiPicker onEmojiClick={handleEmojiClick} />
+          </div>
+        )}
       </div>
     </div>
   );

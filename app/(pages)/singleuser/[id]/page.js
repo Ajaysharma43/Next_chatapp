@@ -132,9 +132,14 @@ const SingleUser = () => {
                       </div>
                     )
                   ) : (
+                    <div className="flex gap-2">
                     <button className="bg-green-600 text-white px-5 py-2 rounded-xl font-medium shadow">
                       Friends 👥
                     </button>
+                    <button className="bg-green-600 text-white px-5 py-2 rounded-xl font-medium shadow">
+                    Chat 👥
+                  </button>
+                  </div>
                   )
                 ) : (
                   <div className="flex gap-2 justify-center">
