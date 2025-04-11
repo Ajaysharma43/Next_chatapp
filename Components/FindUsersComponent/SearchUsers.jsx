@@ -1,8 +1,6 @@
 "use client"
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useDispatch } from "react-redux";
-import { GetUserData } from "@/Redux/features/DashboardSlice";
 import { GetSearchUsers } from "@/Redux/features/UserSlice";
 
 const SearchUsers = () => {

@@ -1,7 +1,6 @@
 "use client";
 import { AuthInstance } from "@/Interseptors/AuthInterseptors";
 import { GoogleLogin } from "@react-oauth/google";
-import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";

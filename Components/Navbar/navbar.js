@@ -23,12 +23,6 @@ const Navbar = () => {
         const GetData = async () => {
             const token = Cookies.get("AccessToken");
 
-            if (!token) {
-                console.error("No token found!");
-                setLoading(false);
-                return;
-            }
-
             try {
                 const decode = jwtDecode(token);
                 setsocialauth(decode?.socialauthenticated);

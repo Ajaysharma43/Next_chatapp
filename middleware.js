@@ -43,9 +43,6 @@ export async function middleware(request) {
         return await refreshAccessToken(request, refreshToken);
     }
 
-
-
-
 }
 
 

@@ -2,7 +2,6 @@
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useEffect, useState, useRef } from "react";
-import io from "socket.io-client";
 import { AnimatePresence, motion } from "framer-motion";
 import { MdDelete } from "react-icons/md";
 import socket from "./SocketConnection/SocketConnection";
@@ -10,13 +9,11 @@ import socket from "./SocketConnection/SocketConnection";
 export default function Home() {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
-  const [user, setUser] = useState("");
-  const socketRef = useRef();
+  const [user, setUser] = useState("");;
   const [visibleDelete, setVisibleDelete] = useState({});
   const [typing, setTyping] = useState(false);
   const [TypingUser, setTypingUser] = useState(false)
   const typingTimeoutRef = useRef(null);
-  const UserTypingTimeoutRef = useRef(null)
 
   useEffect(() => {
     const token = Cookies.get("AccessToken");

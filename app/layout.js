@@ -1,8 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/Components/Navbar/navbar";
-import { Provider } from "react-redux";
-import store from "@/Redux/store";
 import ReduxProvider from "@/Redux/reduxprovider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Friends from "@/Components/friends/page";
