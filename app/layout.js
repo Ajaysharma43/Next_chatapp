@@ -6,6 +6,7 @@ import store from "@/Redux/store";
 import ReduxProvider from "@/Redux/reduxprovider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Friends from "@/Components/friends/page";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ThemeProvider>
         <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID}>
         <ReduxProvider>
         <Navbar/>
@@ -35,6 +37,7 @@ export default function RootLayout({ children }) {
         {children}
         </ReduxProvider>
         </GoogleOAuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

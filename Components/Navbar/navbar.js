@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
 const Navbar = () => {
     const [navdata, setnavdata] = useState([]);
@@ -13,7 +14,8 @@ const Navbar = () => {
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const Pathname = usePathname();
     const accessToken = Cookies.get("AccessToken");
-    const [socialauth , setsocialauth] = useState(false)
+    const [socialauth, setsocialauth] = useState(false);
+    const { theme, setTheme } = useTheme();
 
     const Routes = ["/login", "/signup", "/dashboard", "/not-found"];
 
@@ -29,7 +31,7 @@ const Navbar = () => {
 
             try {
                 const decode = jwtDecode(token);
-                setsocialauth(decode?.socialauthenticated)
+                setsocialauth(decode?.socialauthenticated);
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
                 );
@@ -37,7 +39,7 @@ const Navbar = () => {
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
-                setLoading(false); // Stop loading when API call finishes
+                setLoading(false);
             }
         };
 
@@ -50,38 +52,44 @@ const Navbar = () => {
 
     return (
         <>
-            {/* Hide Navbar on specific routes */}
             <nav
                 className={`bg-blue-600 text-white shadow-lg ${
                     Routes.some((route) => Pathname.startsWith(route)) ? "hidden" : "block"
                 }`}
             >
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-                    {/* Logo Section */}
+                    {/* Logo */}
                     <div className="text-2xl font-bold">
                         <h1>ChatApp</h1>
                     </div>
 
-                    {/* Navigation Links */}
-                    <div className="hidden md:flex space-x-6">
+                    {/* Desktop Navigation */}
+                    <div className="hidden md:flex space-x-6 items-center">
                         {loading ? (
-                            // Loader Skeleton while fetching
                             <>
                                 <div className="h-6 w-24 bg-gray-400 animate-pulse rounded"></div>
                                 <div className="h-6 w-24 bg-gray-400 animate-pulse rounded"></div>
                                 <div className="h-6 w-24 bg-gray-400 animate-pulse rounded"></div>
                             </>
                         ) : (
-                            // Render navigation items
                             navdata.map((item, index) => (
                                 <Link key={index} href={item.route} className="hover:text-gray-300">
                                     {item.modules}
                                 </Link>
                             ))
                         )}
-                        {
-                            socialauth == true? (<><button>logout</button></>) : (<></>)
-                        }
+
+                        {socialauth && (
+                            <button className="hover:underline">Logout</button>
+                        )}
+
+                        {/* 🌗 Theme Toggle Button */}
+                        <button
+                            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                            className="bg-white text-black dark:bg-black dark:text-white px-3 py-1 rounded hover:opacity-80 transition"
+                        >
+                            {theme === "dark" ? "Light" : "Dark"}
+                        </button>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -105,11 +113,10 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                {/* Mobile Menu */}
+                {/* Mobile Navigation Menu */}
                 <div className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}>
                     <ul className="bg-blue-600 space-y-2 p-4">
                         {loading ? (
-                            // Loader for mobile menu
                             <>
                                 <div className="h-6 w-32 bg-gray-400 animate-pulse rounded"></div>
                                 <div className="h-6 w-32 bg-gray-400 animate-pulse rounded"></div>
@@ -124,9 +131,22 @@ const Navbar = () => {
                                 </li>
                             ))
                         )}
-                        {
-                            socialauth == true? (<><button>logout</button></>) : (<></>)
-                        }
+
+                        {socialauth && (
+                            <li>
+                                <button className="hover:underline">Logout</button>
+                            </li>
+                        )}
+
+                        {/* 🌗 Theme Toggle Button for Mobile */}
+                        <li>
+                            <button
+                                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                                className="w-full bg-white text-black dark:bg-black dark:text-white px-3 py-1 rounded hover:opacity-80 transition"
+                            >
+                                {theme === "dark" ? "Light" : "Dark"}
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </nav>

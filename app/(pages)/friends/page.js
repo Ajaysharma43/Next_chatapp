@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import { DeleteDialog } from "./(Dialogs)/DeleteDialog";
 import { TiUserDelete } from "react-icons/ti";
+import { useTheme } from "next-themes";
 
 const Friends = () => {
   const [userId, setUserId] = useState(null);
@@ -17,6 +18,7 @@ const Friends = () => {
   const [friendsList, setFriendsList] = useState([]);
   const [DeleteDialogstate, setDeleteDialogstate] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
+  const { theme } = useTheme();
 
   const dispatch = useDispatch();
   const onlineUsers = useSelector((state) => state.chatreducer.OnlineUsers);
@@ -91,8 +93,7 @@ const Friends = () => {
 
   const handleFriendDelete = async (friend) => {
     try {
-      await dispatch(DeleteFriend({id : userId ,friend}))
-      console.log(friend)
+      await dispatch(DeleteFriend({ id: userId, friend }));
       setDeleteDialogstate(false);
       setSelectedFriend(null);
     } catch (error) {
@@ -109,8 +110,14 @@ const Friends = () => {
         onDelete={handleFriendDelete}
       />
 
-      <div className="p-6 max-w-3xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6 text-gray-800">My Friends</h1>
+      <div className={`p-6 max-w-3xl mx-auto`}>
+        <h1
+          className={`text-2xl font-bold mb-6 ${
+            theme === "dark" ? "text-white" : "text-gray-800"
+          }`}
+        >
+          My Friends
+        </h1>
 
         {friendsList?.length === 0 ? (
           <p className="text-gray-500 text-center">No friends found.</p>
@@ -142,23 +149,40 @@ const Friends = () => {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.4, ease: "easeInOut" }}
                 >
-                  <div className="flex justify-between items-center gap-4 bg-white border border-gray-200 shadow-sm rounded-xl p-4 transition-all hover:shadow-md">
+                  <div
+                    className={`flex justify-between items-center gap-4 p-4 border shadow-sm rounded-xl transition-all hover:shadow-md 
+                      ${
+                        theme === "dark"
+                          ? "bg-gray-800 border-gray-600 text-white"
+                          : "bg-white border-gray-200 text-gray-800"
+                      }`}
+                  >
                     <Link
                       href={`/personalchat/${otherFriendId}/${otherFriendName}/${friend.id}`}
                       className="flex items-center gap-3 flex-grow"
                     >
                       <div className="relative">
-                        <div className="w-10 h-10 bg-blue-200 rounded-full flex items-center justify-center font-semibold text-blue-800">
+                        <div
+                          className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                            theme === "dark"
+                              ? "bg-blue-900 text-white"
+                              : "bg-blue-200 text-blue-800"
+                          }`}
+                        >
                           {otherFriendName.charAt(0)}
                         </div>
                         <span
-                          className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
-                            isOnline ? "bg-green-500" : "bg-gray-400"
-                          }`}
+                          className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${
+                            theme === "dark" ? "border-gray-800" : "border-white"
+                          } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
                         />
                       </div>
                       <div className="flex flex-col">
-                        <h2 className="text-base font-semibold text-gray-800">
+                        <h2
+                          className={`text-base font-semibold ${
+                            theme === "dark" ? "text-white" : "text-gray-800"
+                          }`}
+                        >
                           {otherFriendName}
                         </h2>
                         <span className="text-xs text-gray-500">
