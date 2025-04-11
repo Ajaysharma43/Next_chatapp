@@ -18,25 +18,32 @@ const Friends = () => {
   const friends = useSelector((state) => state.UserReducer.Friends);
 
   useEffect(() => {
-    const token = Cookies.get("AccessToken");
-    if (!token) return;
+  const token = Cookies.get("AccessToken");
+  if (!token) return;
 
-    const decoded = jwtDecode(token);
-    const id = decoded.id;
-    setUserId(id);
+  const decoded = jwtDecode(token);
+  const id = decoded.id;
+  setUserId(id);
 
-    if (!socket.connected) {
-      socket.connect();
-    }
+  if (!socket.connected) {
+    socket.connect();
+  }
 
-    dispatch(CheckFriends({ id, data: onlineUsers }));
-    socket.emit("user-online", id);
+  dispatch(CheckFriends({ id, data: onlineUsers }));
+  socket.emit("user-online", id);
 
-    return () => {
-      socket.off("online-users-update");
-      socket.off("online-friends-list");
-    };
-  }, [dispatch, onlineUsers.length]);
+  // 👉 Join the friends room
+  socket.emit("join-friends-room", id);
+
+  return () => {
+    // ❌ Leave the friends room on unmount
+    socket.emit("leave-friends-room", id);
+
+    socket.off("online-users-update");
+    socket.off("online-friends-list");
+  };
+}, [dispatch, onlineUsers.length]);
+
 
   useEffect(() => {
     if (!userId || friends.length === 0) return;
@@ -54,7 +61,14 @@ const Friends = () => {
       }));
     };
 
+    const handleUpdateFriends = (updatedFriend) => {
+      console.log("called")
+      // Instead of updating the friend manually, refetch the friend list
+      dispatch(CheckFriends({ id: userId, data: onlineUsers }));
+    };
+
     socket.on("UpdateUnreadMessages", handleUnreadMessages);
+    socket.on("UpdateFriendsData", handleUpdateFriends);
 
     friends.forEach((friend) => {
       const sender = friend.sender_id;
@@ -64,8 +78,9 @@ const Friends = () => {
 
     return () => {
       socket.off("UpdateUnreadMessages", handleUnreadMessages);
+      socket.off("UpdateFriendsData", handleUpdateFriends);
     };
-  }, [userId, friends]);
+  }, [userId, friends, dispatch, onlineUsers]);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -103,54 +118,47 @@ const Friends = () => {
                       {otherFriendName.charAt(0)}
                     </div>
                     <span
-                      className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${isOnline
-                        ? "bg-green-500"
-                        : "bg-gray-400"
-                        }`}
+                      className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${
+                        isOnline ? "bg-green-500" : "bg-gray-400"
+                      }`}
                     />
                   </div>
                   <div className="flex flex-col">
-                    <h2 className="text-base font-semibold text-gray-800">{otherFriendName}</h2>
+                    <h2 className="text-base font-semibold text-gray-800">
+                      {otherFriendName}
+                    </h2>
                     <span className="text-xs text-gray-500">
                       {isOnline ? "Online" : "Offline"}
                     </span>
                   </div>
                 </div>
 
-                {
-                  unreadCount?.count != 0 ?
-                    (
-                      <AnimatePresence mode="wait">
-                        {unreadCount?.count > 0 && (
-                          <motion.div
-                            key={unreadCount.count} // ensures rerender when count changes
-                            initial={{ opacity: 0, y: -5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 5 }}
-                            transition={{ duration: 0.3 }}
-                            className="bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full shadow text-center min-w-[80px]"
-                          >
-                            {unreadCount.count > 9
-                              ? "9+ Messages"
-                              : `${unreadCount.count} new message${unreadCount.count > 1 ? "s" : ""}`}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-
-                    )
-                    :
-                    (
-                      ""
-                    )
-                }
-
+                {unreadCount?.count !== 0 && (
+                  <AnimatePresence mode="wait">
+                    {unreadCount?.count > 0 && (
+                      <motion.div
+                        key={unreadCount.count}
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 5 }}
+                        transition={{ duration: 0.3 }}
+                        className="bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full shadow text-center min-w-[80px]"
+                      >
+                        {unreadCount.count > 9
+                          ? "9+ Messages"
+                          : `${unreadCount.count} new message${
+                              unreadCount.count > 1 ? "s" : ""
+                            }`}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                )}
               </Link>
             </motion.div>
           );
         })
       )}
     </div>
-
   );
 };
 
