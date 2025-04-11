@@ -12,7 +12,7 @@ import { MdDelete } from "react-icons/md";
 import EmojiPicker from "emoji-picker-react";
 
 const PersonalChat = () => {
-  const { id, username } = useParams();
+  const { id, username, friendsid } = useParams();
   const decodedUsername = decodeURIComponent(username);
 
   const [userid, setuserid] = useState(null);
@@ -41,6 +41,7 @@ const PersonalChat = () => {
       });
 
       socket.on("RecieveMessages", (Messages, isRecieveronline) => {
+        console.log("reviceve messages is called")
         setMessages((prev) => [...prev, ...Messages]);
         setmessage("");
         if (isRecieveronline) {
@@ -81,7 +82,7 @@ const PersonalChat = () => {
 
   const SendMessage = () => {
     if (!message.trim() || !userid) return;
-    socket.emit("SendMessage", message, id, userid);
+    socket.emit("SendMessage", message, id, userid , friendsid);
   };
 
   const handleTyping = (e) => {

@@ -13,7 +13,6 @@ export const GetSearchUsers = createAsyncThunk('GetSearchUsers', async ({ query 
 export const GetSingleUser = createAsyncThunk('GetSingleUser', async ({ id, currentUserId }) => {
     try {
         const res = await UsersInstance.get(`/GetSingleUser?userid=${id}&currentUserId=${currentUserId}`)
-        console.log(res.data)
         return res.data
     } catch (error) {
         console.error(error)
@@ -22,9 +21,7 @@ export const GetSingleUser = createAsyncThunk('GetSingleUser', async ({ id, curr
 
 export const AddFriends = createAsyncThunk('AddFriends', async ({ data }) => {
     try {
-        console.log(data)
         const res = await UsersInstance.post('/SendRequest', { data })
-        console.log(res.data)
         return res.data
     } catch (error) {
         console.error(error)
@@ -33,7 +30,6 @@ export const AddFriends = createAsyncThunk('AddFriends', async ({ data }) => {
 
 export const AcceptRequest = createAsyncThunk('AcceptRequest', async ({ data }) => {
     try {
-        console.log(data)
         const res = await UsersInstance.post('/AcceptRequest', { data })
         return res.data
     } catch (error) {
@@ -62,7 +58,15 @@ export const GetRequests = createAsyncThunk('GetRequests', async ({ senderid }) 
 export const CheckFriends = createAsyncThunk('CheckFriends' , async({id , data}) => {
     try {
         const res = await UsersInstance.post('/CheckFriends' , {id : id , data : data})
-        console.log(res.data)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+export const DeleteFriend = createAsyncThunk('DeleteFriend' , async({id , friend}) => {
+    try {
+        const res = await UsersInstance.post('/DeleteFriend' , {id : id , data : {sender : friend.sender_id , receiver : friend.receiver_id}})
         return res.data
     } catch (error) {
         console.error(error)
@@ -133,6 +137,10 @@ const UserReducer = createSlice({
         builder.addCase(CheckFriends.fulfilled , (state , action) => {
             state.Friends = action.payload.FriendsData
         } )
+
+        builder.addCase(DeleteFriend.fulfilled , (state , action) => {
+            state.Friends = action.payload.FriendsData
+        })
     }
 })
 
