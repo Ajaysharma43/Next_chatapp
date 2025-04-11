@@ -16,40 +16,39 @@ export async function middleware(request) {
     const refreshToken = request.cookies.get("RefreshToken")?.value;
     const pathname = request.nextUrl.pathname;
 
-    if (!refreshToken) {
-        console.log("RefreshToken is missing");
-        return NextResponse.redirect(new URL("/login", request.url));
-    }
-
     if (!accessToken) {
         console.log("AccessToken is missing, trying to refresh...");
         return refreshAccessToken(request, refreshToken);
     }
 
+    // if (!refreshToken) {
+    //     console.log("RefreshToken is missing");
+    //     return NextResponse.redirect(new URL("/login", request.url));
+    // }
+
     try {
         await jwtVerify(accessToken, JWT_SECRET);
         console.log("AccessToken is valid");
         try {
-            if(pathname.startsWith('/dashboard'))
-                {
-                    console.log('you are on the dashboard')
-                    const decode = jwtDecode(accessToken)
-                    return DashboardAccess(decode.role , request)
-                }
+            if (pathname.startsWith('/dashboard')) {
+                console.log('you are on the dashboard')
+                const decode = jwtDecode(accessToken)
+                return DashboardAccess(decode.role, request)
+            }
         } catch (error) {
-            
+
         }
     } catch (err) {
         console.error("AccessToken is invalid or expired:", err.message);
         return await refreshAccessToken(request, refreshToken);
     }
 
-   
-    
-    
+
+
+
 }
 
 
 export const config = {
-    matcher: ["/" , "/Findusers" , "/friends" , "/dashboard" , "/dashboard/profile"],
+    matcher: ["/", "/Findusers", "/friends", "/Requests", "/dashboard", "/dashboard/profile"],
 };

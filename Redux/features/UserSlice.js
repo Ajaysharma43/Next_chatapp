@@ -55,18 +55,18 @@ export const GetRequests = createAsyncThunk('GetRequests', async ({ senderid }) 
     }
 })
 
-export const CheckFriends = createAsyncThunk('CheckFriends' , async({id , data}) => {
+export const CheckFriends = createAsyncThunk('CheckFriends', async ({ id, data }) => {
     try {
-        const res = await UsersInstance.post('/CheckFriends' , {id : id , data : data})
+        const res = await UsersInstance.post('/CheckFriends', { id: id, data: data })
         return res.data
     } catch (error) {
         console.error(error)
     }
 })
 
-export const DeleteFriend = createAsyncThunk('DeleteFriend' , async({id , friend}) => {
+export const DeleteFriend = createAsyncThunk('DeleteFriend', async ({ id, friend }) => {
     try {
-        const res = await UsersInstance.post('/DeleteFriend' , {id : id , data : {sender : friend.sender_id , receiver : friend.receiver_id}})
+        const res = await UsersInstance.post('/DeleteFriend', { id: id, data: { sender: friend.sender_id, receiver: friend.receiver_id } })
         return res.data
     } catch (error) {
         console.error(error)
@@ -77,8 +77,8 @@ const initialState = {
     SearchData: [],
     SingleUser: {},
     Requests: [],
-    Friends : [],
-    RecieveRequests : [],
+    Friends: [],
+    RecieveRequests: [],
     IsSearchLoading: false,
     IsUserSearchLoading: false,
     AddFriendsLoading: false,
@@ -134,11 +134,11 @@ const UserReducer = createSlice({
             state.RecieveRequests = action.payload.ReciveRequests
         })
 
-        builder.addCase(CheckFriends.fulfilled , (state , action) => {
+        builder.addCase(CheckFriends.fulfilled, (state, action) => {
             state.Friends = action.payload.FriendsData
-        } )
+        })
 
-        builder.addCase(DeleteFriend.fulfilled , (state , action) => {
+        builder.addCase(DeleteFriend.fulfilled, (state, action) => {
             state.Friends = action.payload.FriendsData
         })
     }
