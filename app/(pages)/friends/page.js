@@ -142,9 +142,8 @@ const Friends = () => {
 
       <div className="p-6 max-w-3xl mx-auto">
         <h1
-          className={`text-2xl font-bold mb-6 ${
-            theme === "dark" ? "text-white" : "text-gray-800"
-          }`}
+          className={`text-2xl font-bold mb-6 ${theme === "dark" ? "text-white" : "text-gray-800"
+            }`}
         >
           My Friends
         </h1>
@@ -179,52 +178,49 @@ const Friends = () => {
                   transition={{ duration: 0.4, ease: "easeInOut" }}
                 >
                   <div
-                    className={`flex justify-between items-center gap-4 p-4 border shadow-sm rounded-xl transition-all hover:shadow-md ${
-                      theme === "dark"
+                    className={`flex justify-between items-center gap-4 p-4 border shadow-sm rounded-xl transition-all hover:shadow-md ${theme === "dark"
                         ? "bg-gray-800 border-gray-600 text-white"
                         : "bg-white border-gray-200 text-gray-800"
-                    } ${friend.is_blocked ? "hidden" : ""}`}
+                      } ${friend.is_blocked ? "hidden" : ""}`}
                   >
                     {friend.is_blocked ? (
                       <div className="flex items-center gap-3 flex-grow">
                         {
-                          friend.blocked_id == otherFriendId?
-                          (
-                            <>
-                            <div className="relative">
-                          <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                              theme === "dark"
-                                ? "bg-blue-900 text-white"
-                                : "bg-blue-200 text-blue-800"
-                            }`}
-                          >
-                            {otherFriendName.charAt(0)}
-                          </div>
-                          <span
-                            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${
-                              theme === "dark"
-                                ? "border-gray-800"
-                                : "border-white"
-                            } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <h2 className="text-base font-semibold">
-                            {otherFriendName}
-                          </h2>
-                          <span className="text-xs text-red-500 font-semibold">
-                            Blocked
-                          </span>
-                        </div>
-                            </>
-                          )
-                          :
-                          (
-                            ""
-                          )
+                          friend.blocked_id == otherFriendId ?
+                            (
+                              <>
+                                <div className="relative">
+                                  <div
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${theme === "dark"
+                                        ? "bg-blue-900 text-white"
+                                        : "bg-blue-200 text-blue-800"
+                                      }`}
+                                  >
+                                    {otherFriendName.charAt(0)}
+                                  </div>
+                                  <span
+                                    className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${theme === "dark"
+                                        ? "border-gray-800"
+                                        : "border-white"
+                                      } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
+                                  />
+                                </div>
+                                <div className="flex flex-col">
+                                  <h2 className="text-base font-semibold">
+                                    {otherFriendName}
+                                  </h2>
+                                  <span className="text-xs text-red-500 font-semibold">
+                                    Blocked
+                                  </span>
+                                </div>
+                              </>
+                            )
+                            :
+                            (
+                              ""
+                            )
                         }
-                        
+
                       </div>
                     ) : (
                       <Link
@@ -233,20 +229,18 @@ const Friends = () => {
                       >
                         <div className="relative">
                           <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                              theme === "dark"
+                            className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${theme === "dark"
                                 ? "bg-gradient-to-r from-blue-400 to-blue-600 text-white"
                                 : "bg-gradient-to-r from-blue-200 to-blue-400 text-blue-800"
-                            }`}
+                              }`}
                           >
                             {otherFriendName.charAt(0)}
                           </div>
                           <span
-                            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${
-                              theme === "dark"
+                            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${theme === "dark"
                                 ? "border-gray-800"
                                 : "border-white"
-                            } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
+                              } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
                           />
                         </div>
                         <div className="flex flex-col">
@@ -274,9 +268,8 @@ const Friends = () => {
                             >
                               {unreadCount.count > 9
                                 ? "9+ Messages"
-                                : `${unreadCount.count} new message${
-                                    unreadCount.count > 1 ? "s" : ""
-                                  }`}
+                                : `${unreadCount.count} new message${unreadCount.count > 1 ? "s" : ""
+                                }`}
                             </motion.div>
                           </AnimatePresence>
                         )}
@@ -297,7 +290,7 @@ const Friends = () => {
           </Reorder.Group>
         )}
       </div>
-      
+
     </>
   );
 };
