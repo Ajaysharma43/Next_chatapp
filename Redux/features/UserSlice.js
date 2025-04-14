@@ -1,9 +1,9 @@
 import { UsersInstance } from "@/Interseptors/UsersInterseptors"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 
-export const GetSearchUsers = createAsyncThunk('GetSearchUsers', async ({ query }) => {
+export const GetSearchUsers = createAsyncThunk('GetSearchUsers', async ({ query, id }) => {
     try {
-        const res = await UsersInstance.post('/SearchUsers', { user: query })
+        const res = await UsersInstance.post('/SearchUsers', { user: query, id })
         return res.data
     } catch (error) {
         console.error(error)
@@ -74,12 +74,23 @@ export const DeleteFriend = createAsyncThunk('DeleteFriend', async ({ id, friend
     }
 })
 
+export const BlockedFriends = createAsyncThunk('BlockedFriends', async ({ userid }) => {
+    try {
+        console.log(userid)
+        const res = await UsersInstance.get(`/GetBlockedFriends?userid=${userid}`)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 const initialState = {
     SearchData: [],
     SingleUser: {},
     Requests: [],
     Friends: [],
     RecieveRequests: [],
+    BlockedUser: [],
     IsSearchLoading: false,
     IsUserSearchLoading: false,
     AddFriendsLoading: false,
@@ -91,6 +102,11 @@ const initialState = {
 const UserReducer = createSlice({
     initialState,
     name: "UserReducer",
+    reducers: {
+        UpdateBlockedUsers: (state, action) => {
+            state.BlockedUser = action.payload
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(GetSearchUsers.pending, (state, action) => {
             state.IsSearchLoading = true
@@ -104,10 +120,13 @@ const UserReducer = createSlice({
             state.IsUserSearchLoading = true
         })
         builder.addCase(GetSingleUser.fulfilled, (state, action) => {
-            state.SingleUser = action.payload.user
-            state.IsUserFriends = action.payload.relation
-            state.UsersRelation = action.payload.relationshipStatus
+            state.SingleUser = action.payload?.user
+            state.IsUserFriends = action.payload?.relation
+            state.UsersRelation = action.payload?.relationshipStatus
             state.senderid = action.payload?.sender?.sender_id
+            state.IsUserSearchLoading = false
+        })
+        builder.addCase(GetSingleUser.rejected, (state, action) => {
             state.IsUserSearchLoading = false
         })
 
@@ -142,7 +161,13 @@ const UserReducer = createSlice({
         builder.addCase(DeleteFriend.fulfilled, (state, action) => {
             state.Friends = action.payload.FriendsData
         })
+
+        builder.addCase(BlockedFriends.fulfilled, (state, action) => {
+            state.BlockedUser = action.payload.BlockedUsers
+        })
     }
 })
+
+export const { UpdateBlockedUsers } = UserReducer.actions
 
 export default UserReducer.reducer

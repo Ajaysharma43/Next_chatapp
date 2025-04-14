@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { GetSearchUsers } from "@/Redux/features/UserSlice";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
 
 const SearchUsers = () => {
     const [query, setQuery] = useState(""); // User input
@@ -23,7 +25,9 @@ const SearchUsers = () => {
 
         const fetchUsers = async () => {
             try {
-                dispatch(GetSearchUsers({query}))
+                const Token = Cookies.get('AccessToken')
+                const Decode = jwtDecode(Token)
+                dispatch(GetSearchUsers({query , id : Decode.id}))
             } catch (error) {
                 console.error("Error fetching users:", error);
             }
