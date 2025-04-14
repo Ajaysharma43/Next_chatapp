@@ -88,7 +88,7 @@ const PersonalChat = () => {
 
   const handleTyping = (e) => {
     setmessage(e.target.value);
-    socket.emit("typing", id);
+    socket.emit("typing", id , userid);
   };
 
   const handleEmojiClick = (emojiData) => {

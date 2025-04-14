@@ -23,6 +23,8 @@ const Friends = () => {
   const [blockDialogState, setBlockDialogState] = useState(false);
   const [blockSelectedFriend, setBlockSelectedFriend] = useState(null);
   const [blockfriendid, setblockfriendid] = useState(null);
+  const [typing, settyping] = useState(false)
+  const [typinguser, settypinguser] = useState(null)
 
   const { theme } = useTheme();
 
@@ -54,11 +56,20 @@ const Friends = () => {
       console.log("Block response:", data);
     });
 
+    socket.on("typinguser", (userid) => {
+      settypinguser(userid)
+      settyping(true)
+      setTimeout(() => {
+        settypinguser(null)
+      }, 2000);
+    })
+
     return () => {
       socket.emit("leave-friends-room", id);
       socket.off("online-users-update");
       socket.off("online-friends-list");
       socket.off("UpdateBlockedusers");
+      socket.off("typinguser")
     };
   }, [dispatch, onlineUsers.length]);
 
@@ -179,8 +190,8 @@ const Friends = () => {
                 >
                   <div
                     className={`flex justify-between items-center gap-4 p-4 border shadow-sm rounded-xl transition-all hover:shadow-md ${theme === "dark"
-                        ? "bg-gray-800 border-gray-600 text-white"
-                        : "bg-white border-gray-200 text-gray-800"
+                      ? "bg-gray-800 border-gray-600 text-white"
+                      : "bg-white border-gray-200 text-gray-800"
                       } ${friend.is_blocked ? "hidden" : ""}`}
                   >
                     {friend.is_blocked ? (
@@ -192,16 +203,16 @@ const Friends = () => {
                                 <div className="relative">
                                   <div
                                     className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${theme === "dark"
-                                        ? "bg-blue-900 text-white"
-                                        : "bg-blue-200 text-blue-800"
+                                      ? "bg-blue-900 text-white"
+                                      : "bg-blue-200 text-blue-800"
                                       }`}
                                   >
                                     {otherFriendName.charAt(0)}
                                   </div>
                                   <span
                                     className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${theme === "dark"
-                                        ? "border-gray-800"
-                                        : "border-white"
+                                      ? "border-gray-800"
+                                      : "border-white"
                                       } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
                                   />
                                 </div>
@@ -230,16 +241,16 @@ const Friends = () => {
                         <div className="relative">
                           <div
                             className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${theme === "dark"
-                                ? "bg-gradient-to-r from-blue-400 to-blue-600 text-white"
-                                : "bg-gradient-to-r from-blue-200 to-blue-400 text-blue-800"
+                              ? "bg-gradient-to-r from-blue-400 to-blue-600 text-white"
+                              : "bg-gradient-to-r from-blue-200 to-blue-400 text-blue-800"
                               }`}
                           >
                             {otherFriendName.charAt(0)}
                           </div>
                           <span
                             className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${theme === "dark"
-                                ? "border-gray-800"
-                                : "border-white"
+                              ? "border-gray-800"
+                              : "border-white"
                               } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
                           />
                         </div>
@@ -273,6 +284,40 @@ const Friends = () => {
                             </motion.div>
                           </AnimatePresence>
                         )}
+                        <AnimatePresence mode="wait">
+                          {typinguser === otherFriendId && (
+                            <motion.div
+                              key="typing-indicator"
+                              className="flex justify-start pl-3"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              transition={{ duration: 0.5 }}
+                            >
+                              <div className="px-4 py-2 rounded-2xl text-sm shadow flex gap-1 items-center bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200">
+                                {[0, 0.15, 0.3].map((delay, i) => (
+                                  <motion.span
+                                    key={i}
+                                    className="inline-block w-2 h-2 rounded-full bg-current"
+                                    animate={{
+                                      scale: [1, 1.5, 1],
+                                      opacity: [0.6, 1, 0.6],
+                                    }}
+                                    transition={{
+                                      duration: 0.8,
+                                      repeat: Infinity,
+                                      delay,
+                                      ease: "easeInOut",
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+
+
+
                         <button onClick={() => handleDeleteDialog(friend)}>
                           <TiUserDelete className="text-xl text-red-500 hover:text-red-700" />
                         </button>
