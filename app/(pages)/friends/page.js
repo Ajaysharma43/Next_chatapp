@@ -235,8 +235,8 @@ const Friends = () => {
                           <div
                             className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                               theme === "dark"
-                                ? "bg-blue-900 text-white"
-                                : "bg-blue-200 text-blue-800"
+                                ? "bg-gradient-to-r from-blue-400 to-blue-600 text-white"
+                                : "bg-gradient-to-r from-blue-200 to-blue-400 text-blue-800"
                             }`}
                           >
                             {otherFriendName.charAt(0)}
@@ -297,6 +297,7 @@ const Friends = () => {
           </Reorder.Group>
         )}
       </div>
+      
     </>
   );
 };
