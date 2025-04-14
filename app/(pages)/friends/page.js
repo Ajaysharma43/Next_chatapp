@@ -9,7 +9,9 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion, AnimatePresence, Reorder } from "framer-motion";
 import { DeleteDialog } from "./(Dialogs)/DeleteDialog";
+import { BlockDialog } from "./(Dialogs)/BlockDialog";
 import { TiUserDelete } from "react-icons/ti";
+import { ImBlocked } from "react-icons/im";
 import { useTheme } from "next-themes";
 
 const Friends = () => {
@@ -18,6 +20,11 @@ const Friends = () => {
   const [friendsList, setFriendsList] = useState([]);
   const [DeleteDialogstate, setDeleteDialogstate] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
+
+  const [blockDialogState, setBlockDialogState] = useState(false);
+  const [blockSelectedFriend, setBlockSelectedFriend] = useState(null);
+  const [blockfriendid , setblockfriendid] = useState(null)
+
   const { theme } = useTheme();
 
   const dispatch = useDispatch();
@@ -44,10 +51,22 @@ const Friends = () => {
     socket.emit("user-online", id);
     socket.emit("join-friends-room", id);
 
+    socket.on('UpdateBlockedusers' , (data) => {
+      if(data.success == true)
+      {
+        console.log("user blocked successfully" , data)
+      }
+      else
+      {
+        console.log("user is already blocked" , data)
+      }
+    })
+
     return () => {
       socket.emit("leave-friends-room", id);
       socket.off("online-users-update");
       socket.off("online-friends-list");
+      socket.off("UpdateBlockedusers")
     };
   }, [dispatch, onlineUsers.length]);
 
@@ -101,6 +120,19 @@ const Friends = () => {
     }
   };
 
+  const handleBlockDialog = (friend , otherFriendId) => {
+    setblockfriendid(otherFriendId)
+    setBlockSelectedFriend(friend);
+    setBlockDialogState(true);
+  };
+
+  const handleBlockFriend = async (friend) => {
+    console.log("Block logic goes here for:", friend);
+    socket.emit('BlockUser' , blockfriendid , userId)
+    setBlockDialogState(false);
+    setBlockSelectedFriend(null);
+  };
+
   return (
     <>
       <DeleteDialog
@@ -108,6 +140,13 @@ const Friends = () => {
         onclose={() => setDeleteDialogstate(false)}
         friend={selectedFriend}
         onDelete={handleFriendDelete}
+      />
+
+      <BlockDialog
+        open={blockDialogState}
+        onclose={() => setBlockDialogState(false)}
+        friend={blockSelectedFriend}
+        onBlock={handleBlockFriend}
       />
 
       <div className={`p-6 max-w-3xl mx-auto`}>
@@ -151,10 +190,9 @@ const Friends = () => {
                 >
                   <div
                     className={`flex justify-between items-center gap-4 p-4 border shadow-sm rounded-xl transition-all hover:shadow-md 
-                      ${
-                        theme === "dark"
-                          ? "bg-gray-800 border-gray-600 text-white"
-                          : "bg-white border-gray-200 text-gray-800"
+                      ${theme === "dark"
+                        ? "bg-gray-800 border-gray-600 text-white"
+                        : "bg-white border-gray-200 text-gray-800"
                       }`}
                   >
                     <Link
@@ -173,14 +211,18 @@ const Friends = () => {
                         </div>
                         <span
                           className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${
-                            theme === "dark" ? "border-gray-800" : "border-white"
+                            theme === "dark"
+                              ? "border-gray-800"
+                              : "border-white"
                           } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
                         />
                       </div>
                       <div className="flex flex-col">
                         <h2
                           className={`text-base font-semibold ${
-                            theme === "dark" ? "text-white" : "text-gray-800"
+                            theme === "dark"
+                              ? "text-white"
+                              : "text-gray-800"
                           }`}
                         >
                           {otherFriendName}
@@ -214,6 +256,9 @@ const Friends = () => {
                       )}
                       <button onClick={() => handleDeleteDialog(friend)}>
                         <TiUserDelete className="text-xl text-red-500 hover:text-red-700" />
+                      </button>
+                      <button onClick={() => handleBlockDialog(friend , otherFriendId)}>
+                        <ImBlocked className="text-xl text-red-500 hover:text-red-700" />
                       </button>
                     </div>
                   </div>
