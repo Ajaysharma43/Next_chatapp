@@ -58,6 +58,7 @@ export const GetRequests = createAsyncThunk('GetRequests', async ({ senderid }) 
 export const CheckFriends = createAsyncThunk('CheckFriends', async ({ id, data }) => {
     try {
         const res = await UsersInstance.post('/CheckFriends', { id: id, data: data })
+        console.log(res.data)
         return res.data
     } catch (error) {
         console.error(error)

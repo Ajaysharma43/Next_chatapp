@@ -20,10 +20,9 @@ const Friends = () => {
   const [friendsList, setFriendsList] = useState([]);
   const [DeleteDialogstate, setDeleteDialogstate] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
-
   const [blockDialogState, setBlockDialogState] = useState(false);
   const [blockSelectedFriend, setBlockSelectedFriend] = useState(null);
-  const [blockfriendid , setblockfriendid] = useState(null)
+  const [blockfriendid, setblockfriendid] = useState(null);
 
   const { theme } = useTheme();
 
@@ -51,22 +50,15 @@ const Friends = () => {
     socket.emit("user-online", id);
     socket.emit("join-friends-room", id);
 
-    socket.on('UpdateBlockedusers' , (data) => {
-      if(data.success == true)
-      {
-        console.log("user blocked successfully" , data)
-      }
-      else
-      {
-        console.log("user is already blocked" , data)
-      }
-    })
+    socket.on("UpdateBlockedusers", (data) => {
+      console.log("Block response:", data);
+    });
 
     return () => {
       socket.emit("leave-friends-room", id);
       socket.off("online-users-update");
       socket.off("online-friends-list");
-      socket.off("UpdateBlockedusers")
+      socket.off("UpdateBlockedusers");
     };
   }, [dispatch, onlineUsers.length]);
 
@@ -120,15 +112,14 @@ const Friends = () => {
     }
   };
 
-  const handleBlockDialog = (friend , otherFriendId) => {
-    setblockfriendid(otherFriendId)
+  const handleBlockDialog = (friend, otherFriendId) => {
+    setblockfriendid(otherFriendId);
     setBlockSelectedFriend(friend);
     setBlockDialogState(true);
   };
 
-  const handleBlockFriend = async (friend) => {
-    console.log("Block logic goes here for:", friend);
-    socket.emit('BlockUser' , blockfriendid , userId)
+  const handleBlockFriend = async () => {
+    socket.emit("BlockUser", blockfriendid, userId);
     setBlockDialogState(false);
     setBlockSelectedFriend(null);
   };
@@ -149,7 +140,7 @@ const Friends = () => {
         onBlock={handleBlockFriend}
       />
 
-      <div className={`p-6 max-w-3xl mx-auto`}>
+      <div className="p-6 max-w-3xl mx-auto">
         <h1
           className={`text-2xl font-bold mb-6 ${
             theme === "dark" ? "text-white" : "text-gray-800"
@@ -175,7 +166,6 @@ const Friends = () => {
               const otherFriendName = isSender
                 ? friend.receiver_name
                 : friend.sender_name;
-
               const isOnline = onlineUsers.includes(otherFriendId);
               const unreadCount = unreadMap[otherFriendId];
 
@@ -189,54 +179,91 @@ const Friends = () => {
                   transition={{ duration: 0.4, ease: "easeInOut" }}
                 >
                   <div
-                    className={`flex justify-between items-center gap-4 p-4 border shadow-sm rounded-xl transition-all hover:shadow-md 
-                      ${theme === "dark"
+                    className={`flex justify-between items-center gap-4 p-4 border shadow-sm rounded-xl transition-all hover:shadow-md ${
+                      theme === "dark"
                         ? "bg-gray-800 border-gray-600 text-white"
                         : "bg-white border-gray-200 text-gray-800"
-                      }`}
+                    } ${friend.is_blocked ? "hidden" : ""}`}
                   >
-                    <Link
-                      href={`/personalchat/${otherFriendId}/${otherFriendName}/${friend.id}`}
-                      className="flex items-center gap-3 flex-grow"
-                    >
-                      <div className="relative">
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                            theme === "dark"
-                              ? "bg-blue-900 text-white"
-                              : "bg-blue-200 text-blue-800"
-                          }`}
-                        >
-                          {otherFriendName.charAt(0)}
+                    {friend.is_blocked ? (
+                      <div className="flex items-center gap-3 flex-grow">
+                        {
+                          friend.blocked_id == otherFriendId?
+                          (
+                            <>
+                            <div className="relative">
+                          <div
+                            className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                              theme === "dark"
+                                ? "bg-blue-900 text-white"
+                                : "bg-blue-200 text-blue-800"
+                            }`}
+                          >
+                            {otherFriendName.charAt(0)}
+                          </div>
+                          <span
+                            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${
+                              theme === "dark"
+                                ? "border-gray-800"
+                                : "border-white"
+                            } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
+                          />
                         </div>
-                        <span
-                          className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${
-                            theme === "dark"
-                              ? "border-gray-800"
-                              : "border-white"
-                          } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
-                        />
+                        <div className="flex flex-col">
+                          <h2 className="text-base font-semibold">
+                            {otherFriendName}
+                          </h2>
+                          <span className="text-xs text-red-500 font-semibold">
+                            Blocked
+                          </span>
+                        </div>
+                            </>
+                          )
+                          :
+                          (
+                            ""
+                          )
+                        }
+                        
                       </div>
-                      <div className="flex flex-col">
-                        <h2
-                          className={`text-base font-semibold ${
-                            theme === "dark"
-                              ? "text-white"
-                              : "text-gray-800"
-                          }`}
-                        >
-                          {otherFriendName}
-                        </h2>
-                        <span className="text-xs text-gray-500">
-                          {isOnline ? "Online" : "Offline"}
-                        </span>
-                      </div>
-                    </Link>
+                    ) : (
+                      <Link
+                        href={`/personalchat/${otherFriendId}/${otherFriendName}/${friend.id}`}
+                        className="flex items-center gap-3 flex-grow"
+                      >
+                        <div className="relative">
+                          <div
+                            className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                              theme === "dark"
+                                ? "bg-blue-900 text-white"
+                                : "bg-blue-200 text-blue-800"
+                            }`}
+                          >
+                            {otherFriendName.charAt(0)}
+                          </div>
+                          <span
+                            className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 ${
+                              theme === "dark"
+                                ? "border-gray-800"
+                                : "border-white"
+                            } ${isOnline ? "bg-green-500" : "bg-gray-400"}`}
+                          />
+                        </div>
+                        <div className="flex flex-col">
+                          <h2 className="text-base font-semibold">
+                            {otherFriendName}
+                          </h2>
+                          <span className="text-xs text-gray-500">
+                            {isOnline ? "Online" : "Offline"}
+                          </span>
+                        </div>
+                      </Link>
+                    )}
 
-                    <div className="flex items-center gap-2">
-                      {unreadCount?.count !== 0 && (
-                        <AnimatePresence mode="wait">
-                          {unreadCount?.count > 0 && (
+                    {!friend.is_blocked && (
+                      <div className="flex items-center gap-2">
+                        {unreadCount?.count > 0 && (
+                          <AnimatePresence mode="wait">
                             <motion.div
                               key={unreadCount.count}
                               initial={{ opacity: 0, y: -5 }}
@@ -251,16 +278,18 @@ const Friends = () => {
                                     unreadCount.count > 1 ? "s" : ""
                                   }`}
                             </motion.div>
-                          )}
-                        </AnimatePresence>
-                      )}
-                      <button onClick={() => handleDeleteDialog(friend)}>
-                        <TiUserDelete className="text-xl text-red-500 hover:text-red-700" />
-                      </button>
-                      <button onClick={() => handleBlockDialog(friend , otherFriendId)}>
-                        <ImBlocked className="text-xl text-red-500 hover:text-red-700" />
-                      </button>
-                    </div>
+                          </AnimatePresence>
+                        )}
+                        <button onClick={() => handleDeleteDialog(friend)}>
+                          <TiUserDelete className="text-xl text-red-500 hover:text-red-700" />
+                        </button>
+                        <button
+                          onClick={() => handleBlockDialog(friend, otherFriendId)}
+                        >
+                          <ImBlocked className="text-xl text-red-500 hover:text-red-700" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </Reorder.Item>
               );
