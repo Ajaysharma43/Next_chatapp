@@ -47,7 +47,7 @@ const GroupsData = () => {
 
     const confirmDelete = (groupId) => {
         console.log("Confirmed delete for:", groupId);
-        socket.emit("DeleteGroup", groupId, userid)
+        socket.emit("DeleteGroup", groupId, userid);
         closeDeleteDialog();
     };
 
@@ -63,39 +63,40 @@ const GroupsData = () => {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {Groups.map((group) => (
-                            <>
-                            <Link href={`/groupchat/${group.id}/${group.created_by}`}>
-                            <div
-                                key={group?.id}
-                                className="relative bg-white rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100"
-                            >
-                                {group?.created_by == userid && (
-                                    <button
-                                        onClick={() => openDeleteDialog(group?.id)}
-                                        className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition"
-                                        title="Delete Group"
-                                    >
-                                        <TiDelete size={22} />
-                                    </button>
-                                )}
+                            <div key={group?.id} className="relative">
+                                <Link href={`/groupchat/${group.id}/${group.created_by}`}>
+                                    <div className="bg-white rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100 relative">
 
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="bg-amber-100 text-amber-600 p-2 rounded-full">
-                                        <Users size={20} />
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="bg-amber-100 text-amber-600 p-2 rounded-full">
+                                                <Users size={20} />
+                                            </div>
+                                            <h2 className="text-lg font-semibold text-gray-800">
+                                                {group?.name}
+                                            </h2>
+                                        </div>
+
+                                        {group?.description && (
+                                            <p className="text-sm text-gray-600 pl-10">
+                                                {group?.description}
+                                            </p>
+                                        )}
+
+                                        {group?.created_by == userid && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    openDeleteDialog(group?.id);
+                                                }}
+                                                className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition"
+                                                title="Delete Group"
+                                            >
+                                                <TiDelete size={22} />
+                                            </button>
+                                        )}
                                     </div>
-                                    <h2 className="text-lg font-semibold text-gray-800">
-                                        {group?.name}
-                                    </h2>
-                                </div>
-
-                                {group?.description && (
-                                    <p className="text-sm text-gray-600 pl-10">
-                                        {group?.description}
-                                    </p>
-                                )}
+                                </Link>
                             </div>
-                            </Link>
-                            </>
                         ))}
                     </div>
                 )}
