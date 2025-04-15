@@ -61,7 +61,7 @@ export const CreateGroupDialog = ({ open, onClose }) => {
             resetForm()
             setSelectedMembers([])
             // Optionally call an API to create group here
-            // onClose();
+            onClose();
         },
     });
 
