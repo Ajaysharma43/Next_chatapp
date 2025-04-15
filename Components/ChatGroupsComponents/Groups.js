@@ -64,7 +64,7 @@ const GroupsData = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {Groups.map((group) => (
                             <>
-                            <Link href={`/groupchat/${group.id}`}>
+                            <Link href={`/groupchat/${group.id}/${group.created_by}`}>
                             <div
                                 key={group?.id}
                                 className="relative bg-white rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100"
