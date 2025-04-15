@@ -6,10 +6,10 @@ import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { Users } from "lucide-react";
 import { TiDelete } from "react-icons/ti";
-
 import socket from "@/app/SocketConnection/SocketConnection";
 import { ChatGroups, GetGroups } from "@/Redux/features/ChatGroupsSlice";
 import DeleteDialog from "./Dialogs/DeleteGroupDialog";
+import Link from "next/link";
 
 const GroupsData = () => {
     const [userid, setUserId] = useState(null);
@@ -63,6 +63,8 @@ const GroupsData = () => {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {Groups.map((group) => (
+                            <>
+                            <Link href={`/groupchat/${group.id}`}>
                             <div
                                 key={group?.id}
                                 className="relative bg-white rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100"
@@ -92,6 +94,8 @@ const GroupsData = () => {
                                     </p>
                                 )}
                             </div>
+                            </Link>
+                            </>
                         ))}
                     </div>
                 )}
