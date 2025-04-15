@@ -47,7 +47,7 @@ const GroupsData = () => {
 
     const confirmDelete = (groupId) => {
         console.log("Confirmed delete for:", groupId);
-        // socket.emit("DeleteGroup", groupId) or dispatch API call
+        socket.emit("DeleteGroup", groupId, userid)
         closeDeleteDialog();
     };
 
