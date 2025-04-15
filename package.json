@@ -17,6 +17,7 @@
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
     "emoji-picker-react": "^4.12.2",
+    "formik": "^2.4.6",
     "framer-motion": "^12.6.3",
     "google-auth-library": "^9.15.1",
     "jose": "^6.0.10",
