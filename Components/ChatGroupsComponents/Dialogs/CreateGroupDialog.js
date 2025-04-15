@@ -57,7 +57,7 @@ export const CreateGroupDialog = ({ open, onClose }) => {
                 createdBy: userId,
             };
             console.log("Creating group:", groupData);
-            socket.emit('CreateGroup' , groupData)
+            socket.emit('CreateGroup', groupData)
             resetForm()
             setSelectedMembers([])
             // Optionally call an API to create group here
