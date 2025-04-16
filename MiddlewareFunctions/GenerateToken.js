@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
-export async function generateAccessToken(id , role) {
-    return await new SignJWT({ id , role })
+export async function generateAccessToken(id , role , username) {
+    return await new SignJWT({ id , role , username})
         .setProtectedHeader({ alg: "HS256" , typ : "JWT" })
         .setIssuedAt()
         .setExpirationTime("2h") 
@@ -18,7 +18,7 @@ export async function refreshAccessToken(request, refreshToken) {
 
         console.log("RefreshToken is valid, generating new AccessToken");
 
-        const newAccessToken = await generateAccessToken(payload.id , payload.role);
+        const newAccessToken = await generateAccessToken(payload.id , payload.role , payload.username);
         const response = NextResponse.next();
 
         response.cookies.set("AccessToken", newAccessToken, {
