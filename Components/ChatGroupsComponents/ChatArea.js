@@ -97,7 +97,7 @@ const ChatArea = ({ id, onBack }) => {
                     }`}
                 >
                   <h1 className="font-semibold text-sm mb-1">
-                    {item?.sender_id === userid ? "You" : item.sender_id}
+                    {item?.sender_id === userid ? "You" : item.name}
                   </h1>
                   <p className="text-sm">{item?.content}</p>
                 </div>

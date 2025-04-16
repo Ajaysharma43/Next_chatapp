@@ -48,6 +48,7 @@ const GroupsData = () => {
     useEffect(() => {
         socket.on("SendGroups", (GetGroups) => {
             dispatch(ChatGroups(GetGroups));
+            setSelectedGroupId(null)
         });
     }, [dispatch]);
 
