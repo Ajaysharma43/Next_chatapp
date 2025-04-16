@@ -112,8 +112,8 @@ const GroupsData = () => {
                                             <div
                                                 key={group?.id}
                                                 className={`relative cursor-pointer ${group?.id === selectedGroupId
-                                                        ? "bg-amber-200" // active group background
-                                                        : "bg-white"
+                                                    ? "bg-amber-200" // active group background
+                                                    : "bg-white"
                                                     } rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100 relative`}
                                                 onClick={() => handleGroupClick(group.id, group.created_by)}
                                             >
@@ -157,8 +157,8 @@ const GroupsData = () => {
                                     <div
                                         key={group?.id}
                                         className={`relative cursor-pointer ${group?.id === selectedGroupId
-                                                ? "bg-amber-200" // active group background
-                                                : "bg-white"
+                                            ? "bg-amber-200" // active group background
+                                            : "bg-white"
                                             } rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100 relative`}
                                         onClick={() => handleGroupClick(group.id, group.created_by)}
                                     >

@@ -21,6 +21,10 @@ const ChatArea = ({ id, onBack }) => {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
+    setShowGroupDetails(false)
+  },[id])
+
+  useEffect(() => {
     const token = Cookies.get("AccessToken");
     const decode = jwtDecode(token);
     setUserId(decode.id);
