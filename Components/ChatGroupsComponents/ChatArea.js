@@ -134,8 +134,8 @@ const ChatArea = ({ id, onBack }) => {
             <button
               onClick={() => setShowGroupDetails(false)}
               className={`px-3 py-1 rounded-md text-sm font-medium ${!showGroupDetails
-                  ? "bg-amber-500 text-white"
-                  : "bg-gray-200 text-gray-700"
+                ? "bg-amber-500 text-white"
+                : "bg-gray-200 text-gray-700"
                 }`}
             >
               Chat
@@ -143,8 +143,8 @@ const ChatArea = ({ id, onBack }) => {
             <button
               onClick={() => setShowGroupDetails(true)}
               className={`px-3 py-1 rounded-md text-sm font-medium ${showGroupDetails
-                  ? "bg-amber-500 text-white"
-                  : "bg-gray-200 text-gray-700"
+                ? "bg-amber-500 text-white"
+                : "bg-gray-200 text-gray-700"
                 }`}
             >
               Group Info
@@ -169,8 +169,8 @@ const ChatArea = ({ id, onBack }) => {
                     <div
                       key={item?.id}
                       className={`flex ${item?.sender_id === userid
-                          ? "justify-end"
-                          : "justify-start"
+                        ? "justify-end"
+                        : "justify-start"
                         }`}
                     >
                       {
@@ -191,8 +191,8 @@ const ChatArea = ({ id, onBack }) => {
                                 )
                               }
                               className={`relative max-w-xs md:max-w-md break-words px-4 py-2 rounded-2xl text-white shadow-md cursor-pointer transition-transform active:scale-[.98] ${item?.sender_id === userid
-                                  ? "bg-green-500"
-                                  : "bg-blue-500"
+                                ? "bg-green-500"
+                                : "bg-blue-500"
                                 }`}
                             >
                               <h1 className="font-semibold text-sm mb-1">
