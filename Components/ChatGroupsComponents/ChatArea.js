@@ -31,7 +31,16 @@ const ChatArea = ({ id, onBack }) => {
     socket.emit("PreviousGroupChats", id);
 
     const handlePrevMessages = (messages) => setMessages(messages);
-    const handleNewMessage = (message) => setMessages((prev) => [...prev, ...message]);
+    const handleNewMessage = (message) => {
+      // message might be a single object or an array, handle both
+      const msgs = Array.isArray(message) ? message : [message];
+
+      const filteredMsgs = msgs.filter((msg) => msg.group_id === id);
+      if (filteredMsgs.length > 0) {
+        setMessages((prev) => [...prev, ...filteredMsgs]);
+      }
+    };
+
 
     socket.on("GetPreviosGroupChats", handlePrevMessages);
     socket.on("RecieveMessages", handleNewMessage);

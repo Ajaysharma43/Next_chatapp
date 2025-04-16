@@ -110,32 +110,36 @@ const GroupsData = () => {
                                         {Groups.map((group) => (
                                             <div
                                                 key={group?.id}
-                                                className="relative cursor-pointer"
+                                                className={`relative cursor-pointer ${
+                                                    group?.id === selectedGroupId
+                                                        ? "bg-amber-200" // active group background
+                                                        : "bg-white"
+                                                } rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100 relative`}
                                                 onClick={() => handleGroupClick(group.id, group.created_by)}
                                             >
-                                                <div className="bg-white rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100 relative">
-                                                    <div className="flex items-center gap-3 mb-2">
-                                                        <div className="bg-amber-100 text-amber-600 p-2 rounded-full">
-                                                            <Users size={20} />
-                                                        </div>
-                                                        <h2 className="text-lg font-semibold text-gray-800">{group?.name}</h2>
+                                                <div className="flex items-center gap-3 mb-2">
+                                                    <div className="bg-amber-100 text-amber-600 p-2 rounded-full">
+                                                        <Users size={20} />
                                                     </div>
-                                                    {group?.description && (
-                                                        <p className="text-sm text-gray-600 pl-10">{group?.description}</p>
-                                                    )}
-                                                    {group?.created_by == userid && (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                openDeleteDialog(group?.id);
-                                                            }}
-                                                            className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition"
-                                                            title="Delete Group"
-                                                        >
-                                                            <TiDelete size={22} />
-                                                        </button>
-                                                    )}
+                                                    <h2 className="text-lg font-semibold text-gray-800">
+                                                        {group?.name}
+                                                    </h2>
                                                 </div>
+                                                {group?.description && (
+                                                    <p className="text-sm text-gray-600 pl-10">{group?.description}</p>
+                                                )}
+                                                {group?.created_by == userid && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openDeleteDialog(group?.id);
+                                                        }}
+                                                        className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition"
+                                                        title="Delete Group"
+                                                    >
+                                                        <TiDelete size={22} />
+                                                    </button>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -152,32 +156,34 @@ const GroupsData = () => {
                                 {Groups.map((group) => (
                                     <div
                                         key={group?.id}
-                                        className="relative cursor-pointer"
+                                        className={`relative cursor-pointer ${
+                                            group?.id === selectedGroupId
+                                                ? "bg-amber-200" // active group background
+                                                : "bg-white"
+                                        } rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100 relative`}
                                         onClick={() => handleGroupClick(group.id, group.created_by)}
                                     >
-                                        <div className="bg-white rounded-xl shadow-md hover:shadow-lg p-5 transition-all duration-300 border border-gray-100 relative">
-                                            <div className="flex items-center gap-3 mb-2">
-                                                <div className="bg-amber-100 text-amber-600 p-2 rounded-full">
-                                                    <Users size={20} />
-                                                </div>
-                                                <h2 className="text-lg font-semibold text-gray-800">{group?.name}</h2>
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <div className="bg-amber-100 text-amber-600 p-2 rounded-full">
+                                                <Users size={20} />
                                             </div>
-                                            {group?.description && (
-                                                <p className="text-sm text-gray-600 pl-10">{group?.description}</p>
-                                            )}
-                                            {group?.created_by == userid && (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        openDeleteDialog(group?.id);
-                                                    }}
-                                                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition"
-                                                    title="Delete Group"
-                                                >
-                                                    <TiDelete size={22} />
-                                                </button>
-                                            )}
+                                            <h2 className="text-lg font-semibold text-gray-800">{group?.name}</h2>
                                         </div>
+                                        {group?.description && (
+                                            <p className="text-sm text-gray-600 pl-10">{group?.description}</p>
+                                        )}
+                                        {group?.created_by == userid && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openDeleteDialog(group?.id);
+                                                }}
+                                                className="absolute top-2 right-2 text-red-500 hover:text-red-700 transition"
+                                                title="Delete Group"
+                                            >
+                                                <TiDelete size={22} />
+                                            </button>
+                                        )}
                                     </div>
                                 ))}
                             </div>
