@@ -7,7 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import { SendHorizonal, ArrowLeft } from "lucide-react";
 import { MdDelete } from "react-icons/md";
 import DeleteMessageDialog from "./Dialogs/DeleteMessageDialog";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 const ChatArea = ({ id, onBack }) => {
   const [userid, setUserId] = useState(null);
@@ -15,6 +15,7 @@ const ChatArea = ({ id, onBack }) => {
   const [selectedMessageId, setSelectedMessageId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState(null);
+  const [typingusers, settypingusers] = useState([])
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -40,6 +41,22 @@ const ChatArea = ({ id, onBack }) => {
 
     socket.on("GetPreviosGroupChats", handlePrevMessages);
     socket.on("RecieveMessages", handleNewMessage);
+
+    socket.on("StartGroupTyping", (typingUserId) => {
+      if (typingUserId !== userid) {
+        settypingusers((prev) => {
+          if (!prev.includes(typingUserId)) {
+            return [...prev, typingUserId];
+          }
+          return prev;
+        });
+    
+        setTimeout(() => {
+          settypingusers((prev) => prev.filter((id) => id !== typingUserId));
+        }, 2000); // remove after 2s
+      }
+    });
+    
 
     return () => {
       socket.off("GetPreviosGroupChats", handlePrevMessages);
@@ -71,6 +88,11 @@ const ChatArea = ({ id, onBack }) => {
     setMessageToDelete(null);
     setDeleteDialogOpen(false);
   };
+
+  const HandleUserTyping = () => {
+    let typingUserId = userid
+    socket.emit('GroupUserTyping' , (typingUserId))
+  }
 
   return (
     <>
@@ -104,9 +126,8 @@ const ChatArea = ({ id, onBack }) => {
                         prev === item?.id ? null : item?.id
                       )
                     }
-                    className={`relative max-w-xs md:max-w-md break-words px-4 py-2 rounded-2xl text-white shadow-md cursor-pointer transition-transform active:scale-[.98] ${
-                      item?.sender_id === userid ? "bg-green-500" : "bg-blue-500"
-                    }`}
+                    className={`relative max-w-xs md:max-w-md break-words px-4 py-2 rounded-2xl text-white shadow-md cursor-pointer transition-transform active:scale-[.98] ${item?.sender_id === userid ? "bg-green-500" : "bg-blue-500"
+                      }`}
                   >
                     <h1 className="font-semibold text-sm mb-1">
                       {item?.sender_id === userid ? "You" : item.name}
@@ -129,6 +150,23 @@ const ChatArea = ({ id, onBack }) => {
                   </div>
                 </div>
               ))}
+              {
+                typingusers > 0 && (
+                  <>
+                  <div>
+                    {
+                      typingusers.map((item) => (
+                        <>
+                        <div>
+                          
+                        </div>
+                        </>
+                      ))
+                    }
+                  </div>
+                  </>
+                )
+              }
               <div ref={messagesEndRef} />
             </div>
           )}
@@ -141,7 +179,11 @@ const ChatArea = ({ id, onBack }) => {
               type="text"
               name="message"
               value={formik.values.message}
-              onChange={formik.handleChange}
+              onChange={(e) => {
+                formik.handleChange(e);
+                HandleUserTyping();
+              }}
+              
               placeholder="Type your message..."
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-amber-400"
             />
