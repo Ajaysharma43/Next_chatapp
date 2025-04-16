@@ -22,6 +22,7 @@ const GroupDetails = ({ id, userid , username}) => {
         const handleGroupDetails = (GetGroupDetails, GetMembersDetails) => {
             setGroupDetails(GetGroupDetails[0]);
             setMembersDetails(GetMembersDetails);
+            setRemoveDialog(false)
         };
 
         socket.on("SendGroupDetails", handleGroupDetails);
@@ -65,7 +66,7 @@ const GroupDetails = ({ id, userid , username}) => {
     return (
         <>
             <UpdateGroupDetails open={UpdateDialog} handleClose={HandleUpdateDialog} Details={groupDetails} id={userid} username={username}/>
-            <RemoveUserFromGroup open={RemoveDialog} onClose={HandleRemoveDilog} userDetails={RemoveUser}/>
+            <RemoveUserFromGroup open={RemoveDialog} onClose={HandleRemoveDilog} userDetails={RemoveUser} username={username} id={userid}/>
             <div className="p-5 bg-white shadow-xl rounded-2xl mt-4 w-full max-w-2xl mx-auto">
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold flex items-center gap-2 text-amber-600">
