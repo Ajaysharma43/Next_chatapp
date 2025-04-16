@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import { Users, Info, CalendarDays, UserCircle, ShieldCheck } from "lucide-react";
 import { MdOutlinePersonRemove } from "react-icons/md";
 import { UpdateGroupDetails } from "./Dialogs/UpdateGroupDetails";
-import { UpdateDialog } from "@/app/(dashboard)/dashboard/(dashboardpages)/users/(UserDialogs)/UpdateDialoag";
+import { RemoveUserFromGroup } from "./Dialogs/RemoveUserDialog";
 
 const GroupDetails = ({ id, userid , username}) => {
     const [groupDetails, setGroupDetails] = useState({});
     const [membersDetails, setMembersDetails] = useState([]);
     const [UpdateDialog, setUpdatedialog] = useState(false)
+    const [RemoveUser , setRemoveUser] = useState([])
+    const [RemoveDialog , setRemoveDialog] = useState(false)
 
     useEffect(() => {
         if (!id) return;
@@ -47,9 +49,23 @@ const GroupDetails = ({ id, userid , username}) => {
         }
     }
 
+    const HandleRemoveDilog = (member) => {
+        if(RemoveDialog == true)
+        {
+            setRemoveDialog(false)
+            setRemoveUser([])
+        }
+        else
+        {
+            setRemoveUser(member)
+            setRemoveDialog(true)
+        }
+    }
+
     return (
         <>
             <UpdateGroupDetails open={UpdateDialog} handleClose={HandleUpdateDialog} Details={groupDetails} id={userid} username={username}/>
+            <RemoveUserFromGroup open={RemoveDialog} onClose={HandleRemoveDilog} userDetails={RemoveUser}/>
             <div className="p-5 bg-white shadow-xl rounded-2xl mt-4 w-full max-w-2xl mx-auto">
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold flex items-center gap-2 text-amber-600">
@@ -114,6 +130,7 @@ const GroupDetails = ({ id, userid , username}) => {
                                                 <button
                                                     title="Remove Member"
                                                     className="p-2 rounded-full hover:bg-red-100 transition-colors duration-200 text-red-600 hover:text-red-800"
+                                                    onClick={() => HandleRemoveDilog(member)}
                                                 >
                                                     <MdOutlinePersonRemove size={20} />
                                                 </button>
