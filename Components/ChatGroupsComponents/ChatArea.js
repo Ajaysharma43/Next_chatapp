@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 
 const ChatArea = ({ id, onBack }) => {
   const [userid, setUserId] = useState(null);
+  const [username, setusername] = useState("")
   const [messages, setMessages] = useState([]);
   const [selectedMessageId, setSelectedMessageId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -22,11 +23,12 @@ const ChatArea = ({ id, onBack }) => {
 
   useEffect(() => {
     setShowGroupDetails(false)
-  },[id])
+  }, [id])
 
   useEffect(() => {
     const token = Cookies.get("AccessToken");
     const decode = jwtDecode(token);
+    setusername(decode.username)
     setUserId(decode.id);
   }, []);
 
@@ -47,7 +49,7 @@ const ChatArea = ({ id, onBack }) => {
       }
     };
 
-    const handleTyping = ({ id: typingUserId, username , groupId }) => {
+    const handleTyping = ({ id: typingUserId, username, groupId }) => {
       if (typingUserId !== userid && id == groupId) {
         setTypingUsers((prev) => {
           const exists = prev.find((u) => u.id === typingUserId);
@@ -65,9 +67,14 @@ const ChatArea = ({ id, onBack }) => {
       }
     };
 
+    const HandleNotification = (Notification) => {
+      setMessages((prev) => [...prev, ...Notification])
+    }
+
     socket.on("GetPreviosGroupChats", handlePrevMessages);
     socket.on("RecieveMessages", handleNewMessage);
     socket.on("StartGroupTyping", handleTyping);
+    socket.on('UpdateNotification', HandleNotification)
 
     return () => {
       socket.off("GetPreviosGroupChats", handlePrevMessages);
@@ -105,7 +112,7 @@ const ChatArea = ({ id, onBack }) => {
     socket.emit("GroupUserTyping", {
       id: decoded.id,
       username: decoded.username,
-      groupId : id
+      groupId: id
     });
   };
 
@@ -126,21 +133,19 @@ const ChatArea = ({ id, onBack }) => {
           <div className="flex gap-2 ml-auto">
             <button
               onClick={() => setShowGroupDetails(false)}
-              className={`px-3 py-1 rounded-md text-sm font-medium ${
-                !showGroupDetails
+              className={`px-3 py-1 rounded-md text-sm font-medium ${!showGroupDetails
                   ? "bg-amber-500 text-white"
                   : "bg-gray-200 text-gray-700"
-              }`}
+                }`}
             >
               Chat
             </button>
             <button
               onClick={() => setShowGroupDetails(true)}
-              className={`px-3 py-1 rounded-md text-sm font-medium ${
-                showGroupDetails
+              className={`px-3 py-1 rounded-md text-sm font-medium ${showGroupDetails
                   ? "bg-amber-500 text-white"
                   : "bg-gray-200 text-gray-700"
-              }`}
+                }`}
             >
               Group Info
             </button>
@@ -150,7 +155,7 @@ const ChatArea = ({ id, onBack }) => {
         {/* Main Area Switch */}
         {showGroupDetails ? (
           <div className="flex-1 overflow-y-auto p-4">
-            <GroupDetails id={id} userid={userid}/>
+            <GroupDetails id={id} userid={userid} username={username} />
           </div>
         ) : (
           <>
@@ -163,43 +168,55 @@ const ChatArea = ({ id, onBack }) => {
                   {messages.map((item) => (
                     <div
                       key={item?.id}
-                      className={`flex ${
-                        item?.sender_id === userid
+                      className={`flex ${item?.sender_id === userid
                           ? "justify-end"
                           : "justify-start"
-                      }`}
-                    >
-                      <div
-                        onClick={() =>
-                          setSelectedMessageId((prev) =>
-                            prev === item?.id ? null : item?.id
-                          )
-                        }
-                        className={`relative max-w-xs md:max-w-md break-words px-4 py-2 rounded-2xl text-white shadow-md cursor-pointer transition-transform active:scale-[.98] ${
-                          item?.sender_id === userid
-                            ? "bg-green-500"
-                            : "bg-blue-500"
                         }`}
-                      >
-                        <h1 className="font-semibold text-sm mb-1">
-                          {item?.sender_id === userid ? "You" : item?.name}
-                        </h1>
-                        <p className="text-sm">{item?.content}</p>
-
-                        {item?.sender_id === userid &&
-                          selectedMessageId === item?.id && (
-                            <button
-                              className="absolute top-1 right-1 text-white hover:text-red-300"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenDeleteDialog(item);
-                              }}
-                              title="Delete"
+                    >
+                      {
+                        item.notifications == true ?
+                          (
+                            <div className="w-full flex justify-center">
+                              <div className="bg-gray-200 text-gray-700 px-4 py-1 rounded-full text-sm font-medium">
+                                {item.content}
+                              </div>
+                            </div>
+                          )
+                          :
+                          (
+                            <div
+                              onClick={() =>
+                                setSelectedMessageId((prev) =>
+                                  prev === item?.id ? null : item?.id
+                                )
+                              }
+                              className={`relative max-w-xs md:max-w-md break-words px-4 py-2 rounded-2xl text-white shadow-md cursor-pointer transition-transform active:scale-[.98] ${item?.sender_id === userid
+                                  ? "bg-green-500"
+                                  : "bg-blue-500"
+                                }`}
                             >
-                              <MdDelete size={18} />
-                            </button>
-                          )}
-                      </div>
+                              <h1 className="font-semibold text-sm mb-1">
+                                {item?.sender_id === userid ? "You" : item?.name}
+                              </h1>
+                              <p className="text-sm">{item?.content}</p>
+
+                              {item?.sender_id === userid &&
+                                selectedMessageId === item?.id && (
+                                  <button
+                                    className="absolute top-1 right-1 text-white hover:text-red-300"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleOpenDeleteDialog(item);
+                                    }}
+                                    title="Delete"
+                                  >
+                                    <MdDelete size={18} />
+                                  </button>
+                                )}
+                            </div>
+                          )
+                      }
+
                     </div>
                   ))}
                   <div ref={messagesEndRef} />

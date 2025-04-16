@@ -4,7 +4,7 @@ import socket from "@/app/SocketConnection/SocketConnection";
 import { Dialog, DialogContent } from "@mui/material";
 import { useFormik } from "formik";
 
-export const UpdateGroupDetails = ({ open, handleClose, Details, id }) => {
+export const UpdateGroupDetails = ({ open, handleClose, Details, id , username}) => {
     const formik = useFormik({
         initialValues: {
             GroupId : Details.id,
@@ -13,7 +13,7 @@ export const UpdateGroupDetails = ({ open, handleClose, Details, id }) => {
         },
         enableReinitialize: true,
         onSubmit: (values, { resetForm }) => {
-            socket.emit('UpdateGroupDetails', values)
+            socket.emit('UpdateGroupDetails', values , id , username)
         },
     });
 

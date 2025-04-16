@@ -7,7 +7,7 @@ import { MdOutlinePersonRemove } from "react-icons/md";
 import { UpdateGroupDetails } from "./Dialogs/UpdateGroupDetails";
 import { UpdateDialog } from "@/app/(dashboard)/dashboard/(dashboardpages)/users/(UserDialogs)/UpdateDialoag";
 
-const GroupDetails = ({ id, userid }) => {
+const GroupDetails = ({ id, userid , username}) => {
     const [groupDetails, setGroupDetails] = useState({});
     const [membersDetails, setMembersDetails] = useState([]);
     const [UpdateDialog, setUpdatedialog] = useState(false)
@@ -49,7 +49,7 @@ const GroupDetails = ({ id, userid }) => {
 
     return (
         <>
-            <UpdateGroupDetails open={UpdateDialog} handleClose={HandleUpdateDialog} Details={groupDetails} />
+            <UpdateGroupDetails open={UpdateDialog} handleClose={HandleUpdateDialog} Details={groupDetails} id={userid} username={username}/>
             <div className="p-5 bg-white shadow-xl rounded-2xl mt-4 w-full max-w-2xl mx-auto">
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold flex items-center gap-2 text-amber-600">
