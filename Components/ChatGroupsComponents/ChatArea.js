@@ -80,6 +80,7 @@ const ChatArea = ({ id, onBack }) => {
       socket.off("GetPreviosGroupChats", handlePrevMessages);
       socket.off("RecieveMessages", handleNewMessage);
       socket.off("StartGroupTyping", handleTyping);
+      socket.off('UpdateNotification' , HandleNotification)
     };
   }, [id, userid]);
 

@@ -6,13 +6,15 @@ import { Users, Info, CalendarDays, UserCircle, ShieldCheck } from "lucide-react
 import { MdOutlinePersonRemove } from "react-icons/md";
 import { UpdateGroupDetails } from "./Dialogs/UpdateGroupDetails";
 import { RemoveUserFromGroup } from "./Dialogs/RemoveUserDialog";
+import { AddMemberDialog } from "./Dialogs/AddMembersDialog";
 
-const GroupDetails = ({ id, userid , username}) => {
+const GroupDetails = ({ id, userid, username }) => {
     const [groupDetails, setGroupDetails] = useState({});
     const [membersDetails, setMembersDetails] = useState([]);
     const [UpdateDialog, setUpdatedialog] = useState(false)
-    const [RemoveUser , setRemoveUser] = useState([])
-    const [RemoveDialog , setRemoveDialog] = useState(false)
+    const [RemoveUser, setRemoveUser] = useState([])
+    const [RemoveDialog, setRemoveDialog] = useState(false)
+    const [AddDialog, setAddDialog] = useState(false)
 
     useEffect(() => {
         if (!id) return;
@@ -27,17 +29,26 @@ const GroupDetails = ({ id, userid , username}) => {
 
         socket.on("SendGroupDetails", handleGroupDetails);
 
-        socket.on('UpdatedGroupDetails' , (Update , values) => {
+        socket.on('UpdatedGroupDetails', (Update, values) => {
             console.log(values)
-            if(values.GroupId == id)
-            {
+            if (values.GroupId == id) {
                 setGroupDetails(Update[0])
                 setUpdatedialog(false)
             }
         })
 
+        socket.on('SentNewMembersOfTheGroup', (GetMembersDetail, group_id) => {
+            if (id == group_id) {
+                console.log(GetMembersDetail , "are the members details")
+                setMembersDetails(GetMembersDetail)
+                setAddDialog(false)
+            }
+
+        })
+
         return () => {
             socket.off("SendGroupDetails", handleGroupDetails);
+            socket.off('SentNewMembersOfTheGroup')
         };
     }, [id]);
 
@@ -51,22 +62,31 @@ const GroupDetails = ({ id, userid , username}) => {
     }
 
     const HandleRemoveDilog = (member) => {
-        if(RemoveDialog == true)
-        {
+        if (RemoveDialog == true) {
             setRemoveDialog(false)
             setRemoveUser([])
         }
-        else
-        {
+        else {
             setRemoveUser(member)
             setRemoveDialog(true)
         }
     }
 
+    const HandleAddDialog = () => {
+        if (AddDialog == true) {
+            setAddDialog(false)
+        }
+        else {
+            socket.emit('GetFriendsToAdd', userid, id)
+            setAddDialog(true)
+        }
+    }
+
     return (
         <>
-            <UpdateGroupDetails open={UpdateDialog} handleClose={HandleUpdateDialog} Details={groupDetails} id={userid} username={username}/>
-            <RemoveUserFromGroup open={RemoveDialog} onClose={HandleRemoveDilog} userDetails={RemoveUser} username={username} id={userid}/>
+            <UpdateGroupDetails open={UpdateDialog} handleClose={HandleUpdateDialog} Details={groupDetails} id={userid} username={username} />
+            <RemoveUserFromGroup open={RemoveDialog} onClose={HandleRemoveDilog} userDetails={RemoveUser} username={username} id={userid} />
+            <AddMemberDialog open={AddDialog} onclose={HandleAddDialog} userId={userid} group_id={id} username={username} />
             <div className="p-5 bg-white shadow-xl rounded-2xl mt-4 w-full max-w-2xl mx-auto">
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold flex items-center gap-2 text-amber-600">
@@ -93,8 +113,12 @@ const GroupDetails = ({ id, userid , username}) => {
                         {
                             userid == groupDetails.created_by && (
                                 <>
-                                    <button className="bg-blue-600 rounded-lg uppercase text-white p-2 transition-all duration-200 hover:bg-blue-800"
-                                        onClick={HandleUpdateDialog}>Update details</button>
+                                    <div className="flex flex-wrap gap-2">
+                                        <button className="bg-blue-600 rounded-lg uppercase text-white p-2 transition-all duration-200 hover:bg-blue-800"
+                                            onClick={HandleUpdateDialog}>Update details</button>
+                                        <button className="bg-teal-600 rounded-lg uppercase text-white p-2 transition-all duration-200 hover:bg-teal-800"
+                                            onClick={HandleAddDialog}>Add members</button>
+                                    </div>
                                 </>
                             )
                         }
