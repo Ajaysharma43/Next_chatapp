@@ -57,12 +57,12 @@ export const AddMemberDialog = ({ open, onclose, userId, group_id, username }) =
                         <div className="grid gap-2">
                             <h1 className="text-center text-gray-500">No friends remained to add in the group</h1>
                             <button
-                            type="button"
-                            onClick={onclose}
-                            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                        >
-                            Cancel
-                        </button>
+                                type="button"
+                                onClick={onclose}
+                                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                            >
+                                Cancel
+                            </button>
                         </div>
                     ) : (
                         <div className="space-y-2">
