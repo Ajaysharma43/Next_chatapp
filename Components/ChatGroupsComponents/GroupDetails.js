@@ -48,7 +48,7 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
 
         socket.on('SentNewMembersOfTheGroup', (GetMembersDetail, group_id) => {
             if (id == group_id) {
-        
+                dispatch(GetGroups({userid}))
                 setMembersDetails(GetMembersDetail);
                 setAddDialog(false);
             }

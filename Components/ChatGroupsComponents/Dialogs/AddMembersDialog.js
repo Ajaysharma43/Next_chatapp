@@ -8,10 +8,13 @@ import {
     DialogActions,
     DialogTitle,
 } from "@mui/material"
+import { useDispatch } from "react-redux"
+import { GetGroups } from "@/Redux/features/ChatGroupsSlice"
 
 export const AddMemberDialog = ({ open, onclose, userId, group_id, username }) => {
     const [friends, setFriends] = useState([])
     const [selectedIds, setSelectedIds] = useState([])
+    const dispatch = useDispatch()
 
     useEffect(() => {
         if (!open) return
