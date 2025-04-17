@@ -4,13 +4,13 @@ const { createSlice, createAsyncThunk } = require("@reduxjs/toolkit")
 
 export const GetGroups = createAsyncThunk('GetGroups' , async({userid}) => {
     try {
-        console.log(userid)
         const res = await ChatGroupInstance.get(`/GetGroups?userid=${userid}`)
         return res.data
     } catch (error) {
         console.log(error)
     }
 })
+
 
 const initialstate = {
     Groups: [],

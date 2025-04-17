@@ -1,4 +1,4 @@
-const NotificationComponent = () => {
+const NotificationComponent = ({userid , username}) => {
     return(
         <>
         <div>
