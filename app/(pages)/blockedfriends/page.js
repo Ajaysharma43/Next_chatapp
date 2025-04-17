@@ -11,6 +11,7 @@ import socket from "@/app/SocketConnection/SocketConnection";
 const BlockedUsers = () => {
   const dispatch = useDispatch();
   const [userid, setUserId] = useState();
+  const [username , setusername] = useState()
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
@@ -22,6 +23,7 @@ const BlockedUsers = () => {
         const token = Cookies.get("AccessToken");
         const decode = jwtDecode(token);
         setUserId(decode.id);
+        setusername(decode.username)
         dispatch(BlockedFriends({ userid: decode.id }));
       } catch (error) {
         console.error(error);
@@ -47,7 +49,7 @@ const BlockedUsers = () => {
   };
 
   const handleUnblock = async () => {
-    socket.emit('UnBlockFriend' , selectedUser)
+    socket.emit('UnBlockFriend' , selectedUser , username)
     console.log("Unblocking user:", selectedUser);
     setOpenDialog(false);
     setSelectedUser(null);

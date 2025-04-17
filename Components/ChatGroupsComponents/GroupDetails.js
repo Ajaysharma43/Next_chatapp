@@ -27,10 +27,10 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
         const handleGroupDetails = (GetGroupDetails, GetMembersDetails) => {
             const includesCurrentUser = GetMembersDetails.some(member => member.user_id == userid);
             // Allow if user is group creator (admin) or present in member list
-            if (!includesCurrentUser && userid !== groupDetails.created_by) {
-                dispatch(GetGroups({userid}))
-                onBack()
-            }
+            // if (!includesCurrentUser && userid != groupDetails.created_by) {
+            //     dispatch(GetGroups({userid}))
+            //     onBack()
+            // }
             setGroupDetails(GetGroupDetails[0]);
             setMembersDetails(GetMembersDetails);
             setRemoveDialog(false)

@@ -16,6 +16,7 @@ import { useTheme } from "next-themes";
 
 const Friends = () => {
   const [userId, setUserId] = useState(null);
+  const [username , setusername] = useState(null)
   const [unreadMap, setUnreadMap] = useState({});
   const [friendsList, setFriendsList] = useState([]);
   const [DeleteDialogstate, setDeleteDialogstate] = useState(false);
@@ -38,11 +39,11 @@ const Friends = () => {
 
   useEffect(() => {
     const token = Cookies.get("AccessToken");
-    if (!token) return;
 
     const decoded = jwtDecode(token);
     const id = decoded.id;
     setUserId(id);
+    setusername(decoded.username)
 
     if (!socket.connected) {
       socket.connect();
@@ -130,7 +131,7 @@ const Friends = () => {
   };
 
   const handleBlockFriend = async () => {
-    socket.emit("BlockUser", blockfriendid, userId);
+    socket.emit("BlockUser", blockfriendid, userId , username);
     setBlockDialogState(false);
     setBlockSelectedFriend(null);
   };

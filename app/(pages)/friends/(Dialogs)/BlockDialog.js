@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from "@mui/material";
 
-export const BlockDialog = ({ open, onclose, friend, onBlock }) => {
+export const BlockDialog = ({ open, onclose, friend, onBlock  }) => {
   return (
     <Dialog open={open} onClose={onclose}>
       <DialogContent>

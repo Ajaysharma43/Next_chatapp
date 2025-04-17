@@ -3,7 +3,7 @@ import socket from "@/app/SocketConnection/SocketConnection.js";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import { useParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { FaCheckDouble, FaCheck } from "react-icons/fa6";
 import { FaSmile } from "react-icons/fa";
@@ -15,6 +15,8 @@ import { useTheme } from "next-themes";
 const PersonalChat = () => {
   const { id, username, friendsid } = useParams();
   const decodedUsername = decodeURIComponent(username);
+  const onlineUsers = useSelector((state) => state.chatreducer.OnlineUsers);
+  const { theme } = useTheme();
 
   const [userid, setuserid] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -23,56 +25,54 @@ const PersonalChat = () => {
   const [typing, settyping] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  const onlineUsers = useSelector((state) => state.chatreducer.OnlineUsers);
   const bottomRef = useRef(null);
-  const { theme } = useTheme();
+  const isDark = theme === "dark";
+  const chatId = parseInt(id);
 
+  // Get User ID from JWT
   useEffect(() => {
     const token = Cookies.get("AccessToken");
-    const decode = jwtDecode(token);
-    setuserid(decode.id);
-  }, [onlineUsers.length]);
+    if (token) {
+      const decode = jwtDecode(token);
+      setuserid(decode.id);
+    }
+  }, [onlineUsers]);
 
+  // Socket listeners
   useEffect(() => {
-    if (userid) {
-      socket.emit("join-room", id, userid);
-      socket.emit("PreviosChats", id, userid);
+    if (!userid) return;
 
-      socket.on("Messages", (Chats) => {
-        if (Chats?.length > 0) setMessages(Chats);
-      });
+    socket.emit("join-room", id, userid);
+    socket.emit("PreviosChats", id, userid);
 
-      socket.on("RecieveMessages", (Messages, isRecieveronline) => {
+    const listeners = {
+      Messages: (Chats) => Chats?.length > 0 && setMessages(Chats),
+      RecieveMessages: (Messages, isReceiverOnline) => {
         setMessages((prev) => [...prev, ...Messages]);
         setmessage("");
-        if (isRecieveronline) {
-          socket.emit("MarkAsRead", parseInt(id), userid);
+        if (isReceiverOnline) {
+          socket.emit("MarkAsRead", chatId, userid);
         }
-      });
-
-      socket.on("UpdateMessagesStatus", (MarkasRead) => {
-        setMessages(MarkasRead);
-      });
-
-      socket.on("UpdateMessages", (updateddata) => {
-        setMessages(updateddata);
-      });
-
-      socket.on("UpdatedDeletedMessages", (UpdatedMessages) => {
-        setMessages(UpdatedMessages);
-      });
-
-      socket.on("isTyping", (id) => {
-        if (parseInt(id) === userid) {
+      },
+      UpdateMessagesStatus: setMessages,
+      UpdateMessages: setMessages,
+      UpdatedDeletedMessages: setMessages,
+      isTyping: (typingId) => {
+        if (parseInt(typingId) === userid) {
           settyping(true);
           setTimeout(() => settyping(false), 2000);
         }
-      });
+      },
+    };
+
+    for (const [event, handler] of Object.entries(listeners)) {
+      socket.on(event, handler);
     }
 
     return () => {
-      if (userid) {
-        socket.emit("leave-room", userid);
+      socket.emit("leave-room", userid);
+      for (const event of Object.keys(listeners)) {
+        socket.off(event);
       }
     };
   }, [userid]);
@@ -81,14 +81,15 @@ const PersonalChat = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  const SendMessage = () => {
+  // Handlers
+  const SendMessage = useCallback(() => {
     if (!message.trim() || !userid) return;
     socket.emit("SendMessage", message, id, userid, friendsid);
-  };
+  }, [message, userid, id, friendsid]);
 
   const handleTyping = (e) => {
     setmessage(e.target.value);
-    socket.emit("typing", id , userid);
+    socket.emit("typing", id, userid);
   };
 
   const handleEmojiClick = (emojiData) => {
@@ -100,20 +101,18 @@ const PersonalChat = () => {
   };
 
   const DeleteMessage = (messageId) => {
-    socket.emit("DeleteMessage", messageId, userid, parseInt(id));
+    socket.emit("DeleteMessage", messageId, userid, chatId);
     setMessages((prev) => prev.filter((msg) => msg.id !== messageId));
     setSelectedIndex(null);
   };
-
-  const isDark = theme === "dark";
 
   return (
     <div className={`h-screen flex flex-col justify-between border rounded-lg shadow-lg transition-colors duration-300 ${isDark ? "bg-gray-900 text-white" : "bg-white text-gray-900"}`}>
       
       {/* Header */}
       <div className={`p-3 flex items-center gap-2 text-sm font-medium ${isDark ? "text-gray-300 bg-gray-800" : "text-gray-700 bg-gray-100"} rounded-t-lg shadow-inner`}>
-        <span className={`w-2 h-2 rounded-full ${onlineUsers.includes(parseInt(id)) ? "bg-green-500" : "bg-red-500"}`} />
-        <span>{onlineUsers.includes(parseInt(id)) ? "Online" : "Offline"}</span>
+        <span className={`w-2 h-2 rounded-full ${onlineUsers.includes(chatId) ? "bg-green-500" : "bg-red-500"}`} />
+        <span>{onlineUsers.includes(chatId) ? "Online" : "Offline"}</span>
         <span className="mx-2 text-gray-400">•</span>
         <span className="text-base font-semibold">{decodedUsername}</span>
       </div>
@@ -128,11 +127,7 @@ const PersonalChat = () => {
               className={`flex ${userid === item.sender ? "justify-end" : "justify-start"}`}
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{
-                opacity: 0,
-                scale: 0.8,
-                x: userid === item.sender ? 50 : -50,
-              }}
+              exit={{ opacity: 0, scale: 0.8, x: userid === item.sender ? 50 : -50 }}
               transition={{ duration: 0.3 }}
             >
               <div
@@ -143,12 +138,7 @@ const PersonalChat = () => {
                   }`}
                 onClick={() => handleToggleDelete(index)}
               >
-                <motion.p
-                  className="break-words"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.8 }}
-                >
+                <motion.p className="break-words" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }}>
                   {item.message}
                 </motion.p>
 
@@ -191,7 +181,7 @@ const PersonalChat = () => {
             </motion.div>
           ))}
 
-          {/* Typing Animation */}
+          {/* Typing Indicator */}
           {typing && (
             <motion.div
               className="flex justify-start"
@@ -216,7 +206,7 @@ const PersonalChat = () => {
         <div ref={bottomRef}></div>
       </div>
 
-      {/* Input Area */}
+      {/* Input Field */}
       <div className={`p-4 flex flex-col gap-2 border-t relative ${isDark ? "border-gray-700" : "border-gray-300"}`}>
         <div className="flex items-center gap-2">
           <button
