@@ -156,7 +156,7 @@ const ChatArea = ({ id, onBack }) => {
         {/* Main Area Switch */}
         {showGroupDetails ? (
           <div className="flex-1 overflow-y-auto p-4">
-            <GroupDetails id={id} userid={userid} username={username} />
+            <GroupDetails id={id} userid={userid} username={username} onBack={onBack}/>
           </div>
         ) : (
           <>

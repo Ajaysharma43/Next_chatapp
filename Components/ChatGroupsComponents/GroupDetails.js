@@ -7,14 +7,17 @@ import { MdOutlinePersonRemove } from "react-icons/md";
 import { UpdateGroupDetails } from "./Dialogs/UpdateGroupDetails";
 import { RemoveUserFromGroup } from "./Dialogs/RemoveUserDialog";
 import { AddMemberDialog } from "./Dialogs/AddMembersDialog";
+import { useDispatch } from "react-redux";
+import { GetGroups } from "@/Redux/features/ChatGroupsSlice";
 
-const GroupDetails = ({ id, userid, username }) => {
+const GroupDetails = ({ id, userid, username, onBack }) => {
     const [groupDetails, setGroupDetails] = useState({});
     const [membersDetails, setMembersDetails] = useState([]);
     const [UpdateDialog, setUpdatedialog] = useState(false)
     const [RemoveUser, setRemoveUser] = useState([])
     const [RemoveDialog, setRemoveDialog] = useState(false)
     const [AddDialog, setAddDialog] = useState(false)
+    const dispatch = useDispatch()
 
     useEffect(() => {
         if (!id) return;
@@ -22,6 +25,12 @@ const GroupDetails = ({ id, userid, username }) => {
         socket.emit("GetGroupDetails", id);
 
         const handleGroupDetails = (GetGroupDetails, GetMembersDetails) => {
+            const includesCurrentUser = GetMembersDetails.some(member => member.user_id == userid);
+            // Allow if user is group creator (admin) or present in member list
+            if (!includesCurrentUser && userid !== groupDetails.created_by) {
+                dispatch(GetGroups({userid}))
+                onBack()
+            }
             setGroupDetails(GetGroupDetails[0]);
             setMembersDetails(GetMembersDetails);
             setRemoveDialog(false)
@@ -39,12 +48,12 @@ const GroupDetails = ({ id, userid, username }) => {
 
         socket.on('SentNewMembersOfTheGroup', (GetMembersDetail, group_id) => {
             if (id == group_id) {
-                console.log(GetMembersDetail , "are the members details")
-                setMembersDetails(GetMembersDetail)
-                setAddDialog(false)
+        
+                setMembersDetails(GetMembersDetail);
+                setAddDialog(false);
             }
-
-        })
+        });
+        
 
         return () => {
             socket.off("SendGroupDetails", handleGroupDetails);
