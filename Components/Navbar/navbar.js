@@ -4,39 +4,33 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { redirect, usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import LoadingBar from "react-top-loading-bar";
 
 const Navbar = () => {
     const [navdata, setnavdata] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [logoutLoading, setLogoutLoading] = useState(false);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const pathname = usePathname();
+    const Pathname = usePathname();
     const accessToken = Cookies.get("AccessToken");
     const [socialauth, setsocialauth] = useState(false);
     const { theme, setTheme } = useTheme();
-    const router = useRouter();
-    const loadingBar = useRef(null); // for top loading bar
-    const [progress , setprogress] = useState(0)
 
     const Routes = ["/login", "/signup", "/dashboard", "/not-found"];
 
     useEffect(() => {
+        setLogoutLoading(false);
         const GetData = async () => {
             const token = Cookies.get("AccessToken");
-
             try {
                 const decode = jwtDecode(token);
-                setprogress(30)
                 setsocialauth(decode?.socialauthenticated);
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
                 );
-                setprogress(60)
                 setnavdata(response.data.message);
-                setprogress(100)
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
@@ -47,43 +41,30 @@ const Navbar = () => {
         GetData();
     }, [accessToken]);
 
-    // Start/stop loading bar on route change
-    useEffect(() => {
-        const start = () => loadingBar.current?.continuousStart();
-        const stop = () => loadingBar.current?.complete();
-
-        router.events?.on("routeChangeStart", start);
-        router.events?.on("routeChangeComplete", stop);
-        router.events?.on("routeChangeError", stop);
-
-        return () => {
-            router.events?.off("routeChangeStart", start);
-            router.events?.off("routeChangeComplete", stop);
-            router.events?.off("routeChangeError", stop);
-        };
-    }, [router]);
-
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!isMobileMenuOpen);
     };
 
     const Logout = () => {
-        Cookies.remove("AccessToken");
-        Cookies.remove("RefreshToken");
-        router.push("/login");
+        setLogoutLoading(true);
+        setTimeout(() => {
+            Cookies.remove('AccessToken');
+            Cookies.remove('RefreshToken');
+            redirect('/login');
+        }, 1000); // 1 second delay to show loader
     };
 
     return (
         <>
-            {/* Loading Bar */}
-            <LoadingBar color="green" ref={loadingBar} height={3} progress={progress}/>
+            {/* Backdrop Loader */}
+            {logoutLoading && (
+                <div className="fixed inset-0 bg-[#1111115a] bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            )}
 
             <nav
-                className={`bg-blue-600 text-white shadow-lg ${Routes.some((route) =>
-                    pathname.startsWith(route)
-                )
-                        ? "hidden"
-                        : "block"
+                className={`bg-blue-600 text-white shadow-lg ${Routes.some((route) => Pathname.startsWith(route)) ? "hidden" : "block"
                     }`}
             >
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -114,6 +95,7 @@ const Navbar = () => {
                             Logout
                         </button>
 
+                        {/* Theme Toggle */}
                         <button
                             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                             className="bg-white text-black dark:bg-black dark:text-white px-3 py-1 rounded hover:opacity-80 transition"
@@ -122,7 +104,7 @@ const Navbar = () => {
                         </button>
                     </div>
 
-                    {/* Mobile Menu Button */}
+                    {/* Mobile Menu Toggle */}
                     <div className="lg:hidden">
                         <button className="text-white focus:outline-none" onClick={toggleMobileMenu}>
                             <svg
@@ -138,7 +120,7 @@ const Navbar = () => {
                     </div>
                 </div>
 
-                {/* Mobile Menu */}
+                {/* Mobile Navigation Menu */}
                 <div className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}>
                     <ul className="bg-blue-600 space-y-2 p-4">
                         {loading ? (
@@ -180,4 +162,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
