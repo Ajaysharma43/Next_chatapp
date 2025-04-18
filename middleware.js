@@ -16,36 +16,43 @@ export async function middleware(request) {
     const refreshToken = request.cookies.get("RefreshToken")?.value;
     const pathname = request.nextUrl.pathname;
 
+    // 1. If no accessToken, try refresh or allow access to login
     if (!accessToken) {
         console.log("AccessToken is missing, trying to refresh...");
+        if (pathname.startsWith("/login")) {
+            return NextResponse.next(); // Let them stay on login
+        }
         return refreshAccessToken(request, refreshToken);
     }
-
-    // if (!refreshToken) {
-    //     console.log("RefreshToken is missing");
-    //     return NextResponse.redirect(new URL("/login", request.url));
-    // }
 
     try {
         await jwtVerify(accessToken, JWT_SECRET);
         console.log("AccessToken is valid");
-        try {
-            if (pathname.startsWith('/dashboard')) {
-                console.log('you are on the dashboard')
-                const decode = jwtDecode(accessToken)
-                return DashboardAccess(decode.role, request)
-            }
-        } catch (error) {
 
+        // 2. If user is authenticated and on login, redirect to home
+        if (pathname.startsWith('/login')) {
+            return NextResponse.redirect(new URL("/", request.url));
         }
+
+        // 3. Check dashboard access
+        if (pathname.startsWith('/dashboard')) {
+            const decode = jwtDecode(accessToken);
+            return DashboardAccess(decode.role, request);
+        }
+
     } catch (err) {
         console.error("AccessToken is invalid or expired:", err.message);
+        if (pathname.startsWith("/login")) {
+            return NextResponse.next(); // Allow login for invalid tokens
+        }
         return await refreshAccessToken(request, refreshToken);
     }
 
+    return NextResponse.next();
 }
 
 
+
 export const config = {
-    matcher: ["/", "/Findusers", "/friends", "/Requests" , "/groups", "/dashboard", "/dashboard/profile"],
+    matcher: ["/", "/Findusers", "/friends", "/Requests" , "/groups", "/dashboard", "/dashboard/profile" , "/login"],
 };
