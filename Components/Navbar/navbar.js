@@ -16,7 +16,6 @@ const Navbar = () => {
     const [isNavigating, setIsNavigating] = useState(false);
     const Pathname = usePathname();
     const accessToken = Cookies.get("AccessToken");
-    const [socialauth, setsocialauth] = useState(false);
     const { theme, setTheme } = useTheme();
     const router = useRouter();
 
@@ -30,7 +29,6 @@ const Navbar = () => {
             try {
                 const token = Cookies.get("AccessToken");
                 const decode = jwtDecode(token);
-                setsocialauth(decode?.socialauthenticated);
 
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
