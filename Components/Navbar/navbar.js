@@ -4,7 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
@@ -44,12 +44,17 @@ const Navbar = () => {
         setMobileMenuOpen(!isMobileMenuOpen);
     };
 
+    const Logout = () => {
+        Cookies.remove('AccessToken')
+        Cookies.remove('RefreshToken')
+        redirect('/login')
+    }
+
     return (
         <>
             <nav
-                className={`bg-blue-600 text-white shadow-lg ${
-                    Routes.some((route) => Pathname.startsWith(route)) ? "hidden" : "block"
-                }`}
+                className={`bg-blue-600 text-white shadow-lg ${Routes.some((route) => Pathname.startsWith(route)) ? "hidden" : "block"
+                    }`}
             >
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                     {/* Logo */}
@@ -58,7 +63,7 @@ const Navbar = () => {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex space-x-6 items-center">
+                    <div className="hidden lg:flex space-x-6 items-center">
                         {loading ? (
                             <>
                                 <div className="h-6 w-24 bg-gray-400 animate-pulse rounded"></div>
@@ -73,9 +78,8 @@ const Navbar = () => {
                             ))
                         )}
 
-                        {socialauth && (
-                            <button className="hover:underline">Logout</button>
-                        )}
+                        <button className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
+                            onClick={Logout}>Logout</button>
 
                         {/* 🌗 Theme Toggle Button */}
                         <button
@@ -87,7 +91,7 @@ const Navbar = () => {
                     </div>
 
                     {/* Mobile Menu Button */}
-                    <div className="md:hidden">
+                    <div className="lg:hidden">
                         <button className="text-white focus:outline-none" onClick={toggleMobileMenu}>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -126,11 +130,8 @@ const Navbar = () => {
                             ))
                         )}
 
-                        {socialauth && (
-                            <li>
-                                <button className="hover:underline">Logout</button>
-                            </li>
-                        )}
+                        <button className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
+                            onClick={Logout}>Logout</button>
 
                         {/* 🌗 Theme Toggle Button for Mobile */}
                         <li>
