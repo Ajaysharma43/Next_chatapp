@@ -24,6 +24,8 @@ const Navbar = () => {
 
     useEffect(() => {
         setLogoutLoading(false);
+        setIsNavigating(false)
+        setMobileMenuOpen(false);
         const GetData = async () => {
             try {
                 const token = Cookies.get("AccessToken");
@@ -78,11 +80,8 @@ const Navbar = () => {
         // Close the mobile menu
         setTimeout(() => {
             router.push(href);
-            setTimeout(() => {
-                setIsNavigating(false);
-                setMobileMenuOpen(false);
-            }, 100);
-
+            setIsNavigating(false);
+            setMobileMenuOpen(false);
         }, 1000);
     };
 
