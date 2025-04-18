@@ -78,11 +78,9 @@ const Navbar = () => {
     const handleNavClick = (href) => {
         setIsNavigating(true);
         // Close the mobile menu
-        setTimeout(() => {
             router.push(href);
             setIsNavigating(false);
             setMobileMenuOpen(false);
-        }, 1000);
     };
 
 
