@@ -21,7 +21,7 @@ const SearchUsers = () => {
 
     // API Call
     useEffect(() => {
-        if (debouncedQuery.trim() === "") return;
+        if (debouncedQuery.trim() === "") return ;
 
         const fetchUsers = async () => {
             try {

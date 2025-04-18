@@ -10,7 +10,6 @@ const ShowUserData = () => {
   const SearchLoading = useSelector((state) => state.UserReducer.IsSearchLoading);
 
   useEffect(() => {
-    console.log(SearchData);
   }, [SearchData]);
 
   if (SearchLoading) {
