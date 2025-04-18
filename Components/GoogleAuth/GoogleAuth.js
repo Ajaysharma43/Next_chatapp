@@ -49,7 +49,7 @@ export default function LoginWithGoogle() {
           try {
             const userid = credentialResponse.clientId
             const decode = jwtDecode(credentialResponse.credential);
-
+            console.log(decode)
             if (decode.email_verified) {
               await GetData(credentialResponse , userid , router);
             }

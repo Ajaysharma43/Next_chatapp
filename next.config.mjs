@@ -7,11 +7,11 @@ const nextConfig = {
           headers: [
             {
               key: "Cross-Origin-Opener-Policy",
-              value: "same-origin-allow-popups", // Allows postMessage from Google popup
+              value: "same-origin-allow-popups", // FIX: Allows Google login postMessage
             },
             {
               key: "Cross-Origin-Embedder-Policy",
-              value: "require-corp", // Optional: Keep only if needed for things like WebAssembly
+              value: "require-corp", // Optional: Keep only if needed
             },
           ],
         },
