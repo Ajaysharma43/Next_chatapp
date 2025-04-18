@@ -63,7 +63,7 @@ const Navbar = () => {
     }, []);
 
     useEffect(() => {
-            setIsNavigating(false);
+        setIsNavigating(false);
     }, [isNavigating])
 
     const toggleMobileMenu = () => {
