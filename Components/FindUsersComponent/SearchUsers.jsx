@@ -1,14 +1,14 @@
 "use client"
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { GetSearchUsers } from "@/Redux/features/UserSlice";
+import { GetSearchUsers, setUsersList } from "@/Redux/features/UserSlice"; // <-- Import your reset/clear action
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 
 const SearchUsers = () => {
     const [query, setQuery] = useState(""); // User input
     const [debouncedQuery, setDebouncedQuery] = useState(""); // Debounced value
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
 
     // Debounce logic (500ms delay)
     useEffect(() => {
@@ -21,13 +21,17 @@ const SearchUsers = () => {
 
     // API Call
     useEffect(() => {
-        if (debouncedQuery.trim() === "") return ;
-
         const fetchUsers = async () => {
             try {
-                const Token = Cookies.get('AccessToken')
-                const Decode = jwtDecode(Token)
-                dispatch(GetSearchUsers({query , id : Decode.id}))
+                const Token = Cookies.get("AccessToken");
+                const Decode = jwtDecode(Token);
+
+                if (debouncedQuery.trim() === "") {
+                    dispatch(setUsersList([])); // Reset user list if input is empty
+                    return;
+                }
+
+                dispatch(GetSearchUsers({ query, id: Decode.id }));
             } catch (error) {
                 console.error("Error fetching users:", error);
             }
