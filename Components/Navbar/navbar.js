@@ -75,12 +75,11 @@ const Navbar = () => {
         }, 1000);
     };
 
-    const handleNavClick = (href) => {
+    const handleNavClick = (href) => { 
         setIsNavigating(true);
-        // Close the mobile menu
-            router.push(href);
-            setIsNavigating(false);
-            setMobileMenuOpen(false);
+        router.push(href);
+        setIsNavigating(false);
+        setMobileMenuOpen(false);
     };
 
 
