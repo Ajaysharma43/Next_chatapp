@@ -62,6 +62,10 @@ const Navbar = () => {
         };
     }, []);
 
+    useEffect(() => {
+            setIsNavigating(false);
+    }, [isNavigating])
+
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!isMobileMenuOpen);
     };
@@ -75,10 +79,9 @@ const Navbar = () => {
         }, 1000);
     };
 
-    const handleNavClick = (href) => { 
+    const handleNavClick = (href) => {
         setIsNavigating(true);
         router.push(href);
-        setIsNavigating(false);
         setMobileMenuOpen(false);
     };
 
