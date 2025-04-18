@@ -4,7 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import Link from "next/link";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
@@ -13,20 +13,23 @@ const Navbar = () => {
     const [loading, setLoading] = useState(true);
     const [logoutLoading, setLogoutLoading] = useState(false);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [isNavigating, setIsNavigating] = useState(false);
     const Pathname = usePathname();
     const accessToken = Cookies.get("AccessToken");
     const [socialauth, setsocialauth] = useState(false);
     const { theme, setTheme } = useTheme();
+    const router = useRouter();
 
     const Routes = ["/login", "/signup", "/dashboard", "/not-found"];
 
     useEffect(() => {
         setLogoutLoading(false);
         const GetData = async () => {
-            const token = Cookies.get("AccessToken");
             try {
+                const token = Cookies.get("AccessToken");
                 const decode = jwtDecode(token);
                 setsocialauth(decode?.socialauthenticated);
+
                 const response = await axios.get(
                     `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
                 );
@@ -41,6 +44,22 @@ const Navbar = () => {
         GetData();
     }, [accessToken]);
 
+    // Navigation loader
+    useEffect(() => {
+        const handleStart = () => setIsNavigating(true);
+        const handleEnd = () => setIsNavigating(false);
+
+        window.addEventListener("next:router-start", handleStart);
+        window.addEventListener("next:router-complete", handleEnd);
+        window.addEventListener("next:router-error", handleEnd);
+
+        return () => {
+            window.removeEventListener("next:router-start", handleStart);
+            window.removeEventListener("next:router-complete", handleEnd);
+            window.removeEventListener("next:router-error", handleEnd);
+        };
+    }, []);
+
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!isMobileMenuOpen);
     };
@@ -48,23 +67,36 @@ const Navbar = () => {
     const Logout = () => {
         setLogoutLoading(true);
         setTimeout(() => {
-            Cookies.remove('AccessToken');
-            Cookies.remove('RefreshToken');
-            redirect('/login');
-        }, 1000); // 1 second delay to show loader
+            Cookies.remove("AccessToken");
+            Cookies.remove("RefreshToken");
+            router.push("/login");
+        }, 1000);
+    };
+
+    const handleNavClick = (href) => {
+        setIsNavigating(true);
+        setTimeout(() => {
+            router.push(href);
+            setIsNavigating(false) 
+        }, 1000);
+        
     };
 
     return (
         <>
-            {/* Backdrop Loader */}
-            {logoutLoading && (
-                <div className="fixed inset-0 bg-[#1111115a] bg-opacity-50 z-50 flex items-center justify-center">
+            {/* Backdrop Loader for Logout or Navigation */}
+            {(logoutLoading || isNavigating) && (
+                <div className="fixed inset-0 bg-[#1111115a] z-50 flex items-center justify-center">
                     <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
                 </div>
             )}
 
             <nav
-                className={`bg-blue-600 text-white shadow-lg ${Routes.some((route) => Pathname.startsWith(route)) ? "hidden" : "block"
+                className={`bg-blue-600 text-white shadow-lg ${Routes.some((route) =>
+                    Pathname.startsWith(route)
+                )
+                    ? "hidden"
+                    : "block"
                     }`}
             >
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -82,9 +114,13 @@ const Navbar = () => {
                             </>
                         ) : (
                             navdata.map((item, index) => (
-                                <Link key={index} href={item.route} className="hover:text-gray-300">
+                                <button
+                                    key={index}
+                                    onClick={() => handleNavClick(item.route)}
+                                    className="hover:text-gray-300"
+                                >
                                     {item.modules}
-                                </Link>
+                                </button>
                             ))
                         )}
 
@@ -95,7 +131,6 @@ const Navbar = () => {
                             Logout
                         </button>
 
-                        {/* Theme Toggle */}
                         <button
                             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
                             className="bg-white text-black dark:bg-black dark:text-white px-3 py-1 rounded hover:opacity-80 transition"
@@ -104,7 +139,7 @@ const Navbar = () => {
                         </button>
                     </div>
 
-                    {/* Mobile Menu Toggle */}
+                    {/* Mobile Menu Button */}
                     <div className="lg:hidden">
                         <button className="text-white focus:outline-none" onClick={toggleMobileMenu}>
                             <svg
@@ -132,9 +167,12 @@ const Navbar = () => {
                         ) : (
                             navdata.map((item, index) => (
                                 <li key={index}>
-                                    <Link href={item.route} className="block hover:text-gray-300">
+                                    <button
+                                        onClick={() => handleNavClick(item.route)}
+                                        className="block w-full text-left hover:text-gray-300"
+                                    >
                                         {item.modules}
-                                    </Link>
+                                    </button>
                                 </li>
                             ))
                         )}
