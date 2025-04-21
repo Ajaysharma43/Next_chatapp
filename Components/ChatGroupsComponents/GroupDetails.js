@@ -42,7 +42,6 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
         socket.on("SendGroupDetails", handleGroupDetails);
 
         socket.on('UpdatedGroupDetails', (Update, values) => {
-            console.log(values)
             if (values.GroupId == id) {
                 setGroupDetails(Update[0])
                 setUpdatedialog(false)

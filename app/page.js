@@ -33,20 +33,15 @@ export default function Home() {
 
     socket.on('userTyping', (user) => {
       setTyping(true)
-      console.log(`${user}  is typing`)
       setTypingUser(user)
     })
 
     socket.on('userStoppedTyping', (user) => {
-
-
-      console.log(`${user} stopped typing`)
       setTyping(false);
       setTypingUser(null);
     })
 
     socket.on("response", (message) => {
-      console.log(message.message)
       setMessages(message.message);
     });
 

@@ -16,7 +16,7 @@ import { useTheme } from "next-themes";
 
 const Friends = () => {
   const [userId, setUserId] = useState(null);
-  const [username , setusername] = useState(null)
+  const [username, setusername] = useState(null)
   const [unreadMap, setUnreadMap] = useState({});
   const [friendsList, setFriendsList] = useState([]);
   const [DeleteDialogstate, setDeleteDialogstate] = useState(false);
@@ -53,10 +53,6 @@ const Friends = () => {
     socket.emit("user-online", id);
     socket.emit("join-friends-room", id);
 
-    socket.on("UpdateBlockedusers", (data) => {
-      console.log("Block response:", data);
-    });
-
     socket.on("typinguser", (userid) => {
       settypinguser(userid)
       settyping(true)
@@ -69,7 +65,6 @@ const Friends = () => {
       socket.emit("leave-friends-room", id);
       socket.off("online-users-update");
       socket.off("online-friends-list");
-      socket.off("UpdateBlockedusers");
       socket.off("typinguser")
     };
   }, [dispatch, onlineUsers.length]);
@@ -131,7 +126,7 @@ const Friends = () => {
   };
 
   const handleBlockFriend = async () => {
-    socket.emit("BlockUser", blockfriendid, userId , username);
+    socket.emit("BlockUser", blockfriendid, userId, username);
     setBlockDialogState(false);
     setBlockSelectedFriend(null);
   };

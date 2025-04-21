@@ -56,7 +56,6 @@ export const CreateGroupDialog = ({ open, onClose }) => {
                 members: selectedMembers,
                 createdBy: userId,
             };
-            console.log("Creating group:", groupData);
             socket.emit('CreateGroup', groupData)
             resetForm()
             setSelectedMembers([])
