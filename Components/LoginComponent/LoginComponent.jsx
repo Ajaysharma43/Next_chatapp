@@ -5,6 +5,7 @@ import Cookies from "js-cookie";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import GoogleLogin from "../GoogleAuth/GoogleAuth";
+import Component from "../GoogleAuth/GithubAuth";
 const LoginForm = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
@@ -86,6 +87,11 @@ const LoginForm = () => {
       <div>
         <GoogleLogin/>
       </div>
+
+      <div>
+        <Component/>
+      </div>
+
 
       <p className="text-sm text-center mt-3">
         Do not have an account?{" "}
