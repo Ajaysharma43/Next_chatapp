@@ -21,7 +21,6 @@ const LoginForm = () => {
         if (formData.email && formData.password) {
           setIsLoading(true);
           const res = await AuthInstance.post("/Login", { formData });
-          console.log("res is : ", res.data);
           if (res.data.success == true) {
             Cookies.set("RefreshToken", res.data.RefreshToken, { expires: 7 });
             Cookies.set("AccessToken", res.data.AccessToken, { expires: 2 / 24 });
@@ -36,7 +35,6 @@ const LoginForm = () => {
           }
         }  
     } catch (error) {
-        console.log(error)
         alert(error.message)
         setIsLoading(false)
     }

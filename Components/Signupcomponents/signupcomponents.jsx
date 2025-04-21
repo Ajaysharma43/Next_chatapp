@@ -57,7 +57,6 @@ const StepperOtpForm = () => {
         setEmailValidationMessage("❌ Email already in use");
       }
     } catch (error) {
-      console.error("Error validating email:", error);
       setEmailValidationMessage("⚠️ Error validating email");
       setValidEmail(false);
     }
@@ -170,7 +169,6 @@ const StepperOtpForm = () => {
   const GenerateOtp = async () => {
     try {
       if (formData.phone.length == 10) {
-        console.log(formData.phone)
         const res = await AuthInstance.post("/OTPgenerate", {
           Number: formData.phone,
         });

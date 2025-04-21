@@ -19,22 +19,25 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
     const [AddDialog, setAddDialog] = useState(false)
     const dispatch = useDispatch()
 
+    const handleGroupDetails = (GetGroupDetails, GetMembersDetails) => {
+        console.log(userid , groupDetails.created_by)
+        const includesCurrentUser = GetMembersDetails.some(member => member.user_id == userid);
+        // Allow if user is group creator (admin) or present in member list
+        if (!includesCurrentUser && userid != GetGroupDetails[0].created_by) {
+            dispatch(GetGroups({userid}))
+            onBack()
+        }
+        setGroupDetails(GetGroupDetails[0]);
+        setMembersDetails(GetMembersDetails);
+        setRemoveDialog(false)
+    };
+
     useEffect(() => {
         if (!id) return;
 
         socket.emit("GetGroupDetails", id);
 
-        const handleGroupDetails = (GetGroupDetails, GetMembersDetails) => {
-            const includesCurrentUser = GetMembersDetails.some(member => member.user_id == userid);
-            // Allow if user is group creator (admin) or present in member list
-            // if (!includesCurrentUser && userid != groupDetails.created_by) {
-            //     dispatch(GetGroups({userid}))
-            //     onBack()
-            // }
-            setGroupDetails(GetGroupDetails[0]);
-            setMembersDetails(GetMembersDetails);
-            setRemoveDialog(false)
-        };
+        
 
         socket.on("SendGroupDetails", handleGroupDetails);
 
