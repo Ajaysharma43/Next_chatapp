@@ -58,7 +58,6 @@ export const GetRequests = createAsyncThunk('GetRequests', async ({ senderid }) 
 export const CheckFriends = createAsyncThunk('CheckFriends', async ({ id, data }) => {
     try {
         const res = await UsersInstance.post('/CheckFriends', { id: id, data: data })
-        console.log(res.data)
         return res.data
     } catch (error) {
         console.error(error)
@@ -76,7 +75,6 @@ export const DeleteFriend = createAsyncThunk('DeleteFriend', async ({ id, friend
 
 export const BlockedFriends = createAsyncThunk('BlockedFriends', async ({ userid }) => {
     try {
-        console.log(userid)
         const res = await UsersInstance.get(`/GetBlockedFriends?userid=${userid}`)
         return res.data
     } catch (error) {

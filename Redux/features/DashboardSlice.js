@@ -13,7 +13,6 @@ export const GetUserData = createAsyncThunk('GetUserData', async ({ limit, page 
 export const SortUserData = createAsyncThunk('GetSortData', async ({ data, limit, page }) => {
     try {
         const res = await DashboardInstance.post(`/SortData`, { data, limit, page })
-        console.log(res.data)
         return res.data
     } catch (error) {
         console.error(error)
@@ -24,7 +23,6 @@ export const SortUserData = createAsyncThunk('GetSortData', async ({ data, limit
 export const GetSearchData = createAsyncThunk('GetSearchData', async ({ SearchUserData, limit, page }) => {
     try {
         const res = await DashboardInstance.post('/Search', { SearchUserData, limit, page })
-        
         return res.data
 
     } catch (error) {
@@ -92,7 +90,7 @@ const DashboardReducer = createSlice({
         builder.addCase(GetUserData.fulfilled, (state, action) => {
             state.UserData = action.payload.Data,
                 state.Totalpages = action.payload.TotalPages
-                state.CurrentPage = UpdateCurrentPage(state, action)
+            state.CurrentPage = UpdateCurrentPage(state, action)
             state.IsSearched = false
         })
 

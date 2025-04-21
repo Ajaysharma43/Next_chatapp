@@ -3,7 +3,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 
 export const GetNotifications = createAsyncThunk('GetNotifications' , async({userid}) => {
     try {
-        console.log(userid)
         const res = await NotificationInstance.get(`/GetNotification?userid=${userid}`)
         return res.data
     } catch (error) {

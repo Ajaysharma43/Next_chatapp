@@ -50,7 +50,6 @@ const BlockedUsers = () => {
 
   const handleUnblock = async () => {
     socket.emit('UnBlockFriend' , selectedUser , username)
-    console.log("Unblocking user:", selectedUser);
     setOpenDialog(false);
     setSelectedUser(null);
   };
