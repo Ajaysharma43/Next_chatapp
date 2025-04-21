@@ -89,7 +89,7 @@ const DashboardReducer = createSlice({
         // GetUserData reducers
         builder.addCase(GetUserData.fulfilled, (state, action) => {
             state.UserData = action.payload.Data,
-                state.Totalpages = action.payload.TotalPages
+            state.Totalpages = action.payload.TotalPages
             state.CurrentPage = UpdateCurrentPage(state, action)
             state.IsSearched = false
         })

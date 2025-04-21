@@ -21,7 +21,6 @@ const ChatGroupsReducer = createSlice({
     name: 'ChatGroupsReducer',
     reducers: {
         ChatGroups: (state, action) => {
-            console.log(action.payload)
             state.Groups = action.payload;
         }
     },
