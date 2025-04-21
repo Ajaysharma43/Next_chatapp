@@ -16,8 +16,6 @@ export async function refreshAccessToken(request, refreshToken) {
         const { payload } = await jwtVerify(refreshToken, JWT_SECRET);
         if (!payload.id) throw new Error("Invalid RefreshToken: Missing user ID");
 
-        console.log("RefreshToken is valid, generating new AccessToken");
-
         const newAccessToken = await generateAccessToken(payload.id , payload.role , payload.username);
         const response = NextResponse.next();
 
@@ -26,7 +24,6 @@ export async function refreshAccessToken(request, refreshToken) {
 
         return response;
     } catch (err) {
-        console.error("RefreshToken is invalid or expired:", err.message);
         return NextResponse.redirect(new URL("/login", request.url));
     }
 }

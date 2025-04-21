@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { jwtVerify, SignJWT } from "jose";
 import { refreshAccessToken } from "./MiddlewareFunctions/GenerateToken";
-import { headers } from "next/headers";
 import { DashboardAccess } from "./MiddlewareFunctions/DashBoardAccess";
 import { jwtDecode } from "jwt-decode";
 
@@ -18,7 +17,6 @@ export async function middleware(request) {
 
     // 1. If no accessToken, try refresh or allow access to login
     if (!accessToken) {
-        console.log("AccessToken is missing, trying to refresh...");
         if (pathname.startsWith("/login")) {
             return NextResponse.next(); // Let them stay on login
         }
@@ -27,7 +25,6 @@ export async function middleware(request) {
 
     try {
         await jwtVerify(accessToken, JWT_SECRET);
-        console.log("AccessToken is valid");
 
         // 2. If user is authenticated and on login, redirect to home
         if (pathname.startsWith('/login')) {
@@ -41,7 +38,6 @@ export async function middleware(request) {
         }
 
     } catch (err) {
-        console.error("AccessToken is invalid or expired:", err.message);
         if (pathname.startsWith("/login")) {
             return NextResponse.next(); // Allow login for invalid tokens
         }
