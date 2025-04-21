@@ -14,7 +14,6 @@ const GetData = async (credentialResponse ,userid , router) => {
 
     if(res.data.success == true)
     {
-        console.log("Server Response:", res.data);
 
         // Store tokens securely
         Cookies.set("AccessToken", res.data.AccessToken, {
