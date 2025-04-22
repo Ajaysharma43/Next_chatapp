@@ -5,7 +5,8 @@ import Cookies from "js-cookie";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import GoogleLogin from "../GoogleAuth/GoogleAuth";
-import Component from "../GoogleAuth/GithubAuth";
+// import Component from "../GoogleAuth/GithubAuth";
+import { GithubLogin } from "../GoogleAuth/GithubLogin";
 const LoginForm = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
@@ -88,8 +89,12 @@ const LoginForm = () => {
         <GoogleLogin/>
       </div>
 
-      <div>
+      {/* <div>
         <Component/>
+      </div> */}
+
+      <div>
+        <GithubLogin/>
       </div>
 
 

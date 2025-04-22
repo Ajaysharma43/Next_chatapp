@@ -3,13 +3,12 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
-    const { status } = useSession()
     const [navdata, setnavdata] = useState([]);
     const [loading, setLoading] = useState(true);
     const [logoutLoading, setLogoutLoading] = useState(false);
@@ -20,21 +19,29 @@ const Navbar = () => {
     const { theme, setTheme } = useTheme();
     const router = useRouter();
 
-    const Routes = ["/login", "/signup", "/dashboard", "/not-found"];
+    const Routes = ["/login", "/github-redirect", "/signup", "/dashboard", "/not-found"];
 
     useEffect(() => {
+        // If the current path is github-redirect and the token is not available, reload the page
+        if (Pathname === "/github-redirect" && !accessToken) {
+            window.location.reload();
+            return;
+        }
+
         setLogoutLoading(false);
-        setIsNavigating(false)
+        setIsNavigating(false);
         setMobileMenuOpen(false);
+
         const GetData = async () => {
             try {
                 const token = Cookies.get("AccessToken");
-                const decode = jwtDecode(token);
-
-                const response = await axios.get(
-                    `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
-                );
-                setnavdata(response.data.message);
+                if (token) {
+                    const decode = jwtDecode(token);
+                    const response = await axios.get(
+                        `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
+                    );
+                    setnavdata(response.data.message);
+                }
             } catch (error) {
                 console.error("Error fetching data:", error);
             } finally {
@@ -43,7 +50,7 @@ const Navbar = () => {
         };
 
         GetData();
-    }, [accessToken]);
+    }, [accessToken, Pathname]);
 
     // Navigation loader
     useEffect(() => {
@@ -61,10 +68,6 @@ const Navbar = () => {
         };
     }, []);
 
-    useEffect(() => {
-        setIsNavigating(false);
-    }, [isNavigating])
-
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!isMobileMenuOpen);
     };
@@ -78,21 +81,11 @@ const Navbar = () => {
         }, 1000);
     };
 
-    const Githublogout = () => {
-        setLogoutLoading(true);
-        setTimeout(() => {
-            Cookies.remove("AccessToken");
-            Cookies.remove("RefreshToken");
-            signOut({ callbackUrl: "/login" });
-        }, 1000);
-    }
-
     const handleNavClick = (href) => {
         setIsNavigating(true);
         router.push(href);
         setMobileMenuOpen(false);
     };
-
 
     return (
         <>
@@ -104,12 +97,11 @@ const Navbar = () => {
             )}
 
             <nav
-                className={`bg-blue-600 text-white shadow-lg ${Routes.some((route) =>
-                    Pathname.startsWith(route)
-                )
-                    ? "hidden"
-                    : "block"
-                    }`}
+                className={`bg-blue-600 text-white shadow-lg ${
+                    Routes.some((route) => Pathname.startsWith(route))
+                        ? "hidden"
+                        : "block"
+                }`}
             >
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                     <div className="text-2xl font-bold">
@@ -136,28 +128,12 @@ const Navbar = () => {
                             ))
                         )}
 
-                        {
-                            status == 'authenticated' ?
-                                (
-                                    <>
-                                        <button
-                                            className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
-                                            onClick={Githublogout}
-                                        >
-                                            Logout
-                                        </button>
-                                    </>
-                                )
-                                :
-                                (
-                                    <button
-                                        className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
-                                        onClick={Logout}
-                                    >
-                                        Logout
-                                    </button>
-                                )
-                        }
+                        <button
+                            className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
+                            onClick={Logout}
+                        >
+                            Logout
+                        </button>
 
                         <button
                             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -205,28 +181,12 @@ const Navbar = () => {
                             ))
                         )}
 
-                        {
-                            status == 'authenticated' ?
-                                (
-                                    <>
-                                        <button
-                                            className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
-                                            onClick={Githublogout}
-                                        >
-                                            Logout
-                                        </button>
-                                    </>
-                                )
-                                :
-                                (
-                                    <button
-                                        className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
-                                        onClick={Logout}
-                                    >
-                                        Logout
-                                    </button>
-                                )
-                        }
+                        <button
+                            className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
+                            onClick={Logout}
+                        >
+                            Logout
+                        </button>
 
                         <li>
                             <button

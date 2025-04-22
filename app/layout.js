@@ -5,7 +5,7 @@ import ReduxProvider from "@/Redux/reduxprovider";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Friends from "@/Components/friends/page";
 import { ThemeProvider } from "next-themes";
-import SessionWrapper from "@/Components/SesssionWrapper/SessionWrapper";
+// import SessionWrapper from "@/Components/SesssionWrapper/SessionWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +25,7 @@ export const metadata = {
 export default function RootLayout({ children  }) {
   return (
     <html lang="en">
-      <SessionWrapper>
+      {/* <SessionWrapper> */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -39,7 +39,7 @@ export default function RootLayout({ children  }) {
           </GoogleOAuthProvider>
         </ThemeProvider>
       </body>
-      </SessionWrapper>
+      {/* </SessionWrapper> */}
     </html>
   );
 }
