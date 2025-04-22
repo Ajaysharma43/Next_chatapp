@@ -30,7 +30,7 @@ export const GithubLogin = () => {
     return (
         <button
             onClick={HandleLogin}
-            className="flex items-center justify-center bg-gray-900 text-white rounded-lg px-6 py-2 hover:bg-gray-800 transition duration-200"
+            className="w-full flex items-center justify-center bg-gray-900 text-white rounded-lg px-6 py-2 mt-2 hover:bg-gray-800 transition duration-200"
         >
             <svg
                 xmlns="http://www.w3.org/2000/svg"
