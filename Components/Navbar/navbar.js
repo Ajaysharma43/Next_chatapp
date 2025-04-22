@@ -3,12 +3,13 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { signOut, useSession } from "next-auth/react";
 
 const Navbar = () => {
+    const { status } = useSession()
     const [navdata, setnavdata] = useState([]);
     const [loading, setLoading] = useState(true);
     const [logoutLoading, setLogoutLoading] = useState(false);
@@ -77,6 +78,15 @@ const Navbar = () => {
         }, 1000);
     };
 
+    const Githublogout = () => {
+        setLogoutLoading(true);
+        setTimeout(() => {
+            Cookies.remove("AccessToken");
+            Cookies.remove("RefreshToken");
+            signOut({ callbackUrl: "/login" });
+        }, 1000);
+    }
+
     const handleNavClick = (href) => {
         setIsNavigating(true);
         router.push(href);
@@ -126,12 +136,28 @@ const Navbar = () => {
                             ))
                         )}
 
-                        <button
-                            className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
-                            onClick={Logout}
-                        >
-                            Logout
-                        </button>
+                        {
+                            status == 'authenticated' ?
+                                (
+                                    <>
+                                        <button
+                                            className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
+                                            onClick={Githublogout}
+                                        >
+                                            Logout
+                                        </button>
+                                    </>
+                                )
+                                :
+                                (
+                                    <button
+                                        className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
+                                        onClick={Logout}
+                                    >
+                                        Logout
+                                    </button>
+                                )
+                        }
 
                         <button
                             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -179,12 +205,28 @@ const Navbar = () => {
                             ))
                         )}
 
-                        <button
-                            className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
-                            onClick={Logout}
-                        >
-                            Logout
-                        </button>
+                        {
+                            status == 'authenticated' ?
+                                (
+                                    <>
+                                        <button
+                                            className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
+                                            onClick={Githublogout}
+                                        >
+                                            Logout
+                                        </button>
+                                    </>
+                                )
+                                :
+                                (
+                                    <button
+                                        className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
+                                        onClick={Logout}
+                                    >
+                                        Logout
+                                    </button>
+                                )
+                        }
 
                         <li>
                             <button
