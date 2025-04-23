@@ -22,6 +22,7 @@ export default function Home() {
       setUser(decode.id);
     }
 
+    socket.emit('SendPrevGlobalMessages')
     socket.on("GetPrevChats", (data) => {
       setMessages(data.chats);
     });
