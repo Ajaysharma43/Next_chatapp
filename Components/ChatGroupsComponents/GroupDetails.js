@@ -3,16 +3,19 @@
 import socket from "@/app/SocketConnection/SocketConnection";
 import { useEffect, useState } from "react";
 import { Users, Info, CalendarDays, UserCircle, ShieldCheck } from "lucide-react";
+import { FaUserEdit } from "react-icons/fa";
 import { MdOutlinePersonRemove } from "react-icons/md";
 import { UpdateGroupDetails } from "./Dialogs/UpdateGroupDetails";
 import { RemoveUserFromGroup } from "./Dialogs/RemoveUserDialog";
 import { AddMemberDialog } from "./Dialogs/AddMembersDialog";
 import { useDispatch } from "react-redux";
 import { GetGroups } from "@/Redux/features/ChatGroupsSlice";
+import UpdateGroupRoleDialog from "./Dialogs/UpdateGroupRole";
 
 const GroupDetails = ({ id, userid, username, onBack }) => {
     const [groupDetails, setGroupDetails] = useState({});
     const [membersDetails, setMembersDetails] = useState([]);
+    const [GroupRole, SetGroupRole] = useState('')
     const [UpdateDialog, setUpdatedialog] = useState(false)
     const [RemoveUser, setRemoveUser] = useState([])
     const [RemoveDialog, setRemoveDialog] = useState(false)
@@ -20,15 +23,19 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
     const dispatch = useDispatch()
 
     const handleGroupDetails = (GetGroupDetails, GetMembersDetails) => {
-        console.log(userid , groupDetails.created_by)
+        console.log(userid, groupDetails.created_by)
         const includesCurrentUser = GetMembersDetails.some(member => member.user_id == userid);
         // Allow if user is group creator (admin) or present in member list
         if (!includesCurrentUser && userid != GetGroupDetails[0].created_by) {
-            dispatch(GetGroups({userid}))
+            dispatch(GetGroups({ userid }))
             onBack()
         }
         setGroupDetails(GetGroupDetails[0]);
         setMembersDetails(GetMembersDetails);
+        if (userid != GetGroupDetails[0].created_by) {
+            const FindUser = GetMembersDetails.find((user) => user.user_id == userid)
+            SetGroupRole(FindUser.role)
+        }
         setRemoveDialog(false)
     };
 
@@ -37,7 +44,7 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
 
         socket.emit("GetGroupDetails", id);
 
-        
+
 
         socket.on("SendGroupDetails", handleGroupDetails);
 
@@ -98,6 +105,7 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
             <UpdateGroupDetails open={UpdateDialog} handleClose={HandleUpdateDialog} Details={groupDetails} id={userid} username={username} />
             <RemoveUserFromGroup open={RemoveDialog} onClose={HandleRemoveDilog} userDetails={RemoveUser} username={username} id={userid} />
             <AddMemberDialog open={AddDialog} onclose={HandleAddDialog} userId={userid} group_id={id} username={username} />
+            <UpdateGroupRoleDialog/>
             <div className="p-5 bg-white shadow-xl rounded-2xl mt-4 w-full max-w-2xl mx-auto">
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold flex items-center gap-2 text-amber-600">
@@ -122,7 +130,7 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
                             <span className="font-semibold">Created By :</span> {groupDetails.username}
                         </p>
                         {
-                            userid == groupDetails.created_by && (
+                            userid == groupDetails.created_by || GroupRole == 'EDITOR' && (
                                 <>
                                     <div className="flex flex-wrap gap-2">
                                         <button className="bg-blue-600 rounded-lg uppercase text-white p-2 transition-all duration-200 hover:bg-blue-800"
@@ -170,6 +178,13 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
                                                 >
                                                     <MdOutlinePersonRemove size={20} />
                                                 </button>
+                                                <button
+                                                    title="Edit Role"
+                                                    className="p-2 rounded-full hover:bg-red-100 transition-colors duration-200 text-blue-600 hover:text-red-800"
+                                                >
+                                                    <FaUserEdit size={20} />
+                                                </button>
+
                                             </div>
                                         )
                                     }
