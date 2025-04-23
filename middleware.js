@@ -17,7 +17,7 @@ export async function middleware(request) {
 
     // 1. If no accessToken, try refresh or allow access to login
     if (!accessToken) {
-        if (pathname.startsWith("/login")) {
+        if (pathname.startsWith("/login") || pathname.startsWith('/signup')) {
             return NextResponse.next(); // Let them stay on login
         }
         return refreshAccessToken(request, refreshToken);
@@ -27,7 +27,7 @@ export async function middleware(request) {
         await jwtVerify(accessToken, JWT_SECRET);
 
         // 2. If user is authenticated and on login, redirect to home
-        if (pathname.startsWith('/login')) {
+        if (pathname.startsWith("/login") || pathname.startsWith('/signup')) {
             return NextResponse.redirect(new URL("/", request.url));
         }
 
@@ -38,7 +38,7 @@ export async function middleware(request) {
         }
 
     } catch (err) {
-        if (pathname.startsWith("/login")) {
+        if (pathname.startsWith("/login") || pathname.startsWith('/signup')) {
             return NextResponse.next(); // Allow login for invalid tokens
         }
         return await refreshAccessToken(request, refreshToken);
@@ -50,5 +50,5 @@ export async function middleware(request) {
 
 
 export const config = {
-    matcher: ["/", "/Findusers", "/friends", "/Requests" , "/groups", "/dashboard", "/dashboard/profile" , "/login"],
+    matcher: ["/", "/Findusers", "/friends", "/Requests" , "/groups", "/dashboard", "/dashboard/profile" , "/login" , "/signup"],
 };
