@@ -13,9 +13,9 @@ const Friends = () => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    const token = Cookies.get("AccessToken");
 
-    if (pathname !== "/login") {
+    if (pathname !== "/login" && pathname !== '/signup') {
+      const token = Cookies.get("AccessToken");
       const decoded = jwtDecode(token);
       const id = decoded?.id;
       setUserId(id);
