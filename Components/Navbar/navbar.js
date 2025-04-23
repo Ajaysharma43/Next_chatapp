@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 
 const Navbar = () => {
     const [navdata, setnavdata] = useState([]);
@@ -13,6 +14,7 @@ const Navbar = () => {
     const [logoutLoading, setLogoutLoading] = useState(false);
     const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [isNavigating, setIsNavigating] = useState(false);
+    const [userInfo, setUserInfo] = useState({ name: "", profilePic: "" });
     const Pathname = usePathname();
     const accessToken = Cookies.get("AccessToken");
     const { theme, setTheme } = useTheme();
@@ -30,6 +32,11 @@ const Navbar = () => {
                 const token = Cookies.get("AccessToken");
                 if (token) {
                     const decode = jwtDecode(token);
+                    setUserInfo({
+                        name: decode.username || "U",
+                        profilePic: decode.profile || "",
+                    });
+
                     const response = await axios.get(
                         `${process.env.NEXT_PUBLIC_SERVER_URL}/Nav/NavBar?role=${decode.role}`
                     );
@@ -45,7 +52,6 @@ const Navbar = () => {
         GetData();
     }, [accessToken, Pathname]);
 
-    // Navigation loader
     useEffect(() => {
         const handleStart = () => setIsNavigating(true);
         const handleEnd = () => setIsNavigating(false);
@@ -75,21 +81,17 @@ const Navbar = () => {
     };
 
     const handleNavClick = (href) => {
-        // Prevent navigating to the same page
         if (Pathname === href) {
             setMobileMenuOpen(false);
             return;
         }
-    
         setIsNavigating(true);
         router.push(href);
         setMobileMenuOpen(false);
     };
-    
 
     return (
         <>
-            {/* Backdrop Loader for Logout or Navigation */}
             {(logoutLoading || isNavigating) && (
                 <div className="fixed inset-0 bg-[#1111115a] z-50 flex items-center justify-center">
                     <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -97,11 +99,8 @@ const Navbar = () => {
             )}
 
             <nav
-                className={`bg-blue-600 text-white shadow-lg ${
-                    Routes.some((route) => Pathname.startsWith(route))
-                        ? "hidden"
-                        : "block"
-                }`}
+                className={`bg-blue-600 text-white shadow-lg ${Routes.some((route) => Pathname.startsWith(route)) ? "hidden" : "block"
+                    }`}
             >
                 <div className="container mx-auto px-4 py-3 flex justify-between items-center">
                     <div className="text-2xl font-bold">
@@ -127,6 +126,23 @@ const Navbar = () => {
                                 </button>
                             ))
                         )}
+
+                        {/* Avatar/Profile */}
+                        <div className="relative group">
+                            {userInfo.profilePic ? (
+                                <Image
+                                    height={36}
+                                    width={36}
+                                    src={userInfo.profilePic}
+                                    alt="Profile"
+                                    className="w-9 h-9 rounded-full object-cover border-2 border-white"
+                                />
+                            ) : (
+                                <div className="w-9 h-9 rounded-full bg-teal-600 flex items-center justify-center text-white font-semibold uppercase">
+                                    {userInfo.name?.[0] || "U"}
+                                </div>
+                            )}
+                        </div>
 
                         <button
                             className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
@@ -180,6 +196,23 @@ const Navbar = () => {
                                 </li>
                             ))
                         )}
+
+                        {/* Avatar in Mobile */}
+                        <li>
+                            {userInfo.profilePic ? (
+                                <Image
+                                    height={36}
+                                    width={36}
+                                    src={userInfo.profilePic}
+                                    alt="Profile"
+                                    className="w-9 h-9 rounded-full object-cover border-2 border-white"
+                                />
+                            ) : (
+                                <div className="w-9 h-9 rounded-full bg-teal-600 flex items-center justify-center text-white font-semibold uppercase">
+                                    {userInfo.name?.[0] || "U"}
+                                </div>
+                            )}
+                        </li>
 
                         <button
                             className="bg-teal-500 text-white rounded-lg p-2 transition-all duration-200 hover:bg-teal-700"
