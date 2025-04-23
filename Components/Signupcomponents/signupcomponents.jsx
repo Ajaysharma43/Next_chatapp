@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { AuthInstance } from "@/Interseptors/AuthInterseptors";
 import Cookies from "js-cookie";
 import bcrypt from "bcryptjs";
+import Link from "next/link";
 
 const StepperOtpForm = () => {
   const [step, setStep] = useState(1);
@@ -345,9 +346,11 @@ const StepperOtpForm = () => {
               Thank you for signing up. Your account has been created
               successfully.
             </p>
+            <Link href={'/login'}>
             <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
               Go to Login
             </button>
+            </Link>
           </div>
         </div>
       )}
