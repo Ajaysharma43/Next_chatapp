@@ -30,7 +30,7 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
             dispatch(GetGroups({ userid }))
             onBack()
         }
-        setGroupDetails(GetGroupDetails[0]);
+        setGroupDetails(GetGroupDetails[0]); 
         setMembersDetails(GetMembersDetails);
         if (userid != GetGroupDetails[0].created_by) {
             const FindUser = GetMembersDetails.find((user) => user.user_id == userid)
