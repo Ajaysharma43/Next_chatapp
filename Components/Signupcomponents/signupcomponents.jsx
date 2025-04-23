@@ -130,8 +130,8 @@ const StepperOtpForm = () => {
         const hashedPassword = await hashPassword(formData.password);
         const newUserData = { ...formData, password: hashedPassword };
         console.log(newUserData);
-        
-        const res = await AuthInstance.post("/Signup", {newUserData}); 
+
+        const res = await AuthInstance.post("/Signup", { newUserData });
         if (res.data.success === true) {
           setTimeout(() => {
             setStep(step + 1);
@@ -362,15 +362,17 @@ const StepperOtpForm = () => {
             Previous
           </button>
         )}
-        <button
-          onClick={nextStep}
-          disabled={isLoading || !ValidEmail}
-          className={`px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-300 ${
-            step == 2 || step == 3 ? "hidden" : "block"
-          }`}
-        >
-          Next
-        </button>
+        {step != 4 && (
+          <button
+            onClick={nextStep}
+            disabled={isLoading || !ValidEmail}
+            className={`px-4 py-2 bg-blue-500 text-white rounded-lg disabled:bg-gray-300 ${
+              step == 2 || step == 3 ? "hidden" : "block"
+            }`}
+          >
+            Next
+          </button>
+        )}
       </div>
     </div>
   );
