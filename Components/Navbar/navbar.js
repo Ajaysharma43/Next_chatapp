@@ -139,7 +139,7 @@ const Navbar = () => {
                                 />
                             ) : (
                                 <div className="w-9 h-9 rounded-full bg-teal-600 flex items-center justify-center text-white font-semibold uppercase">
-                                    {userInfo.name?.[0] || "U"}
+                                    {userInfo.name.charAt(0).toUpperCase() || "U"}
                                 </div>
                             )}
                         </div>
@@ -209,7 +209,7 @@ const Navbar = () => {
                                 />
                             ) : (
                                 <div className="w-9 h-9 rounded-full bg-teal-600 flex items-center justify-center text-white font-semibold uppercase">
-                                    {userInfo.name?.[0] || "U"}
+                                    {userInfo.name.charAt(0).toUpperCase() || "U"}
                                 </div>
                             )}
                         </li>
