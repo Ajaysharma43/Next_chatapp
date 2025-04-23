@@ -80,7 +80,7 @@ const ChatArea = ({ id, onBack }) => {
       socket.off("GetPreviosGroupChats", handlePrevMessages);
       socket.off("RecieveMessages", handleNewMessage);
       socket.off("StartGroupTyping", handleTyping);
-      socket.off('UpdateNotification' , HandleNotification)
+      socket.off('UpdateNotification', HandleNotification)
     };
   }, [id, userid]);
 
@@ -156,7 +156,7 @@ const ChatArea = ({ id, onBack }) => {
         {/* Main Area Switch */}
         {showGroupDetails ? (
           <div className="flex-1 overflow-y-auto p-4">
-            <GroupDetails id={id} userid={userid} username={username} onBack={onBack}/>
+            <GroupDetails id={id} userid={userid} username={username} onBack={onBack} />
           </div>
         ) : (
           <>
