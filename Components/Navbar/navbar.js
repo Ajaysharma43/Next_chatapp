@@ -3,7 +3,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
@@ -19,15 +18,9 @@ const Navbar = () => {
     const { theme, setTheme } = useTheme();
     const router = useRouter();
 
-    const Routes = ["/login", "/github-redirect", "/signup", "/dashboard", "/not-found"];
+    const Routes = ["/login", "/signup", "/dashboard", "/not-found"];
 
     useEffect(() => {
-        // If the current path is github-redirect and the token is not available, reload the page
-        if (Pathname === "/github-redirect" && !accessToken) {
-            window.location.reload();
-            return;
-        }
-
         setLogoutLoading(false);
         setIsNavigating(false);
         setMobileMenuOpen(false);
