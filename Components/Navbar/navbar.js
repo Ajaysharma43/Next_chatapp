@@ -82,10 +82,17 @@ const Navbar = () => {
     };
 
     const handleNavClick = (href) => {
+        // Prevent navigating to the same page
+        if (Pathname === href) {
+            setMobileMenuOpen(false);
+            return;
+        }
+    
         setIsNavigating(true);
         router.push(href);
         setMobileMenuOpen(false);
     };
+    
 
     return (
         <>
