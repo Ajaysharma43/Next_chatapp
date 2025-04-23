@@ -11,8 +11,8 @@ const store = configureStore({
         chatreducer: chatreducer,
         DashboardReducer: DashboardReducer,
         UserReducer: UserReducer,
-        ChatGroupsReducer : ChatGroupsReducer,
-        NotificationReducer : NotificationReducer
+        ChatGroupsReducer: ChatGroupsReducer,
+        NotificationReducer: NotificationReducer
     }
 })
 

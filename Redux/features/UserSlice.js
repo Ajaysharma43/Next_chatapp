@@ -104,7 +104,7 @@ const UserReducer = createSlice({
         UpdateBlockedUsers: (state, action) => {
             state.BlockedUser = action.payload
         },
-        setUsersList : (state , action) => {
+        setUsersList: (state, action) => {
             state.SearchData = action.payload
         }
     },
@@ -169,6 +169,6 @@ const UserReducer = createSlice({
     }
 })
 
-export const { UpdateBlockedUsers , setUsersList } = UserReducer.actions
+export const { UpdateBlockedUsers, setUsersList } = UserReducer.actions
 
 export default UserReducer.reducer

@@ -1,4 +1,3 @@
-import { notFound } from "next/navigation"
 import { NextResponse } from "next/server"
 
 export const DashboardAccess = (role , request) => {
