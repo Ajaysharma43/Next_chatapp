@@ -14,7 +14,6 @@ const GetData = async (credentialResponse ,userid , router) => {
 
     if(res.data.success == true)
     {
-
         // Store tokens securely
         Cookies.set("AccessToken", res.data.AccessToken, {
           secure: true,
@@ -48,7 +47,6 @@ export default function LoginWithGoogle() {
           try {
             const userid = credentialResponse.clientId
             const decode = jwtDecode(credentialResponse.credential);
-            console.log(decode)
             if (decode.email_verified) {
               await GetData(credentialResponse , userid , router);
             }
