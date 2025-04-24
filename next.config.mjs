@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['avatars.githubusercontent.com',"storage.googleapis.com"], // ✅ Allow GitHub avatars
+    domains: ['avatars.githubusercontent.com',"storage.googleapis.com"], 
   },
   async headers() {
     return [
@@ -10,11 +10,11 @@ const nextConfig = {
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",
-            value: "same-origin-allow-popups", // ✅ Allows Google login postMessage
+            value: "same-origin-allow-popups", 
           },
           {
             key: "Cross-Origin-Embedder-Policy",
-            value: "require-corp", // Optional
+            value: "require-corp", 
           },
         ],
       },
