@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['avatars.githubusercontent.com'], // ✅ Allow GitHub avatars
+    domains: ['avatars.githubusercontent.com',"storage.googleapis.com"], // ✅ Allow GitHub avatars
   },
   async headers() {
     return [
