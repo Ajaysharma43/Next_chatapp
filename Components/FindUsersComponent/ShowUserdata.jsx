@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 const ShowUserData = () => {
   const SearchData = useSelector((state) => state.UserReducer.SearchData);
   const SearchLoading = useSelector((state) => state.UserReducer.IsSearchLoading);
 
-  useEffect(() => {
-  }, [SearchData]);
+  useEffect(() => {}, [SearchData]);
 
   if (SearchLoading) {
     return (
@@ -43,9 +43,19 @@ const ShowUserData = () => {
                 <Link href={`/singleuser/${item.id}`}>
                   <div className="group bg-white p-5 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 hover:bg-gray-50 cursor-pointer">
                     <div className="flex items-center gap-3">
-                      <div className="bg-blue-500 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center text-sm shadow-sm">
-                        {item.name?.charAt(0).toUpperCase()}
-                      </div>
+                      {item.profilepic ? (
+                        <Image
+                          src={item.profilepic}
+                          alt={item.name}
+                          width={40}
+                          height={40}
+                          className="w-10 h-10 rounded-full object-cover border border-gray-300 shadow-sm"
+                        />
+                      ) : (
+                        <div className="bg-blue-500 text-white font-bold rounded-full w-10 h-10 flex items-center justify-center text-sm shadow-sm">
+                          {item.name?.charAt(0).toUpperCase()}
+                        </div>
+                      )}
                       <div>
                         <h2 className="text-lg font-semibold text-gray-800 group-hover:text-blue-600 transition">
                           {item.name}

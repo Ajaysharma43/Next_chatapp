@@ -7,6 +7,7 @@ import { UpdateProfile } from "./Dialogs/UpdateProfilepic"
 import { useDispatch } from "react-redux"
 import { UpdateProfilePic } from "@/Redux/features/UserProfileSlice"
 import { FaEdit } from "react-icons/fa" // Importing React Icon (FaEdit)
+import Link from "next/link"
 
 const ProfileData = ({ userid, UserData }) => {
     const [isDialogOpen, setDialogOpen] = useState(false) // State for dialog visibility
@@ -20,7 +21,7 @@ const ProfileData = ({ userid, UserData }) => {
     const closeDialog = () => setDialogOpen(false) // Close the dialog
 
     const HandleUpdateImage = (formdata) => {
-        dispatch(UpdateProfilePic({formdata}))
+        dispatch(UpdateProfilePic({ formdata }))
         setSelectedImage(null)
     }
 
@@ -35,7 +36,7 @@ const ProfileData = ({ userid, UserData }) => {
                         className="object-cover rounded-full"
                     />
                     {/* Update Icon */}
-                    <div 
+                    <div
                         className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md cursor-pointer hover:bg-indigo-100 transform translate-x-1 translate-y-1 z-10"
                         onClick={openDialog} // Open dialog on icon click
                     >
@@ -55,19 +56,23 @@ const ProfileData = ({ userid, UserData }) => {
                         <p className="text-sm text-gray-500">Posts</p>
                     </div>
                     <div>
-                        <p className="text-xl font-semibold text-indigo-600">{user.followers_count}</p>
-                        <p className="text-sm text-gray-500">Followers</p>
+                        <Link href={'/profile/friends'}>
+                            <p className="text-xl font-semibold text-indigo-600">{user.followers_count}</p>
+                            <p className="text-sm text-gray-500">Followers</p>
+                        </Link>
                     </div>
                     <div>
-                        <p className="text-xl font-semibold text-indigo-600">{user.following_count}</p>
-                        <p className="text-sm text-gray-500">Following</p>
+                        <Link href={'/profile/friends'}>
+                            <p className="text-xl font-semibold text-indigo-600">{user.following_count}</p>
+                            <p className="text-sm text-gray-500">Following</p>
+                        </Link>
                     </div>
                 </div>
             </div>
 
             {/* Profile Picture Update Dialog */}
             <Dialog open={isDialogOpen} onClose={closeDialog}>
-                <UpdateProfile onClose={closeDialog} userid={userid} selectedImage={selectedImage} setSelectedImage={setSelectedImage} onSave={HandleUpdateImage}/>
+                <UpdateProfile onClose={closeDialog} userid={userid} selectedImage={selectedImage} setSelectedImage={setSelectedImage} onSave={HandleUpdateImage} />
             </Dialog>
         </div>
     )

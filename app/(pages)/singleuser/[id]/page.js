@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 const SingleUser = () => {
   const { id } = useParams();
@@ -70,18 +71,34 @@ const SingleUser = () => {
 
         {SingleUserData ? (
           <motion.div
-            className="bg-gray-50 rounded-xl p-6 space-y-4 shadow-inner"
+            className="bg-gray-50 rounded-xl p-6 space-y-6 shadow-inner"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            <div className="text-center">
+            {/* Profile Picture */}
+            <div className="flex flex-col items-center space-y-2">
+              <div className="relative w-28 h-28 rounded-full overflow-hidden shadow-lg bg-gray-200">
+                {SingleUserData.profilepic ? (
+                  <Image
+                    src={SingleUserData.profilepic}
+                    alt={SingleUserData.name}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white text-3xl font-semibold bg-gray-500">
+                    {SingleUserData.name?.[0]?.toUpperCase()}
+                  </div>
+                )}
+              </div>
               <h2 className="text-2xl font-semibold text-gray-900">{SingleUserData.name}</h2>
               {currentUserId == id && (
                 <p className="text-gray-500">{SingleUserData.email}</p>
               )}
             </div>
 
+            {/* User Info */}
             {currentUserId == id ? (
               <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
                 <p><strong>Phone:</strong> {SingleUserData.phone}</p>
@@ -98,6 +115,7 @@ const SingleUser = () => {
               </p>
             )}
 
+            {/* Friend Action Buttons */}
             {currentUserId == id ? (
               <p className="text-green-600 font-semibold text-center mt-4">
                 This is your profile.
@@ -133,13 +151,13 @@ const SingleUser = () => {
                     )
                   ) : (
                     <div className="flex gap-2">
-                    <button className="bg-green-600 text-white px-5 py-2 rounded-xl font-medium shadow">
-                      Friends 👥
-                    </button>
-                    <button className="bg-green-600 text-white px-5 py-2 rounded-xl font-medium shadow">
-                    Chat 👥
-                  </button>
-                  </div>
+                      <button className="bg-green-600 text-white px-5 py-2 rounded-xl font-medium shadow">
+                        Friends 👥
+                      </button>
+                      <button className="bg-green-600 text-white px-5 py-2 rounded-xl font-medium shadow">
+                        Chat 💬
+                      </button>
+                    </div>
                   )
                 ) : (
                   <div className="flex gap-2 justify-center">
