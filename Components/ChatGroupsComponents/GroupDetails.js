@@ -11,6 +11,7 @@ import { AddMemberDialog } from "./Dialogs/AddMembersDialog";
 import { useDispatch } from "react-redux";
 import { GetGroups } from "@/Redux/features/ChatGroupsSlice";
 import UpdateGroupRoleDialog from "./Dialogs/UpdateGroupRole";
+import Image from "next/image";
 
 const GroupDetails = ({ id, userid, username, onBack }) => {
     const [groupDetails, setGroupDetails] = useState({});
@@ -30,7 +31,7 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
             dispatch(GetGroups({ userid }))
             onBack()
         }
-        setGroupDetails(GetGroupDetails[0]); 
+        setGroupDetails(GetGroupDetails[0]);
         setMembersDetails(GetMembersDetails);
         if (userid != GetGroupDetails[0].created_by) {
             const FindUser = GetMembersDetails.find((user) => user.user_id == userid)
@@ -105,7 +106,7 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
             <UpdateGroupDetails open={UpdateDialog} handleClose={HandleUpdateDialog} Details={groupDetails} id={userid} username={username} />
             <RemoveUserFromGroup open={RemoveDialog} onClose={HandleRemoveDilog} userDetails={RemoveUser} username={username} id={userid} />
             <AddMemberDialog open={AddDialog} onclose={HandleAddDialog} userId={userid} group_id={id} username={username} />
-            <UpdateGroupRoleDialog/>
+            <UpdateGroupRoleDialog />
             <div className="p-5 bg-white shadow-xl rounded-2xl mt-4 w-full max-w-2xl mx-auto">
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold flex items-center gap-2 text-amber-600">
@@ -155,10 +156,26 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
                             <li key={member.id} className="p-3 bg-gray-100 rounded-xl shadow-sm">
                                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                                     <div className="text-gray-700 text-sm">
-                                        <p className="flex items-center gap-2">
-                                            <UserCircle size={16} className="text-gray-500" />
-                                            <span className="font-medium">Name:</span> {member.name}
-                                        </p>
+                                        <div className="flex items-center gap-3">
+                                            {member.profilepic ? (
+                                                <Image
+                                                    src={member.profilepic}
+                                                    width={40}
+                                                    height={40}
+                                                    alt="Group"
+                                                    className="w-8 h-8 rounded-full object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center text-sm text-white">
+                                                    {member.name?.[0]?.toUpperCase()}
+                                                </div>
+                                            )}
+                                            <p className="flex items-center gap-2">
+                                                <Users size={18} className="text-gray-500" />
+                                                <span className="font-semibold">Name:</span> {member.name}
+                                            </p>
+                                        </div>
+
                                         <p className="flex items-center gap-2 mt-1">
                                             <ShieldCheck size={16} className="text-gray-500" />
                                             <span className="font-medium">Role:</span> {member.role}

@@ -9,6 +9,7 @@ import { MdDelete } from "react-icons/md";
 import DeleteMessageDialog from "./Dialogs/DeleteMessageDialog";
 import GroupDetails from "./GroupDetails";
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 const ChatArea = ({ id, onBack }) => {
   const [userid, setUserId] = useState(null);
@@ -191,30 +192,47 @@ const ChatArea = ({ id, onBack }) => {
                                   prev === item?.id ? null : item?.id
                                 )
                               }
-                              className={`relative max-w-xs md:max-w-md break-words px-4 py-2 rounded-2xl text-white shadow-md cursor-pointer transition-transform active:scale-[.98] ${item?.sender_id === userid
-                                ? "bg-green-500"
-                                : "bg-blue-500"
+                              className={`relative max-w-xs md:max-w-md break-words px-4 py-2 rounded-2xl text-white shadow-md cursor-pointer transition-transform active:scale-[.98] flex items-start gap-2 ${item?.sender_id === userid ? "bg-green-500" : "bg-blue-500"
                                 }`}
                             >
-                              <h1 className="font-semibold text-sm mb-1">
-                                {item?.sender_id === userid ? "You" : item?.name}
-                              </h1>
-                              <p className="text-sm">{item?.content}</p>
+                              {/* Profile Picture or Initial */}
+                              {item?.profilepic ? (
+                                <Image
+                                  src={item.profilepic}
+                                  width={40}
+                                  height={40}
+                                  alt="profile"
+                                  className="w-8 h-8 rounded-full object-cover mt-1"
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center font-semibold text-sm mt-1">
+                                  {item?.name?.[0]?.toUpperCase()}
+                                </div>
+                              )}
 
-                              {item?.sender_id === userid &&
-                                selectedMessageId === item?.id && (
-                                  <button
-                                    className="absolute top-1 right-1 text-white hover:text-red-300"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleOpenDeleteDialog(item);
-                                    }}
-                                    title="Delete"
-                                  >
-                                    <MdDelete size={18} />
-                                  </button>
-                                )}
+                              {/* Message Content */}
+                              <div className="flex-1">
+                                <h1 className="font-semibold text-sm mb-1">
+                                  {item?.sender_id === userid ? "You" : item?.name}
+                                </h1>
+                                <p className="text-sm">{item?.content}</p>
+                              </div>
+
+                              {/* Delete Button */}
+                              {item?.sender_id === userid && selectedMessageId === item?.id && (
+                                <button
+                                  className="absolute top-1 right-1 text-white hover:text-red-300"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleOpenDeleteDialog(item);
+                                  }}
+                                  title="Delete"
+                                >
+                                  <MdDelete size={18} />
+                                </button>
+                              )}
                             </div>
+
                           )
                       }
 

@@ -9,7 +9,6 @@ import {
   Box,
   Tabs,
   Tab,
-  Typography,
   CircularProgress,
   Container,
 } from "@mui/material";
