@@ -20,7 +20,7 @@ const UserPostsData = ({ userid, UserPosts }) => {
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
+                        <div className="absolute inset-0 bg-[#11111154] bg-opacity-40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-300">
                             <div className="text-white text-sm flex gap-6 items-center">
                                 <span className="flex items-center gap-1">
                                     <Heart className="w-4 h-4" /> {post.like_count}
