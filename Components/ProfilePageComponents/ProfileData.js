@@ -6,7 +6,7 @@ import Image from "next/image"
 import { UpdateProfile } from "./Dialogs/UpdateProfilepic"
 import { useDispatch } from "react-redux"
 import { UpdateProfilePic } from "@/Redux/features/UserProfileSlice"
-import { FaEdit } from "react-icons/fa" 
+import { FaEdit } from "react-icons/fa"
 import Link from "next/link"
 
 const ProfileData = ({ userid, UserData }) => {
@@ -17,8 +17,8 @@ const ProfileData = ({ userid, UserData }) => {
 
     if (!user) return null
 
-    const openDialog = () => setDialogOpen(true)  
-    const closeDialog = () => setDialogOpen(false) 
+    const openDialog = () => setDialogOpen(true)
+    const closeDialog = () => setDialogOpen(false)
 
     const HandleUpdateImage = (formdata) => {
         dispatch(UpdateProfilePic({ formdata }))
