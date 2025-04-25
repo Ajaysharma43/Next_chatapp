@@ -1,5 +1,6 @@
 import { UserProfileInstance } from "@/Interseptors/UserProfileInterseptors"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
+import Cookies from "js-cookie"
 
 export const GetUserProfileData = createAsyncThunk('GetUserProfileData', async ({ userid }) => {
     try {
@@ -39,6 +40,8 @@ const UserProfileSlice = createSlice({
 
         builder.addCase(UpdateProfilePic.fulfilled, (state, action) => {
             state.UserDetails[0].profilepic = action.payload.Userdata[0]?.profilepic;
+            Cookies.set('AccessToken' , action.payload.AccessToken)
+            Cookies.set('RefreshToken' , action.payload.RefreshToken)
             
         });
         
