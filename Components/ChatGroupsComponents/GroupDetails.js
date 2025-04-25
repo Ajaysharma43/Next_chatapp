@@ -45,8 +45,6 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
 
         socket.emit("GetGroupDetails", id);
 
-
-
         socket.on("SendGroupDetails", handleGroupDetails);
 
         socket.on('UpdatedGroupDetails', (Update, values) => {
