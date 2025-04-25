@@ -142,7 +142,6 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
                                 </>
                             )
                         }
-
                     </div>
                 </div>
 
