@@ -5,6 +5,7 @@ import DashboardReducer from '@/Redux/features/DashboardSlice'
 import UserReducer from '@/Redux/features/UserSlice'
 import ChatGroupsReducer from "@/Redux/features/ChatGroupsSlice"
 import NotificationReducer from '@/Redux/features/NotificationsSlice'
+import UserProfileSlice from '@/Redux/features/UserProfileSlice'
 
 const store = configureStore({
     reducer: {
@@ -12,7 +13,8 @@ const store = configureStore({
         DashboardReducer: DashboardReducer,
         UserReducer: UserReducer,
         ChatGroupsReducer: ChatGroupsReducer,
-        NotificationReducer: NotificationReducer
+        NotificationReducer: NotificationReducer,
+        UserProfileSlice : UserProfileSlice
     }
 })
 
