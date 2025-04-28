@@ -38,6 +38,15 @@ export const AddComment = createAsyncThunk('AddComment', async ({ values, userid
     }
 })
 
+export const DeleteComment = createAsyncThunk('DeleteComment' , async ({commentid , imageid}) => {
+    try {
+        const res = await UserProfileInstance.delete(`/DeleteComment?commentid=${commentid}&imageid=${imageid}`)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 const initialState = {
     UserDetails: [],
     UserFollowerData: [],
@@ -72,6 +81,23 @@ const UserProfileSlice = createSlice({
             const ImageComments = state.UserImagesUploadData.find((item) => item.image_id === action.payload.Comment[0].image_id)
             ImageComments.comment_count = Number(ImageComments.comment_count) + 1;
         })
+
+        builder.addCase(DeleteComment.fulfilled, (state, action) => {
+            // Remove the comment from the ImageComments array
+            state.ImageComments = state.ImageComments.filter(
+                (comment) => comment.id !== parseInt(action.payload.id)
+            );
+        
+            // Find the corresponding image and update the comment count
+            const ImageComments = state.UserImagesUploadData.find(
+                (item) => item.image_id === parseInt(action.payload.imageid)
+            );
+        
+            if (ImageComments) {
+                ImageComments.comment_count = Number(ImageComments.comment_count) - 1;
+            }
+        });
+        
     }
 })
 
