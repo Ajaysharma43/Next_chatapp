@@ -1,7 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { UserProfileInstance } from "@/Interseptors/UserProfileInterseptors";
 import Image from "next/image";
-import { FaHeart, FaRegComment, FaShare } from "react-icons/fa"; // Using react-icons
+import { FaHeart, FaRegComment, FaShare } from "react-icons/fa";
+import { CommentsDrawer } from "./Dialogs/CommentsDrawer";
 
 const formatDate = (timestamp) => {
     const date = new Date(timestamp);
@@ -10,10 +13,55 @@ const formatDate = (timestamp) => {
 };
 
 const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
+    const [posts, setPosts] = useState([]);
+    const [CommentsDrawerState , setCommentsDrawerState] = useState(false)
+
+    useEffect(() => {
+        setPosts(Userposts); 
+    }, [Userposts]);
+
+    const HandleCommentDrawer = () => {
+        if(CommentsDrawerState == true)
+        {
+            setCommentsDrawerState(false)
+        }
+        else
+        {
+            setCommentsDrawerState(true)
+        }
+    }
+
+    const HandleLike = async (item, index) => {
+        try {
+            const LikeStatus = await UserProfileInstance.post("/Checklikes", {
+                imageid: item.image_id,
+                userid: userid,
+            });
+
+            if (LikeStatus.data.success === true) {
+                setPosts((prevPosts) =>
+                    prevPosts.map((post, idx) =>
+                        idx === index
+                            ? {
+                                  ...post,
+                                  is_liked_by_user: !post.is_liked_by_user,
+                                  like_count: post.is_liked_by_user
+                                      ? post.like_count - 1
+                                      : post.like_count + 1,
+                              }
+                            : post
+                    )
+                );
+            }
+        } catch (error) {
+            console.error("Error while liking:", error);
+        }
+    };
 
     return (
+        <>
         <div className="flex flex-col items-center gap-8 p-4">
-            {Userposts.map((item) => (
+            {posts.map((item, index) => (
                 <div
                     key={item.image_id}
                     className="w-full max-w-md bg-white shadow-lg rounded-2xl overflow-hidden"
@@ -47,8 +95,13 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
 
                     {/* Action Icons */}
                     <div className="flex items-center gap-6 p-4 text-gray-700 text-xl">
-                        <FaHeart className={`cursor-pointer hover:text-red-500 transition-colors duration-200 ${item.is_liked_by_user == true ? "text-red-400" : "text-gray-700"}`} />
-                        <FaRegComment className="cursor-pointer hover:text-blue-400 transition-colors duration-200" />
+                        <FaHeart
+                            className={`cursor-pointer hover:text-red-500 transition-colors duration-200 ${
+                                item.is_liked_by_user ? "text-red-400" : "text-gray-700"
+                            }`}
+                            onClick={() => HandleLike(item, index)}
+                        />
+                        <FaRegComment className="cursor-pointer hover:text-blue-400 transition-colors duration-200" onClick={HandleCommentDrawer}/>
                         <FaShare className="cursor-pointer hover:text-green-400 transition-colors duration-200" />
                     </div>
 
@@ -60,6 +113,9 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
                 </div>
             ))}
         </div>
+
+        <CommentsDrawer open={CommentsDrawerState} onClose={HandleCommentDrawer}/>
+        </>
     );
 };
 
