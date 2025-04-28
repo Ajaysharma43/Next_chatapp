@@ -118,7 +118,7 @@ export const CommentsDrawer = ({ open, onClose, dispatch, imageid, userid }) => 
                 )}
 
                 {/* Add Comment */}
-                <form action="" onSubmit={formik.handleSubmit} className="flex gap-2 mt-2">
+                <form action="" onSubmit={formik.handleSubmit} className="flex gap-1 mt-2">
                     <textarea
                         name="comment"
                         value={formik.values.comment}
