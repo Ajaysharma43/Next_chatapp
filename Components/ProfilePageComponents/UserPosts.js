@@ -10,7 +10,6 @@ const formatDate = (timestamp) => {
 };
 
 const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
-    console.log(Userposts, "is the user posts");
 
     return (
         <div className="flex flex-col items-center gap-8 p-4">
@@ -48,7 +47,7 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
 
                     {/* Action Icons */}
                     <div className="flex items-center gap-6 p-4 text-gray-700 text-xl">
-                        <FaHeart className={`cursor-pointer hover:text-red-500 transition-colors duration-200 ${item.is_liked_by_user == true? "text-red-400" : "text-gray-700"}`} />
+                        <FaHeart className={`cursor-pointer hover:text-red-500 transition-colors duration-200 ${item.is_liked_by_user == true ? "text-red-400" : "text-gray-700"}`} />
                         <FaRegComment className="cursor-pointer hover:text-blue-400 transition-colors duration-200" />
                         <FaShare className="cursor-pointer hover:text-green-400 transition-colors duration-200" />
                     </div>

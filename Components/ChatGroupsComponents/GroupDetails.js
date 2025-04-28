@@ -24,7 +24,6 @@ const GroupDetails = ({ id, userid, username, onBack }) => {
     const dispatch = useDispatch()
 
     const handleGroupDetails = (GetGroupDetails, GetMembersDetails) => {
-        console.log(userid, groupDetails.created_by)
         const includesCurrentUser = GetMembersDetails.some(member => member.user_id == userid);
         // Allow if user is group creator (admin) or present in member list
         if (!includesCurrentUser && userid != GetGroupDetails[0].created_by) {
