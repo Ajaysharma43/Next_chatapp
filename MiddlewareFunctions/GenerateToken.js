@@ -3,8 +3,8 @@ import { NextResponse } from "next/server";
 
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 
-export async function generateAccessToken(id , role , username) {
-    return await new SignJWT({ id , role , username})
+export async function generateAccessToken(id , role , username , profile) {
+    return await new SignJWT({ id , role , username , profile})
         .setProtectedHeader({ alg: "HS256" , typ : "JWT" })
         .setIssuedAt()
         .setExpirationTime("2h") 

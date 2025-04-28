@@ -5,6 +5,8 @@ import { UserProfileInstance } from "@/Interseptors/UserProfileInterseptors";
 import Image from "next/image";
 import { FaHeart, FaRegComment, FaShare } from "react-icons/fa";
 import { CommentsDrawer } from "./Dialogs/CommentsDrawer";
+import { useDispatch } from "react-redux";
+import { GetComments } from "@/Redux/features/UserProfileSlice";
 
 const formatDate = (timestamp) => {
     const date = new Date(timestamp);
@@ -15,18 +17,24 @@ const formatDate = (timestamp) => {
 const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
     const [posts, setPosts] = useState([]);
     const [CommentsDrawerState , setCommentsDrawerState] = useState(false)
+    const [imageid , setimageid] = useState(null)
+    const dispatch = useDispatch()
 
     useEffect(() => {
         setPosts(Userposts); 
     }, [Userposts]);
 
-    const HandleCommentDrawer = () => {
+    const HandleCommentDrawer = async(item) => {
         if(CommentsDrawerState == true)
         {
+            setimageid(null)
             setCommentsDrawerState(false)
         }
         else
         {
+            setimageid(item.image_id)
+            let imageid = item.image_id
+            await dispatch(GetComments({imageid}))
             setCommentsDrawerState(true)
         }
     }
@@ -101,7 +109,7 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
                             }`}
                             onClick={() => HandleLike(item, index)}
                         />
-                        <FaRegComment className="cursor-pointer hover:text-blue-400 transition-colors duration-200" onClick={HandleCommentDrawer}/>
+                        <FaRegComment className="cursor-pointer hover:text-blue-400 transition-colors duration-200" onClick={() => HandleCommentDrawer(item)}/>
                         <FaShare className="cursor-pointer hover:text-green-400 transition-colors duration-200" />
                     </div>
 
@@ -114,7 +122,7 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
             ))}
         </div>
 
-        <CommentsDrawer open={CommentsDrawerState} onClose={HandleCommentDrawer}/>
+        <CommentsDrawer open={CommentsDrawerState} onClose={HandleCommentDrawer} dispatch={dispatch} imageid={imageid} userid={userid}/>
         </>
     );
 };

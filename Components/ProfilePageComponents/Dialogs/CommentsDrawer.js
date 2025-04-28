@@ -1,33 +1,95 @@
+"use client";
 import { SwipeableDrawer } from "@mui/material";
+import Image from "next/image";
+import { useSelector } from "react-redux";
+import { useFormik } from "formik";
+import { LuSend } from "react-icons/lu";
+import { AddComment } from "@/Redux/features/UserProfileSlice";
 
-export const CommentsDrawer = ({ open, onClose, comments }) => {
+
+const formatDate = (timestamp) => {
+    const date = new Date(timestamp);
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    return date.toLocaleDateString(undefined, options);
+};
+
+export const CommentsDrawer = ({ open, onClose, dispatch, imageid, userid }) => {
+    const comments = useSelector((state) => state.UserProfileSlice.ImageComments);
+    const formik = useFormik({
+        initialValues: {
+            comment: ""
+        },
+        onSubmit: (values , {resetForm}) => {
+            dispatch(AddComment({ values, imageid, userid }))
+            resetForm()
+        }
+    })
+
     return (
         <SwipeableDrawer
             anchor="bottom"
             open={open}
             onClose={onClose}
-            onOpen={() => {}}  // Required by MUI
+            onOpen={() => { }}
             PaperProps={{
-                className: "rounded-t-2xl",  // Smooth rounded top corners
+                className: "rounded-t-3xl bg-white",
             }}
         >
             {/* Puller */}
-            <div className="w-full flex justify-center py-2">
-                <div className="w-12 h-1.5 bg-gray-400 rounded-full" />
+            <div className="w-full flex justify-center py-3">
+                <div className="w-16 h-1.5 bg-gray-300 rounded-full" />
             </div>
 
-            {/* Content */}
-            <div className="p-4">
-                <h1 className="text-lg font-bold mb-4">Comments</h1>
+            {/* Header */}
+            <div className="text-center pb-4">
+                <h1 className="text-lg font-bold text-gray-800">Comments</h1>
+            </div>
+
+            {/* Comments Section */}
+            <div className="px-4 pb-6 overflow-y-auto max-h-[70vh]">
                 {comments && comments.length > 0 ? (
-                    comments.map((comment, index) => (
-                        <div key={index} className="border-b py-2">
-                            {comment}
+                    <>
+                        <div className="flex flex-col gap-6">
+                            {comments.map((comment, index) => (
+                                <div key={index} className="flex items-start gap-4">
+                                    {/* Avatar */}
+                                    <div className="flex-shrink-0">
+                                        {comment.profilepic ? (
+                                            <Image
+                                                src={comment.profilepic}
+                                                height={44}
+                                                width={44}
+                                                alt="Profile pic"
+                                                className="rounded-full object-cover w-10 h-10"
+                                            />
+                                        ) : (
+                                            <div className="w-11 h-11 bg-gradient-to-tr from-purple-500 to-pink-500 text-white rounded-full flex items-center justify-center font-bold uppercase">
+                                                {comment.name.charAt(0)}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Comment Content */}
+                                    <div className="flex flex-col bg-gray-100 p-3 rounded-2xl w-full rounded-tl-none">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h1 className="text-sm font-semibold text-gray-800">{comment.name}</h1>
+                                            <p className="text-[10px] text-gray-500">{formatDate(comment.created_at)}</p>
+                                        </div>
+                                        <p className="text-sm text-gray-700">{comment.comment}</p>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ))
+                    </>
                 ) : (
-                    <p className="text-gray-500">No comments yet.</p>
+                    <div className="text-center text-gray-400 py-10">
+                        No comments yet.
+                    </div>
                 )}
+                <form action="" onSubmit={formik.handleSubmit} className="flex gap-2 mt-2">
+                    <textarea name="comment" value={formik.values.comment} onChange={formik.handleChange} placeholder="Enter your comment" className="w-full rounded-lg focus:outline-none text-sm text-gray-700" />
+                    <button className="w-10 h-10 bg-blue-400 flex justify-center items-center rounded-full text-white transition-all duration-300 hover:text-black hover:bg-blue-500"><LuSend /></button>
+                </form>
             </div>
         </SwipeableDrawer>
     );

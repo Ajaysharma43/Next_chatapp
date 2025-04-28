@@ -20,11 +20,30 @@ export const UpdateProfilePic = createAsyncThunk('UpdateProfilePic', async ({ fo
     }
 })
 
+export const GetComments = createAsyncThunk('GetComments', async ({ imageid }) => {
+    try {
+        const res = await UserProfileInstance.get(`/GetComments?imageid=${imageid}`)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+export const AddComment = createAsyncThunk('AddComment', async ({ values, userid, imageid }) => {
+    try {
+        const res = await UserProfileInstance.post('/Comment', { comment: values.comment, imageid, userid })
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 const initialState = {
     UserDetails: [],
     UserFollowerData: [],
     UserFollowingData: [],
-    UserImagesUploadData: []
+    UserImagesUploadData: [],
+    ImageComments: []
 }
 
 const UserProfileSlice = createSlice({
@@ -40,11 +59,19 @@ const UserProfileSlice = createSlice({
 
         builder.addCase(UpdateProfilePic.fulfilled, (state, action) => {
             state.UserDetails[0].profilepic = action.payload.Userdata[0]?.profilepic;
-            Cookies.set('AccessToken' , action.payload.AccessToken)
-            Cookies.set('RefreshToken' , action.payload.RefreshToken)
-            
+            Cookies.set('AccessToken', action.payload.AccessToken)
+            Cookies.set('RefreshToken', action.payload.RefreshToken)
         });
-        
+
+        builder.addCase(GetComments.fulfilled, (state, action) => {
+            state.ImageComments = action.payload.Comments
+        })
+
+        builder.addCase(AddComment.fulfilled, (state, action) => {
+            state.ImageComments = [...state.ImageComments, action.payload.Comment[0]];
+            const ImageComments = state.UserImagesUploadData.find((item) => item.image_id === action.payload.Comment[0].image_id)
+            ImageComments.comment_count = Number(ImageComments.comment_count) + 1;
+        })
     }
 })
 
