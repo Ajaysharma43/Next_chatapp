@@ -16,7 +16,7 @@ export async function refreshAccessToken(request, refreshToken) {
         const { payload } = await jwtVerify(refreshToken, JWT_SECRET);
         if (!payload.id) throw new Error("Invalid RefreshToken: Missing user ID");
 
-        const newAccessToken = await generateAccessToken(payload.id , payload.role , payload.username);
+        const newAccessToken = await generateAccessToken(payload.id , payload.role , payload.username , payload.profile);
         const response = NextResponse.next();
 
         response.cookies.set("AccessToken", newAccessToken, {
