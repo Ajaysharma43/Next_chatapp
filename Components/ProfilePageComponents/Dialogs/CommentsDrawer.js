@@ -91,7 +91,7 @@ export const CommentsDrawer = ({ open, onClose, dispatch, imageid, userid }) => 
                                         )}
                                     </div>
 
-                                    {/* Comment Content */}
+                                    {/* Comment Content */} 
                                     <div className="flex flex-col bg-gray-100 p-3 rounded-2xl w-full rounded-tl-none relative">
                                         <div className="flex items-center justify-between mb-1">
                                             <h1 className="text-sm font-semibold text-gray-800">{comment.name}</h1>
