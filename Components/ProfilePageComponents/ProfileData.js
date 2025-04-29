@@ -70,6 +70,12 @@ const ProfileData = ({ userid, UserData }) => {
                 </div>
             </div>
 
+            <div className="flex justify-center">
+                <Link href={'/profile/upload'}>
+                <button className="bg-purple-200 p-[10px] rounded-full transition-all duration-200 hover:bg-purple-400 hover:text-white">Create a Post</button>
+                </Link>
+            </div>
+
             {/* Profile Picture Update Dialog */}
             <Dialog open={isDialogOpen} onClose={closeDialog}>
                 <UpdateProfile onClose={closeDialog} userid={userid} selectedImage={selectedImage} setSelectedImage={setSelectedImage} onSave={HandleUpdateImage} />
