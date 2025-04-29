@@ -1,11 +1,29 @@
 "use client";
 
+import { PostUpload } from "@/Redux/features/UserProfileSlice";
 import Image from "next/image";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-const UploadUserPost = ({userid , username}) => {
+const UploadUserPost = ({ userid, username }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [postDescription, setPostDescription] = useState("");
+  const UploadStatus = useSelector((state) => state.UserProfileSlice.PostUploadStatus);
+  const UploadLoading = useSelector((state) => state.UserProfileSlice.PostUploadLoading);
+  const dispatch = useDispatch();
+  const router = useRouter()
+
+  useEffect(() => {
+    if (UploadStatus === "success") {
+      alert("Post uploaded successfully!");
+      setSelectedImage(null);
+      setPostDescription("");
+      router.push('/profile')
+    } else if (UploadStatus === "failed") {
+      alert("Failed to upload post. Please try again.");
+    }
+  }, [UploadStatus]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -15,12 +33,18 @@ const UploadUserPost = ({userid , username}) => {
   };
 
   const HandleSubmit = () => {
+    if (!selectedImage || !postDescription.trim()) {
+      alert("Please select an image and add a description.");
+      return;
+    }
+
     const formdata = new FormData();
-    formdata.append('file' , selectedImage)
-    formdata.append('id' , userid)
-    formdata.append('name' , username)
-    formdata.append('description' , postDescription)
-  }
+    formdata.append("file", selectedImage);
+    formdata.append("id", userid);
+    formdata.append("name", username);
+    formdata.append("description", postDescription);
+    dispatch(PostUpload({ formdata }));
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -43,12 +67,14 @@ const UploadUserPost = ({userid , username}) => {
               hover:file:bg-blue-100 cursor-pointer"
           />
           {selectedImage && (
-            <Image
-              src={selectedImage}
-              alt="Selected"
-              fill
-              className="mt-4 rounded-md max-h-64 w-full object-cover"
-            />
+            <div className="relative w-full h-64 mt-4 rounded-md overflow-hidden">
+              <Image
+                src={URL.createObjectURL(selectedImage)}
+                alt="Selected"
+                fill
+                className="object-cover"
+              />
+            </div>
           )}
         </div>
 
@@ -68,10 +94,15 @@ const UploadUserPost = ({userid , username}) => {
 
         {/* Upload Button */}
         <button
-          className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200"
+          disabled={UploadLoading}
+          className={`w-full py-2 px-4 text-white rounded-lg transition duration-200 ${
+            UploadLoading
+              ? "bg-blue-300 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
           onClick={HandleSubmit}
         >
-          Upload Post
+          {UploadLoading ? "Uploading..." : "Upload Post"}
         </button>
       </div>
     </div>

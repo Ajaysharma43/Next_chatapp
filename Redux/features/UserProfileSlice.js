@@ -47,12 +47,23 @@ export const DeleteComment = createAsyncThunk('DeleteComment' , async ({commenti
     }
 })
 
+export const PostUpload = createAsyncThunk('PostUpload' , async ({formdata}) => {
+    try {
+        const res = await UserProfileInstance.post('/UploadImage' , (formdata))
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 const initialState = {
     UserDetails: [],
     UserFollowerData: [],
     UserFollowingData: [],
     UserImagesUploadData: [],
-    ImageComments: []
+    ImageComments: [],
+    PostUploadStatus : "",
+    PostUploadLoading : false,
 }
 
 const UserProfileSlice = createSlice({
@@ -96,7 +107,23 @@ const UserProfileSlice = createSlice({
             if (ImageComments) {
                 ImageComments.comment_count = Number(ImageComments.comment_count) - 1;
             }
-        });
+        })
+
+        builder.addCase(PostUpload.pending , (state , action) => {
+            state.PostUploadLoading = true
+            state.PostUploadStatus = "Uploading of post is started"
+        })
+
+        builder.addCase(PostUpload.fulfilled , (state , action) => {
+            state.PostUploadLoading = false
+            state.PostUploadStatus = "success"
+            state.PostUploadStatus = "completed"
+        })
+
+        builder.addCase(PostUpload.rejected , (state , action) => {
+            state.PostUploadLoading = false
+            state.PostUploadStatus = "failed to upload post"
+        })
         
     }
 })
