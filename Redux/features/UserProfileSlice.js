@@ -38,7 +38,7 @@ export const AddComment = createAsyncThunk('AddComment', async ({ values, userid
     }
 })
 
-export const DeleteComment = createAsyncThunk('DeleteComment' , async ({commentid , imageid}) => {
+export const DeleteComment = createAsyncThunk('DeleteComment', async ({ commentid, imageid }) => {
     try {
         const res = await UserProfileInstance.delete(`/DeleteComment?commentid=${commentid}&imageid=${imageid}`)
         return res.data
@@ -47,9 +47,19 @@ export const DeleteComment = createAsyncThunk('DeleteComment' , async ({commenti
     }
 })
 
-export const PostUpload = createAsyncThunk('PostUpload' , async ({formdata}) => {
+export const PostUpload = createAsyncThunk('PostUpload', async ({ formdata }) => {
     try {
-        const res = await UserProfileInstance.post('/UploadImage' , (formdata))
+        const res = await UserProfileInstance.post('/UploadImage', (formdata))
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+
+export const GetFriendsPosts = createAsyncThunk('GetFriendsPosts', async ({ userid }) => {
+    try {
+        const res = await UserProfileInstance.get(`/GetFriendsPosts?userid=${userid}`)
         return res.data
     } catch (error) {
         console.error(error)
@@ -62,13 +72,19 @@ const initialState = {
     UserFollowingData: [],
     UserImagesUploadData: [],
     ImageComments: [],
-    PostUploadStatus : "",
-    PostUploadLoading : false,
+    FriendsPosts: [],
+    PostUploadStatus: "",
+    PostUploadLoading: false,
 }
 
 const UserProfileSlice = createSlice({
     initialState: initialState,
     name: 'UserProfileSlice',
+    reducers: {
+        UpdateUploadStatus: (state, action) => {
+            state.PostUploadStatus = ""
+        }
+    },
     extraReducers: (builder) => {
         builder.addCase(GetUserProfileData.fulfilled, (state, action) => {
             state.UserDetails = action.payload.UserDetails
@@ -98,34 +114,38 @@ const UserProfileSlice = createSlice({
             state.ImageComments = state.ImageComments.filter(
                 (comment) => comment.id !== parseInt(action.payload.id)
             );
-        
+
             // Find the corresponding image and update the comment count
             const ImageComments = state.UserImagesUploadData.find(
                 (item) => item.image_id === parseInt(action.payload.imageid)
             );
-        
+
             if (ImageComments) {
                 ImageComments.comment_count = Number(ImageComments.comment_count) - 1;
             }
         })
 
-        builder.addCase(PostUpload.pending , (state , action) => {
+        builder.addCase(PostUpload.pending, (state, action) => {
             state.PostUploadLoading = true
             state.PostUploadStatus = "Uploading of post is started"
         })
 
-        builder.addCase(PostUpload.fulfilled , (state , action) => {
+        builder.addCase(PostUpload.fulfilled, (state, action) => {
             state.PostUploadLoading = false
             state.PostUploadStatus = "success"
-            state.PostUploadStatus = "completed"
         })
 
-        builder.addCase(PostUpload.rejected , (state , action) => {
+        builder.addCase(PostUpload.rejected, (state, action) => {
             state.PostUploadLoading = false
             state.PostUploadStatus = "failed to upload post"
         })
-        
+
+        builder.addCase(GetFriendsPosts.fulfilled , (state , action) => {
+            state.FriendsPosts = action.payload.FriendsPosts
+        })
+
     }
 })
 
+export const { UpdateUploadStatus } = UserProfileSlice.actions
 export default UserProfileSlice.reducer

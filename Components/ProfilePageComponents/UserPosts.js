@@ -54,8 +54,8 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
                                   ...post,
                                   is_liked_by_user: !post.is_liked_by_user,
                                   like_count: post.is_liked_by_user
-                                      ? post.like_count - 1
-                                      : post.like_count + 1,
+                                      ? parseInt(post.like_count) - 1
+                                      : parseInt(post.like_count) + 1,
                               }
                             : post
                     )
@@ -113,7 +113,7 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
                         <FaShare className="cursor-pointer hover:text-green-400 transition-colors duration-200" />
                     </div>
 
-                    <div className="pl-4 capitalize text-gray-700 text-xl">
+                    <div className="pl-4 capitalize text-gray-700 text-sm">
                         <h1>{item.description}</h1>
                     </div>
 

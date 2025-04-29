@@ -2,7 +2,7 @@
 
 import ProfileData from "@/Components/ProfilePageComponents/ProfileData"
 import UserPostsData from "@/Components/ProfilePageComponents/UserPostsDataComponent"
-import { GetUserProfileData } from "@/Redux/features/UserProfileSlice"
+import { GetUserProfileData, UpdateUploadStatus } from "@/Redux/features/UserProfileSlice"
 import Cookies from "js-cookie"
 import { jwtDecode } from "jwt-decode"
 import { useEffect, useState } from "react"
@@ -12,8 +12,16 @@ const ProfilePage = () => {
     const [userid, setUserid] = useState(null)
     const [loading, setLoading] = useState(true)
     const UserPosts = useSelector((state) => state.UserProfileSlice.UserImagesUploadData)
+    const UploadStatus = useSelector((state) => state.UserProfileSlice.PostUploadStatus);
     const UserData = useSelector((state) => state.UserProfileSlice.UserDetails)
     const dispatch = useDispatch()
+
+    useEffect(() => {
+        if(UploadStatus == 'success')
+        {
+           dispatch(UpdateUploadStatus()) 
+        }
+    },[UploadStatus])
 
     useEffect(() => {
         const Token = Cookies.get('AccessToken')
