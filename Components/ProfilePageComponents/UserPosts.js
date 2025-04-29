@@ -113,6 +113,10 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
                         <FaShare className="cursor-pointer hover:text-green-400 transition-colors duration-200" />
                     </div>
 
+                    <div className="pl-4 capitalize text-gray-700 text-xl">
+                        <h1>{item.description}</h1>
+                    </div>
+
                     {/* Like and Comment Count */}
                     <div className="px-4 pb-4 flex flex-col gap-1 text-sm text-gray-700">
                         <p className="font-semibold">{item.like_count} likes</p>
