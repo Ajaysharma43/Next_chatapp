@@ -4,6 +4,9 @@ import { UserProfileInstance } from "@/Interseptors/UserProfileInterseptors";
 import Image from "next/image"
 import { useEffect, useState } from "react";
 import { FaHeart, FaRegComment, FaShare } from "react-icons/fa"
+import { useDispatch } from "react-redux";
+import { GetComments } from "@/Redux/features/UserProfileSlice";
+import { CommentsDrawer } from "../ProfilePageComponents/Dialogs/CommentsDrawer";
 
 const formatDate = (timestamp) => {
     const date = new Date(timestamp);
@@ -13,41 +16,57 @@ const formatDate = (timestamp) => {
 
 const FriendsPosts = ({ userid, username, posts }) => {
     const [post, setPosts] = useState([]);
+    const [commentdrawer, setcommentdrawer] = useState(false)
+    const [imageid, setimageid] = useState(null)
+    const dispatch = useDispatch()
 
     useEffect(() => {
-            setPosts(posts); 
-        }, [posts]);
-    
-    const HandleLike = async (item, index) => {
-            try {
-                const LikeStatus = await UserProfileInstance.post("/Checklikes", {
-                    imageid: item.id,
-                    userid: userid,
-                });
+        setPosts(posts);
+    }, [posts]);
 
-                if (LikeStatus.data.success === true) {
-                    setPosts((prevPosts) =>
-                        prevPosts.map((post, idx) =>
-                            idx === index
-                                ? {
-                                      ...post,
-                                      is_liked_by_user: !post.is_liked_by_user,
-                                      like_count: post.is_liked_by_user
-                                          ? parseInt(post.like_count) - 1
-                                          : parseInt(post.like_count) + 1,
-                                  }
-                                : post
-                        )
-                    );
-                }
-            } catch (error) {
-                console.error("Error while liking:", error);
+    const HandleCommentDrawer = async (item) => {
+        if (commentdrawer == true) {
+            setimageid(null)
+            setcommentdrawer(false)
+        }
+        else {
+            setimageid(item.id)
+            let imageid = item.id
+            await dispatch(GetComments({ imageid }))
+            setcommentdrawer(true)
+        }
+    }
+
+    const HandleLike = async (item, index) => {
+        try {
+            const LikeStatus = await UserProfileInstance.post("/Checklikes", {
+                imageid: item.id,
+                userid: userid,
+            });
+
+            if (LikeStatus.data.success === true) {
+                setPosts((prevPosts) =>
+                    prevPosts.map((post, idx) =>
+                        idx === index
+                            ? {
+                                ...post,
+                                is_liked_by_user: !post.is_liked_by_user,
+                                like_count: post.is_liked_by_user
+                                    ? parseInt(post.like_count) - 1
+                                    : parseInt(post.like_count) + 1,
+                            }
+                            : post
+                    )
+                );
             }
-        };
+        } catch (error) {
+            console.error("Error while liking:", error);
+        }
+    };
 
     return (
         <>
-            <div>
+            <div className="flex flex-col items-center gap-8 p-4">
                 {post.map((item, index) => (
                     <div
                         key={item.id}
@@ -103,6 +122,8 @@ const FriendsPosts = ({ userid, username, posts }) => {
                     </div>
                 ))}
             </div>
+
+            <CommentsDrawer open={commentdrawer} onClose={HandleCommentDrawer} dispatch={dispatch} imageid={imageid} userid={userid}/>
         </>
     )
 }
