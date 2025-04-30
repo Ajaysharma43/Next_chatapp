@@ -175,7 +175,7 @@ const UserProfileSlice = createSlice({
 
         builder.addCase(DeletePost.fulfilled , (state , action) => {
             state.UserImagesUploadData = state.UserImagesUploadData.filter(
-                (item) => item.id !== parseInt(action.payload.imageid)
+                (item) => item.image_id !== parseInt(action.payload.imageid)
             );
         })
 
