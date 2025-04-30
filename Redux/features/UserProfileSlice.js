@@ -67,6 +67,15 @@ export const GetFriendsPosts = createAsyncThunk('GetFriendsPosts', async ({ user
     }
 })
 
+export const DeletePost = createAsyncThunk('DeletePost' , async ({ imageurl , userid , imageid}) => {
+    try {
+        const res = await UserProfileInstance.delete(`/DeletePost?imageUrl=${imageurl}&userid=${userid}&imageid=${imageid}`)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 const initialState = {
     UserDetails: [],
     UserFollowerData: [],
@@ -162,6 +171,12 @@ const UserProfileSlice = createSlice({
 
         builder.addCase(GetFriendsPosts.fulfilled, (state, action) => {
             state.FriendsPosts = action.payload.FriendsPosts
+        })
+
+        builder.addCase(DeletePost.fulfilled , (state , action) => {
+            state.UserImagesUploadData = state.UserImagesUploadData.filter(
+                (item) => item.id !== parseInt(action.payload.imageid)
+            );
         })
 
     }
