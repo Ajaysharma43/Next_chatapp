@@ -1,52 +1,93 @@
-"use client"
+"use client";
 
-import ProfileData from "@/Components/ProfilePageComponents/ProfileData"
-import UserPostsData from "@/Components/ProfilePageComponents/UserPostsDataComponent"
-import { GetUserProfileData, UpdateUploadStatus } from "@/Redux/features/UserProfileSlice"
-import Cookies from "js-cookie"
-import { jwtDecode } from "jwt-decode"
-import { useEffect, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
+import ProfileData from "@/Components/ProfilePageComponents/ProfileData";
+import UserPostsData from "@/Components/ProfilePageComponents/UserPostsDataComponent";
+import { GetUserProfileData, UpdateUploadStatus } from "@/Redux/features/UserProfileSlice";
+import { Container, Tab, Tabs } from "@mui/material";
+import Cookies from "js-cookie";
+import { jwtDecode } from "jwt-decode";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { MdPhotoLibrary, MdVisibilityOff } from "react-icons/md";
+
+// TabPanel component
+const TabPanel = ({ children, value, index }) => {
+  return value === index ? <div>{children}</div> : null;
+};
 
 const ProfilePage = () => {
-    const [userid, setUserid] = useState(null)
-    const [loading, setLoading] = useState(true)
-    const UserPosts = useSelector((state) => state.UserProfileSlice.UserImagesUploadData)
-    const UploadStatus = useSelector((state) => state.UserProfileSlice.PostUploadStatus);
-    const UserData = useSelector((state) => state.UserProfileSlice.UserDetails)
-    const dispatch = useDispatch()
+  const [userid, setUserid] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [tabIndex, setTabIndex] = useState(0);
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-        if(UploadStatus == 'success')
-        {
-           dispatch(UpdateUploadStatus()) 
-        }
-    },[UploadStatus])
+  const UserPosts = useSelector((state) => state.UserProfileSlice.UserImagesUploadData);
+  const UploadStatus = useSelector((state) => state.UserProfileSlice.PostUploadStatus);
+  const UserData = useSelector((state) => state.UserProfileSlice.UserDetails);
 
-    useEffect(() => {
-        const Token = Cookies.get('AccessToken')
-        if (Token) {
-            try {
-                const decode = jwtDecode(Token)
-                setUserid(decode.id)
-                dispatch(GetUserProfileData({ userid : decode.id }))
-            } catch (error) {
-                console.error("Invalid token:", error)
-            }
-        }
-        setLoading(false)
-    }, [])
+  const handleTabChange = (event, newValue) => {
+    setTabIndex(newValue);
+  };
 
-    if (loading || !userid) {
-        return null // Or replace with a loader/spinner if you want
+  useEffect(() => {
+    if (UploadStatus === "success") {
+      dispatch(UpdateUploadStatus());
     }
+  }, [UploadStatus]);
 
-    return (
-        <div className="p-4">
-            <ProfileData userid={userid} UserData={UserData}/>
-            <UserPostsData userid={userid} UserPosts={UserPosts}/>
-        </div>
-    )
-}
+  useEffect(() => {
+    const Token = Cookies.get("AccessToken");
+    if (Token) {
+      try {
+        const decode = jwtDecode(Token);
+        setUserid(decode.id);
+        dispatch(GetUserProfileData({ userid: decode.id }));
+      } catch (error) {
+        console.error("Invalid token:", error);
+      }
+    }
+    setLoading(false);
+  }, []);
 
-export default ProfilePage
+  if (loading || !userid) {
+    return <div className="text-center py-8 text-gray-500">Loading...</div>;
+  }
+
+  return (
+    <div className="p-4">
+      <ProfileData userid={userid} UserData={UserData} />
+
+      <Container maxWidth="sm">
+        <Tabs
+          value={tabIndex}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          centered
+          sx={{ mb: 2 }}
+        >
+          <Tab
+            icon={<MdPhotoLibrary size={20} />}
+            label="User Posts"
+            iconPosition="start"
+          />
+          <Tab
+            icon={<MdVisibilityOff size={20} />}
+            label="Hidden Posts"
+            iconPosition="start"
+          />
+        </Tabs>
+
+        <TabPanel value={tabIndex} index={0}>
+          <UserPostsData userid={userid} UserPosts={UserPosts} />
+        </TabPanel>
+
+        <TabPanel value={tabIndex} index={1}>
+          <div className="text-center text-gray-500">No hidden posts available.</div>
+        </TabPanel>
+      </Container>
+    </div>
+  );
+};
+
+export default ProfilePage;

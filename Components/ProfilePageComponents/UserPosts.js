@@ -89,8 +89,10 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
                         key={item.image_id}
                         className="w-full max-w-md bg-white shadow-lg rounded-2xl overflow-hidden"
                     >
-                        {/* User Info */}
-                        <div className="flex justify-between">
+                        {
+                            item.hidden == false && (
+                                <>
+                                <div className="flex justify-between">
                             <div className="flex items-center gap-3 p-4">
                                 <Image
                                     src={UserProfile || "/default_profile.png"}
@@ -142,6 +144,11 @@ const UserPostsComponent = ({ userid, Userposts, UserProfile }) => {
                             <p className="font-semibold">{item.like_count} likes</p>
                             <p className="text-gray-600">{item.comment_count} comments</p>
                         </div>
+                                </>
+                            )
+                        }
+                        {/* User Info */}
+                        
                     </div>
                 ))}
             </div>

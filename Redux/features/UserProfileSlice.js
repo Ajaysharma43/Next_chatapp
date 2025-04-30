@@ -67,9 +67,18 @@ export const GetFriendsPosts = createAsyncThunk('GetFriendsPosts', async ({ user
     }
 })
 
-export const DeletePost = createAsyncThunk('DeletePost' , async ({ imageurl , userid , imageid}) => {
+export const DeletePost = createAsyncThunk('DeletePost', async ({ imageurl, userid, imageid }) => {
     try {
         const res = await UserProfileInstance.delete(`/DeletePost?imageUrl=${imageurl}&userid=${userid}&imageid=${imageid}`)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+export const HidePost = createAsyncThunk('HidePost', async ({ imageid }) => {
+    try {
+        const res = await UserProfileInstance.post('/HidePost', { imageid })
         return res.data
     } catch (error) {
         console.error(error)
@@ -173,11 +182,27 @@ const UserProfileSlice = createSlice({
             state.FriendsPosts = action.payload.FriendsPosts
         })
 
-        builder.addCase(DeletePost.fulfilled , (state , action) => {
+        builder.addCase(DeletePost.fulfilled, (state, action) => {
             state.UserImagesUploadData = state.UserImagesUploadData.filter(
                 (item) => item.image_id !== parseInt(action.payload.imageid)
             );
         })
+
+        builder.addCase(HidePost.fulfilled, (state, action) => {
+            const updatedData = state.UserImagesUploadData.map((item) => {
+              if (item.id == action.payload.imageid) {
+                return {
+                  ...item,
+                  hidden: action.payload.hidden,
+                };
+              }
+              return item;
+            });
+          
+            state.UserImagesUploadData = updatedData;
+          });
+          
+
 
     }
 })
