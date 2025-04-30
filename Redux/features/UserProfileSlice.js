@@ -60,6 +60,7 @@ export const PostUpload = createAsyncThunk('PostUpload', async ({ formdata }) =>
 export const GetFriendsPosts = createAsyncThunk('GetFriendsPosts', async ({ userid }) => {
     try {
         const res = await UserProfileInstance.get(`/GetFriendsPosts?userid=${userid}`)
+        console.log(res.data)
         return res.data
     } catch (error) {
         console.error(error)
@@ -104,10 +105,23 @@ const UserProfileSlice = createSlice({
         })
 
         builder.addCase(AddComment.fulfilled, (state, action) => {
+            // Add the new comment to the list
             state.ImageComments = [...state.ImageComments, action.payload.Comment[0]];
-            const ImageComments = state.UserImagesUploadData.find((item) => item.image_id === action.payload.Comment[0].image_id)
-            ImageComments.comment_count = Number(ImageComments.comment_count) + 1;
-        })
+
+            const imageId = action.payload.Comment[0].image_id;
+
+            // Update comment count in UserImagesUploadData if it exists
+            const userPost = state.UserImagesUploadData.find((item) => item.image_id === imageId);
+            if (userPost) {
+                userPost.comment_count = parseInt(userPost.comment_count) + 1;
+            }
+            // Update comment count in FriendsPosts if it exists
+            const friendPost = state.FriendsPosts.find((item) => item.id === imageId);
+            if (friendPost) {
+                friendPost.comment_count = parseInt(friendPost.comment_count) + 1;
+            }
+        });
+
 
         builder.addCase(DeleteComment.fulfilled, (state, action) => {
             // Remove the comment from the ImageComments array
@@ -117,11 +131,17 @@ const UserProfileSlice = createSlice({
 
             // Find the corresponding image and update the comment count
             const ImageComments = state.UserImagesUploadData.find(
-                (item) => item.image_id === parseInt(action.payload.imageid)
+                (item) => item.image_id === parseInt(action.payload.imageid) || item.id === parseInt(action.payload.imageid)
             );
 
             if (ImageComments) {
-                ImageComments.comment_count = Number(ImageComments.comment_count) - 1;
+                ImageComments.comment_count = parseInt(ImageComments.comment_count) - 1;
+            }
+
+            const friendPost = state.FriendsPosts.find((item) => item.id === parseInt(action.payload.imageid));
+            console.log(friendPost)
+            if (friendPost) {
+                friendPost.comment_count = parseInt(friendPost.comment_count) - 1;
             }
         })
 
@@ -140,7 +160,7 @@ const UserProfileSlice = createSlice({
             state.PostUploadStatus = "failed to upload post"
         })
 
-        builder.addCase(GetFriendsPosts.fulfilled , (state , action) => {
+        builder.addCase(GetFriendsPosts.fulfilled, (state, action) => {
             state.FriendsPosts = action.payload.FriendsPosts
         })
 
