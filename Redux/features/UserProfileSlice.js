@@ -92,8 +92,9 @@ const initialState = {
     UserImagesUploadData: [],
     ImageComments: [],
     FriendsPosts: [],
+    HiddenPosts: [],
     PostUploadStatus: "",
-    PostUploadLoading: false,
+    PostUploadLoading: false
 }
 
 const UserProfileSlice = createSlice({
@@ -110,6 +111,7 @@ const UserProfileSlice = createSlice({
             state.UserFollowerData = action.payload.UserFollowerData
             state.UserFollowingData = action.payload.UserFollowingData
             state.UserImagesUploadData = action.payload.UserImagesUploadData
+            state.HiddenPosts = action.payload.UserHiddenPostsData
         })
 
         builder.addCase(UpdateProfilePic.fulfilled, (state, action) => {
@@ -189,20 +191,17 @@ const UserProfileSlice = createSlice({
         })
 
         builder.addCase(HidePost.fulfilled, (state, action) => {
-            const updatedData = state.UserImagesUploadData.map((item) => {
-              if (item.id == action.payload.imageid) {
-                return {
-                  ...item,
-                  hidden: action.payload.hidden,
-                };
-              }
-              return item;
-            });
-          
-            state.UserImagesUploadData = updatedData;
-          });
-          
-
+            if (action.payload.hidden == true) {
+                state.UserImagesUploadData = state.UserImagesUploadData.filter(
+                    (item) => item.image_id !== parseInt(action.payload.imageid)
+                );
+            }
+            else {
+                state.HiddenPosts = state.HiddenPosts.filter(
+                    (item) => item.image_id !== parseInt(action.payload.imageid)
+                )
+            }
+        });
 
     }
 })

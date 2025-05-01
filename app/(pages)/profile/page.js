@@ -9,6 +9,7 @@ import { jwtDecode } from "jwt-decode";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { MdPhotoLibrary, MdVisibilityOff } from "react-icons/md";
+import UserHiddenPostsData from "@/Components/ProfilePageComponents/HiddenPostComponent";
 
 // TabPanel component
 const TabPanel = ({ children, value, index }) => {
@@ -24,6 +25,7 @@ const ProfilePage = () => {
   const UserPosts = useSelector((state) => state.UserProfileSlice.UserImagesUploadData);
   const UploadStatus = useSelector((state) => state.UserProfileSlice.PostUploadStatus);
   const UserData = useSelector((state) => state.UserProfileSlice.UserDetails);
+  const HiddenPostsData = useSelector((state) => state.UserProfileSlice.HiddenPosts);
 
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
@@ -83,7 +85,7 @@ const ProfilePage = () => {
         </TabPanel>
 
         <TabPanel value={tabIndex} index={1}>
-          <div className="text-center text-gray-500">No hidden posts available.</div>
+          <UserHiddenPostsData userid={userid} UserPosts={HiddenPostsData} />
         </TabPanel>
       </Container>
     </div>

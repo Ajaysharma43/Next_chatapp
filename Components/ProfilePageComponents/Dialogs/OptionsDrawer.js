@@ -6,7 +6,7 @@ import { useState } from "react";
 import DeleteUserPost from "./DeletePostDialog";
 import HidePostDialog from "./HidePostDialog";
 
-const OptionsDrawer = ({ open, onClose, dispatch, imageid, userid, imageurl }) => {
+const OptionsDrawer = ({ open, onClose, dispatch, imageid, userid, imageurl , isHidden }) => {
     const [ViewDialog, setViewDialog] = useState(false)
     const [DeletePostDialog, setDeletePostDialog] = useState(false)
     const [HidePoststate, setHidePoststate] = useState(false)
@@ -45,7 +45,7 @@ const OptionsDrawer = ({ open, onClose, dispatch, imageid, userid, imageurl }) =
     const options = [
         { label: "View Image", icon: <HiOutlineEye />, onClick: handleView },
         { label: "Download", icon: <HiOutlineDownload />, onClick: handleDownload },
-        { label: "Hide Post", icon: <HiOutlineEyeOff />, onClick: handleHide },
+        { label: isHidden == true ? "UnHide Post" : "Hide Post", icon: isHidden == true ? <HiOutlineEye /> : <HiOutlineEyeOff />, onClick: handleHide },
         { label: "Delete Post", icon: <HiOutlineTrash />, onClick: handleDelete, color: "text-red-600" },
     ];
 
