@@ -11,7 +11,9 @@ import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
-import Image from "next/image";
+import ProfilePage from "../../profile/page";
+import SingleProfileData from "@/Components/SingleUserComponents/Profile";
+import SingleUserPostsData from "@/Components/SingleUserComponents/Uploads";
 
 const SingleUser = () => {
   const { id } = useParams();
@@ -23,24 +25,24 @@ const SingleUser = () => {
   const SingleUserData = useSelector((state) => state.UserReducer.SingleUser);
   const UsersRelation = useSelector((state) => state.UserReducer.UsersRelation);
   const IsUserFriends = useSelector((state) => state.UserReducer.IsUserFriends);
-  const IsUserSearchLoading = useSelector((state) => state.UserReducer.IsUserSearchLoading);
+  const ImagesData = useSelector((state) => state.UserReducer.ImagesData);
+  const IsUserSearchLoading = useSelector(
+    (state) => state.UserReducer.IsUserSearchLoading
+  );
   const senderid = useSelector((state) => state.UserReducer.senderid);
 
+  const Userdata = [SingleUserData];
+
   useEffect(() => {
-    const fetchUser = () => {
-      const token = Cookies.get("AccessToken");
-
-      try {
-        const decode = jwtDecode(token);
-        setCurrentUserId(decode.id);
-        setData({ sender: decode.id, receiver: parseInt(id) });
-        dispatch(GetSingleUser({ id, currentUserId: decode.id }));
-      } catch (error) {
-        console.error("Error decoding token:", error);
-      }
-    };
-
-    fetchUser();
+    const token = Cookies.get("AccessToken");
+    try {
+      const decode = jwtDecode(token);
+      setCurrentUserId(decode.id);
+      setData({ sender: decode.id, receiver: parseInt(id) });
+      dispatch(GetSingleUser({ id, currentUserId: decode.id }));
+    } catch (error) {
+      console.error("Error decoding token:", error);
+    }
   }, [id, dispatch]);
 
   const handleSendFriendRequest = () => {
@@ -57,130 +59,83 @@ const SingleUser = () => {
     );
   }
 
+  if (currentUserId == id) {
+    return <ProfilePage />;
+  }
+
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 px-4">
+    <div className="min-h-screen bg-white text-black w-full px-4 md:px-10 py-6">
       <motion.div
-        className="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-6 sm:p-10 border border-gray-200"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
+        className="max-w-4xl mx-auto"
       >
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">
-          {currentUserId == id ? "Your Profile" : "User Profile"}
-        </h1>
-
         {SingleUserData ? (
-          <motion.div
-            className="bg-gray-50 rounded-xl p-6 space-y-6 shadow-inner"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
-            {/* Profile Picture */}
-            <div className="flex flex-col items-center space-y-2">
-              <div className="relative w-28 h-28 rounded-full overflow-hidden shadow-lg bg-gray-200">
-                {SingleUserData.profilepic ? (
-                  <Image
-                    src={SingleUserData.profilepic}
-                    alt={SingleUserData.name}
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-white text-3xl font-semibold bg-gray-500">
-                    {SingleUserData.name?.[0]?.toUpperCase()}
-                  </div>
-                )}
-              </div>
-              <h2 className="text-2xl font-semibold text-gray-900">{SingleUserData.name}</h2>
-              {currentUserId == id && (
-                <p className="text-gray-500">{SingleUserData.email}</p>
-              )}
-            </div>
-
-            {/* User Info */}
-            {currentUserId == id ? (
-              <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
-                <p><strong>Phone:</strong> {SingleUserData.phone}</p>
-                <p><strong>City:</strong> {SingleUserData.city}</p>
-                <p><strong>Country:</strong> {SingleUserData.country}</p>
-                <p><strong>Street:</strong> {SingleUserData.street}</p>
-                <p><strong>Postal Code:</strong> {SingleUserData.postal_code}</p>
-                <p><strong>Role:</strong> {SingleUserData.roles}</p>
-                <p><strong>Created:</strong> {new Date(SingleUserData.created_at).toLocaleDateString()}</p>
-              </div>
-            ) : (
-              <p className="text-center text-gray-600 mt-2">
-                Only limited details are visible.
-              </p>
-            )}
-
-            {/* Friend Action Buttons */}
-            {currentUserId == id ? (
-              <p className="text-green-600 font-semibold text-center mt-4">
-                This is your profile.
-              </p>
-            ) : (
-              <div className="flex justify-center mt-6">
-                {IsUserFriends ? (
-                  UsersRelation === "request_sent" ? (
-                    senderid == currentUserId ? (
-                      <button
-                        className="bg-yellow-400 text-white px-5 py-2 rounded-xl font-medium shadow-sm cursor-not-allowed"
-                        disabled
-                      >
-                        Request Sent ✅
-                      </button>
+          <>
+            {/* Profile Section with Action Buttons */}
+            <SingleProfileData
+              UserData={Userdata}
+              buttons={
+                <div className="flex gap-4 flex-wrap justify-center md:justify-start mt-4">
+                  {IsUserFriends ? (
+                    UsersRelation === "request_sent" ? (
+                      senderid == currentUserId ? (
+                        <button
+                          className="bg-gray-300 text-gray-700 px-5 py-2 rounded-md font-medium shadow-sm cursor-not-allowed"
+                          disabled
+                        >
+                          Request Sent
+                        </button>
+                      ) : (
+                        <>
+                          <motion.button
+                            className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-md font-medium shadow-md"
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => dispatch(AcceptRequest({ data }))}
+                          >
+                            Accept
+                          </motion.button>
+                          <motion.button
+                            className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md font-medium shadow-md"
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => dispatch(DeclineRequest({ data }))}
+                          >
+                            Reject
+                          </motion.button>
+                        </>
+                      )
                     ) : (
-                      <div className="flex gap-4">
-                        <motion.button
-                          className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-xl font-medium shadow-md"
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => dispatch(AcceptRequest({ data }))}
-                        >
-                          Accept
-                        </motion.button>
-                        <motion.button
-                          className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-xl font-medium shadow-md"
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => dispatch(DeclineRequest({ data }))}
-                        >
-                          Reject
-                        </motion.button>
-                      </div>
-                    )
-                  ) : (
-                    <div className="flex gap-2">
-                      <button className="bg-green-600 text-white px-5 py-2 rounded-xl font-medium shadow">
+                      <button className="bg-black text-white px-5 py-2 rounded-md font-medium shadow">
                         Friends 👥
                       </button>
-                      <button className="bg-green-600 text-white px-5 py-2 rounded-xl font-medium shadow">
-                        Chat 💬
-                      </button>
-                    </div>
-                  )
-                ) : (
-                  <div className="flex gap-2 justify-center">
-                    {UsersRelation === "request_received" ? (
-                      <button
-                        className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-xl font-medium shadow-md"
-                      >
-                        Accept Request ✅
-                      </button>
-                    ) : (
-                      <motion.button
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-xl font-medium shadow-md"
-                        whileTap={{ scale: 0.95 }}
-                        onClick={handleSendFriendRequest}
-                      >
-                        Send Friend Request
-                      </motion.button>
-                    )}
-                  </div>
-                )}
-              </div>
-            )}
-          </motion.div>
+                    )
+                  ) : UsersRelation === "request_received" ? (
+                    <motion.button
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2 rounded-md font-medium shadow-md"
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => dispatch(AcceptRequest({ data }))}
+                    >
+                      Accept Request ✅
+                    </motion.button>
+                  ) : (
+                    <motion.button
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md font-medium shadow-md"
+                      whileTap={{ scale: 0.95 }}
+                      onClick={handleSendFriendRequest}
+                    >
+                      Send Friend Request
+                    </motion.button>
+                  )}
+                </div>
+              }
+            />
+
+            {/* Posts Section */}
+            <div className="mt-8">
+              <SingleUserPostsData UserPosts={ImagesData} />
+            </div>
+          </>
         ) : (
           <h2 className="text-center text-gray-500 mt-6">No user found</h2>
         )}

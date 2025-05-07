@@ -89,6 +89,9 @@ const initialState = {
     Friends: [],
     RecieveRequests: [],
     BlockedUser: [],
+    ImagesData : [],
+    FollowersData : [],
+    FollowingData : [],
     IsSearchLoading: false,
     IsUserSearchLoading: false,
     AddFriendsLoading: false,
@@ -122,6 +125,9 @@ const UserReducer = createSlice({
         })
         builder.addCase(GetSingleUser.fulfilled, (state, action) => {
             state.SingleUser = action.payload?.user
+            state.ImagesData = action.payload?.UserImagesUploadData,
+            state.FollowersData = action.payload.UserFollowerData,
+            state.FollowingData = action.payload.UserFollowingData,
             state.IsUserFriends = action.payload?.relation
             state.UsersRelation = action.payload?.relationshipStatus
             state.senderid = action.payload?.sender?.sender_id
