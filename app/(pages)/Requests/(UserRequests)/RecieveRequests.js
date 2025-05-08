@@ -1,47 +1,60 @@
 "use client";
+import Image from "next/image";
 import { AcceptRequest } from "@/Redux/features/UserSlice";
 import { UserPlus } from "lucide-react";
 import { useDispatch } from "react-redux";
 
 const ReceivedRequests = ({ requests, userId }) => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
+    const receivedRequests = requests?.filter((req) => req.receiver_id === userId);
+
     return (
         <section>
-            <div className="flex items-center justify-center gap-3 mb-8">
-                <UserPlus className="text-purple-600" size={26} />
-                <h2 className="text-2xl font-bold text-purple-700">Received Requests</h2>
-            </div>
 
-            {requests && requests.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {requests.map(
-                        (request) =>
-                            request.receiver_id === userId && (
-                                <div
-                                    key={request.id}
-                                    className="bg-white rounded-2xl shadow-md hover:shadow-xl p-6 border border-purple-100 transition duration-300"
-                                >
-                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                                        Request #{request.id}
-                                    </h3>
-                                    <p className="text-sm text-gray-600">
-                                        <strong>From:</strong> {request.sender_id}
+            {receivedRequests?.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-4">
+                    {receivedRequests.map((request) => (
+                        <div
+                            key={request.id}
+                            className="flex items-center justify-between bg-white border rounded-2xl shadow-sm p-4 hover:shadow-md transition"
+                        >
+                            <div className="flex items-center gap-4">
+                                <Image
+                                    src={request.profilepic}
+                                    alt={request.name}
+                                    width={50}
+                                    height={50}
+                                    className="rounded-full object-cover w-12 h-12"
+                                />
+                                <div>
+                                    <p className="font-semibold text-gray-800">{request.name}</p>
+                                    <p className="text-sm text-gray-500">
+                                        Received: {new Date(request.created_at).toLocaleDateString()}
                                     </p>
-                                    <p className="text-sm text-gray-500 mt-1">
-                                        <strong>Received:</strong> {new Date(request.created_at).toLocaleString()}
-                                    </p>
-                                    <div className="mt-4 flex gap-3">
-                                        <button className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl shadow transition"
-                                        onClick={() => dispatch(AcceptRequest({data : {sender : request.sender_id , receiver : request.receiver_id} }))}>
-                                            Accept
-                                        </button>
-                                        <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl shadow transition">
-                                            Decline
-                                        </button>
-                                    </div>
                                 </div>
-                            )
-                    )}
+                            </div>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() =>
+                                        dispatch(
+                                            AcceptRequest({
+                                                data: {
+                                                    sender: request.sender_id,
+                                                    receiver: request.receiver_id,
+                                                },
+                                            })
+                                        )
+                                    }
+                                    className="bg-green-500 hover:bg-green-600 text-white text-sm px-3 py-1.5 rounded-xl"
+                                >
+                                    Accept
+                                </button>
+                                <button className="bg-red-500 hover:bg-red-600 text-white text-sm px-3 py-1.5 rounded-xl">
+                                    Decline
+                                </button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             ) : (
                 <p className="text-center text-gray-500">No received requests found.</p>

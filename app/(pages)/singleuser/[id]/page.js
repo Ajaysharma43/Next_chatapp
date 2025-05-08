@@ -133,7 +133,7 @@ const SingleUser = () => {
 
             {/* Posts Section */}
             <div className="mt-8">
-              <SingleUserPostsData UserPosts={ImagesData} />
+              <SingleUserPostsData UserPosts={ImagesData} id={id}/>
             </div>
           </>
         ) : (

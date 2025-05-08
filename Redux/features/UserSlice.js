@@ -19,6 +19,24 @@ export const GetSingleUser = createAsyncThunk('GetSingleUser', async ({ id, curr
     }
 })
 
+export const GetFollowerAndFollowingData = createAsyncThunk('GetFollowerAndFollowingData', async ({ id }) => {
+    try {
+        const res = await UsersInstance.get(`/GetFollowersAndFollowingData?userid=${id}`)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+export const GetUserPostsData = createAsyncThunk('GetUserPostsData', async ({ userid }) => {
+    try {
+        const res = await UsersInstance.get(`/GetUserPostsData?userid=${userid}`)
+        return res.data
+    } catch (error) {
+        console.error(error)
+    }
+})
+
 export const AddFriends = createAsyncThunk('AddFriends', async ({ data }) => {
     try {
         const res = await UsersInstance.post('/SendRequest', { data })
@@ -89,9 +107,9 @@ const initialState = {
     Friends: [],
     RecieveRequests: [],
     BlockedUser: [],
-    ImagesData : [],
-    FollowersData : [],
-    FollowingData : [],
+    ImagesData: [],
+    FollowersData: [],
+    FollowingData: [],
     IsSearchLoading: false,
     IsUserSearchLoading: false,
     AddFriendsLoading: false,
@@ -126,14 +144,36 @@ const UserReducer = createSlice({
         builder.addCase(GetSingleUser.fulfilled, (state, action) => {
             state.SingleUser = action.payload?.user
             state.ImagesData = action.payload?.UserImagesUploadData,
-            state.FollowersData = action.payload.UserFollowerData,
-            state.FollowingData = action.payload.UserFollowingData,
-            state.IsUserFriends = action.payload?.relation
+                state.IsUserFriends = action.payload?.relation
             state.UsersRelation = action.payload?.relationshipStatus
             state.senderid = action.payload?.sender?.sender_id
             state.IsUserSearchLoading = false
         })
         builder.addCase(GetSingleUser.rejected, (state, action) => {
+            state.IsUserSearchLoading = false
+        })
+        builder.addCase(GetFollowerAndFollowingData.pending, (state, action) => {
+            state.IsUserSearchLoading = true
+        })
+        builder.addCase(GetFollowerAndFollowingData.fulfilled, (state, action) => {
+            state.FollowersData = action.payload.UserFollowerData,
+                state.FollowingData = action.payload.UserFollowingData
+            state.IsUserSearchLoading = false
+        })
+        builder.addCase(GetFollowerAndFollowingData.rejected, (state, action) => {
+            state.IsUserSearchLoading = false
+        })
+
+        builder.addCase(GetUserPostsData.pending, (state, action) => {
+            state.IsUserSearchLoading = true
+        })
+
+        builder.addCase(GetUserPostsData.fulfilled, (state, action) => {
+            state.ImagesData = action.payload?.UserImagesUploadData
+            state.IsUserSearchLoading = false
+        })
+
+        builder.addCase(GetUserPostsData.rejected, (state, action) => {
             state.IsUserSearchLoading = false
         })
 

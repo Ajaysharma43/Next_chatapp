@@ -4,7 +4,7 @@ import Image from "next/image"
 import { Heart, MessageCircle } from "lucide-react"
 import Link from "next/link"
 
-const SingleUserPostsData = ({ userid, UserPosts }) => {
+const SingleUserPostsData = ({ userid, UserPosts , id }) => {
     return (
         <div className="w-full mt-6 grid grid-cols-3 gap-1 sm:gap-2">
             {UserPosts?.length === 0 ? (
@@ -19,7 +19,7 @@ const SingleUserPostsData = ({ userid, UserPosts }) => {
                                         key={post.image_id}
                                         className="relative group aspect-square bg-gray-200 overflow-hidden"
                                     >
-                                        <Link href={'/profile/posts'}>
+                                        <Link href={`/singleuser/${id}/posts`}>
                                             <Image
                                                 src={post.image_url}
                                                 alt={post.name}

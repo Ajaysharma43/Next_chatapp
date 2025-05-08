@@ -15,7 +15,7 @@ import {
 import UserFollowers from "@/Components/ProfilePageComponents/UserFollowers";
 import UserFollowing from "@/Components/ProfilePageComponents/UserFollowing";
 import { useParams } from "next/navigation";
-import { GetSingleUser } from "@/Redux/features/UserSlice";
+import { GetFollowerAndFollowingData, GetSingleUser } from "@/Redux/features/UserSlice";
 
 function TabPanel({ children, value, index }) {
     return (
@@ -39,7 +39,7 @@ const UserFriends = () => {
         try {
             const decode = jwtDecode(token);
             setUserid(decode.id);
-            dispatch(GetSingleUser({ currentUserId: decode.id , id }));
+            dispatch(GetFollowerAndFollowingData({ id }));
         } catch (error) {
             console.error("Invalid token:", error);
         } finally {
